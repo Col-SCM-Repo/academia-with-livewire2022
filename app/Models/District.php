@@ -15,6 +15,6 @@ class District extends Model
 
     public function entities()
     {
-        return $this->hasMany('App\Entity');
+        return $this->hasMany(Entity::class);
     }
 }

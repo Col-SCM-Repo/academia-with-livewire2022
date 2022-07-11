@@ -10,16 +10,16 @@ class Student extends Model
 
     public function entity()
     {
-        return $this->belongsTo('App\Entity');
+        return $this->belongsTo(Entity::class);
     }
 
     public function school()
     {
-        return $this->belongsTo('App\School');
+        return $this->belongsTo(School::class);
     }
 
     public function enrollment()
     {
-        return $this->hasOne('App\Enrollment');
+        return $this->hasOne(Enrollment::class);
     }
 }

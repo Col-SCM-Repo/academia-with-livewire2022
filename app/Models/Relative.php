@@ -6,10 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Relative extends Model
 {
-    //
-
     public function entity()
     {
-        return $this->belongsTo('App\Entity');
+        return $this->belongsTo(Entity::class);
     }
 }

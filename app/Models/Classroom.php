@@ -10,12 +10,12 @@ class Classroom extends Model
 
     public function level()
     {
-        return $this->belongsTo('App\Level');
+        return $this->belongsTo(Level::class);
     }
 
     public function enrollments()
     {
-        return $this->hasMany('App\Enrollment');
+        return $this->hasMany(Enrollment::class);
     }
 
     // public function full_description(){

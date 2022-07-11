@@ -6,10 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class School extends Model
 {
-    //
-
     public function district()
     {
-        return $this->belongsTo('App\District');
+        return $this->belongsTo(District::class);
     }
 }

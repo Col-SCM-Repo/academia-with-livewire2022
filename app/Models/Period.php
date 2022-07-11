@@ -9,23 +9,20 @@ class Period extends Model
     protected $table = 'periods';
     protected $primaryKey = 'id';
 
-    //
-
     public function levels()
     {
-        return $this->hasMany('App\Level');
+        return $this->hasMany(Level::class);
     }
 
     public function classrooms()
     {
-        return $this->hasManyThrough('App\Classroom', 'App\Level');
+        return $this->hasManyThrough(Classroom::class, Level::class);
     }
 
     public function enrollments()
     {
-        return $this->hasManyThrough('App\Enrollment', 'App\Classroom');
+        return $this->hasManyThrough(Enrollment::class, Classroom::class);
     }
-
 
     protected $fillable = [
         'id',

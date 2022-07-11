@@ -13,17 +13,17 @@ class Installment extends Model
 
     public function payments()
     {
-        return $this->hasMany('App\Payment')->where('type', '=', 'ticket');
+        return $this->hasMany(Payment::class)->where('type', '=', 'ticket');
     }
 
     public function note_payments()
     {
-        return $this->hasMany('App\Payment')->where('type', '=', 'note');
+        return $this->hasMany(Payment::class)->where('type', '=', 'note');
     }
 
     public function enrollment()
     {
-        return $this->belongsTo('App\Enrollment');
+        return $this->belongsTo(Enrollment::class);
     }
 
     public function balance()

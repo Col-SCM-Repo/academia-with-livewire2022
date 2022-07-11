@@ -6,29 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entity extends Model
 {
-    //
-
     public function district()
     {
-        return $this->belongsTo('App\District');
+        return $this->belongsTo(District::class);
     }
-
-
-
 
     public function student()
     {
-        return $this->hasOne('App\Student');
+        return $this->hasOne(Student::class);
     }
 
     public function relative()
     {
-        return $this->hasOne('App\Relative');
+        return $this->hasOne(Relative::class);
     }
 
     public function user()
     {
-        return $this->hasOne('App\User');
+        return $this->hasOne(User::class);
     }
 
     public function full_name()

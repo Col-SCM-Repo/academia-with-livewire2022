@@ -9,6 +9,6 @@ class Group extends Model
 
     public function careers()
     {
-        return $this->hasMany('App\Career');
+        return $this->hasMany(Career::class);
     }
 }

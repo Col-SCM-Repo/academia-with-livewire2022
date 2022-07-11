@@ -13,32 +13,32 @@ class Enrollment extends Model
 
     public function installments()
     {
-        return $this->hasMany('App\Installment')->where('state', null);
+        return $this->hasMany(installments::class)->where('state', null);
     }
 
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo(User::class);
     }
 
     public function student()
     {
-        return $this->belongsTo('App\Student');
+        return $this->belongsTo(Student::class);
     }
 
     public function career()
     {
-        return $this->belongsTo('App\Career');
+        return $this->belongsTo(Career::class);
     }
 
     public function relative()
     {
-        return $this->belongsTo('App\Relative');
+        return $this->belongsTo(Relative::class);
     }
 
     public function classroom()
     {
-        return $this->belongsTo('App\Classroom');
+        return $this->belongsTo(Classroom::class);
     }
 
     public function balance()

@@ -10,21 +10,21 @@ class Payment extends Model
 
     public function installment()
     {
-        return $this->belongsTo('App\Installment');
+        return $this->belongsTo(Installment::class);
     }
 
     public function payment()
     {
-        return $this->belongsTo('App\Payment');
+        return $this->belongsTo(Payment::class);
     }
 
     public function notes()
     {
-        return $this->hasMany('App\Payment');
+        return $this->hasMany(Payment::class);
     }
 
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo(User::class);
     }
 }

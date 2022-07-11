@@ -19,8 +19,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'entity_id',
+        'username',
         'email',
         'password',
+        'type',
+        'status',
     ];
 
     /**
@@ -41,4 +45,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function entity()
+    {
+        return $this->belongsTo(Entity::class);
+    }
 }

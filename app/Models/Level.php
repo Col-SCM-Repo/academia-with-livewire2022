@@ -10,21 +10,21 @@ class Level extends Model
 
     public function period()
     {
-        return $this->belongsTo('App\Period');
+        return $this->belongsTo(Period::class);
     }
 
     public function classrooms()
     {
-        return $this->hasMany('App\Classroom');
+        return $this->hasMany(Classroom::class);
     }
 
     public function level_type()
     {
-        return $this->belongsTo('App\Type_code', 'type_id');
+        return $this->belongsTo(Type_code::class, 'type_id');
     }
 
     public function enrollments()
     {
-        return $this->hasManyThrough('App\Enrollment', 'App\Classroom');
+        return $this->hasManyThrough(Enrollment::class, Classroom::class);
     }
 }

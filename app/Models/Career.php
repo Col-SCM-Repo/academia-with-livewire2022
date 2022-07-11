@@ -9,11 +9,11 @@ class Career extends Model
 
     public function group()
     {
-        return $this->belongsTo('App\Group');
+        return $this->belongsTo(Group::class);
     }
 
     public function enrollments()
     {
-        return $this->hasMany('App\Enrollment');
+        return $this->hasMany(Enrollment::class);
     }
 }
