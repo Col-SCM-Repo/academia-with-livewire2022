@@ -1,80 +1,126 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ACADEMIA | Main</title>
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="{{ asset('inspinia_admin/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('inspinia_admin/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+    <!-- Toastr style -->
+    <link href="{{ asset('inspinia_admin/css/plugins/toastr/toastr.min.css') }}" rel="stylesheet">
+    <!-- Gritter -->
+    <link href="{{ asset('inspinia_admin/js/plugins/gritter/jquery.gritter.css') }}" rel="stylesheet">
+    <link href="{{ asset('inspinia_admin/css/animate.css') }}" rel="stylesheet">
+    <link href="{{ asset('inspinia_admin/css/style.css') }}" rel="stylesheet">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    
+    @livewireStyles
+    @stack('styles')
 </head>
 <body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav mr-auto">
-
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
+    <div id="wrapper">
+        @include('layouts.partials.side_nav_app')
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            <div class="row border-bottom">
+                @include('layouts.partials.top_nav_app')
+            </div>
+            <div class="row  border-bottom white-bg dashboard-header">
+                @yield('header')
+                <div class="col-md-3">
+                    <h2>Welcome Amelia</h2>
+                    <small>You have 42 messages and 6 notifications.</small>
                 </div>
             </div>
-        </nav>
-
-        <main class="py-4">
-            @yield('content')
-        </main>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="wrapper wrapper-content">
+                    @yield('content')
+                </div>
+                @include('layouts.partials.footer')
+            </div>
+        </div>
     </div>
+
+    <!-- Mainly scripts -->
+    <script src="{{ asset('inspinia_admin/js/jquery-3.1.1.min.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/slimscroll/jquery.slimscroll.min.js') }}"></script>
+
+    <!-- Flot -->
+    <script src="{{ asset('inspinia_admin/js/plugins/flot/jquery.flot.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/flot/jquery.flot.tooltip.min.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/flot/jquery.flot.spline.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/flot/jquery.flot.resize.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/flot/jquery.flot.pie.js') }}"></script>
+
+    <!-- Peity -->
+    <script src="{{ asset('inspinia_admin/js/plugins/peity/jquery.peity.min.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/demo/peity-demo.js') }}"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="{{ asset('inspinia_admin/js/inspinia.js') }}"></script>
+    <script src="{{ asset('inpinia_admin/js/plugins/pace/pace.min.js') }}"></script>
+
+    <!-- jQuery UI -->
+    <script src="{{ asset('inspinia_admin/js/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+
+    <!-- GITTER -->
+    <script src="{{ asset('inspinia_admin/js/plugins/gritter/jquery.gritter.min.js') }}"></script>
+
+    <!-- Toastr -->
+    <script src="{{ asset('inspinia_admin/js/plugins/toastr/toastr.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    showMethod: 'slideDown',
+                    timeOut: 4000
+                };
+                toastr.success('Responsive Admin Theme', 'Welcome to INSPINIA');
+
+            }, 1300);
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('.sidebar-collapse').slimscroll({
+                height: '100%',
+                railOpacity: 0.9
+            });
+        });
+    </script>
+    @stack('scripts')
+    @livewireScripts
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

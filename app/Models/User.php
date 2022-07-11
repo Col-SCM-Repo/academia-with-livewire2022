@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Entity::class);
     }
+
+    public function nombreCompleto()
+    {
+        return \Str::upper($this->entity->name . ' ' . $this->entity->father_lastname . ' ' . $this->entity->mother_lastname);
+    }
 }

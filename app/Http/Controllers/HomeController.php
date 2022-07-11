@@ -11,8 +11,26 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function dashboard()
     {
-        return view('home');
+        return view('index');
+    }
+
+    // matriculas
+    public function matriculas()
+    {
+        return "matriculas";
+    }
+
+    // mantenimiento
+    public function mantenimiento()
+    {
+        return "mantenimiento";
+    }
+
+    // reportes
+    public function reportes()
+    {
+        return "reportes";
     }
 }

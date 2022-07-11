@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Livewire\Mantenimiento\CiclosYAulas;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -13,130 +15,31 @@ Route::get('/', [AdministratorController::class, 'showLoginForm']);
 Route::get('/dni/{dni}', [AdministratorController::class, 'dni']);
 Route::get('/quertium/{dni}', [AdministratorController::class, 'quertium']);
 
-
 Auth::routes();
 
-// Rutas Generales
-Route::get('/main', [EnrollmentController::class, 'main'])->middleware('auth');
-Route::get('/test', [PaymentController::class, 'test'])->middleware('auth');
+Route::get('/main', [HomeController::class, 'dashboard'])->name('dashboard');
 
-
-
-/********************** Busquedas (aoutocompletado) *********************/
-Route::get('/search-ie', 'SchoolController@search_ie')->middleware('auth');
-Route::get('/search-career', 'CareerController@search_career')->middleware('auth');
-Route::get('/search-relative', 'RelativeController@search_relative')->middleware('auth');
-Route::get('/search-classroom', 'ClassroomController@search_classroom')->middleware('auth');
-Route::get('/search-district', 'AdministratorController@search_district')->middleware('auth');
-Route::get('/search-student', 'StudentController@search_student')->middleware('auth');
-
-
-/******************* Modulo de  Matricula  *******************/
 Route::middleware(['auth'])->prefix('matricula')->group(function () {
-    /******************************* Enrollemnt **************************/
-    Route::get('/nueva-matricula', [EnrollmentController::class, 'create']);
-    Route::post('/registrar-matricula', [EnrollmentController::class, 'store']);
-    Route::get('/buscar-matricula/{param}', [EnrollmentController::class, 'search_enrollment']);
-    Route::get('/editar-matricula/{id}', [EnrollmentController::class, 'edit']);
-    //Route::post('/actualizar-matricula', 'EnrollmentController@update')->middleware('auth');
-    Route::get('/buscar-matricula/{param}', [EnrollmentController::class, 'search_enrollment']);
-
-    Route::post('/retirar', [EnrollmentController::class, 'cancel']);
-
-    Route::post('informacion-matricula', 'EnrollmentController@getEnrollment');
-    Route::post('updateMatricula/{id}', 'EnrollmentController@updateMatricula');
-    Route::post('updateAlumno/{matriculaId}', 'EnrollmentController@updateAlumno');
-    Route::post('updateApoderado/{matriculaId}', 'EnrollmentController@updateApoderado');
-    Route::get('installment-info/{matriculaId}', 'InstallmentController@installmentsInfo');
+    Route::get('/', [HomeController::class, 'matriculas'])->name('matricula');
+    Route::get('/nueva', [HomeController::class, 'matriculas'])->name('matricula.nueva');
 });
 
-// Pagos
-Route::middleware(['auth'])->prefix('pagos')->group(function () {
-    Route::get('/control-cuotas/{enrollment_id}', 'InstallmentController@installments_control_view');
-    Route::get('/agregar-pago/{installment_id}', 'PaymentController@create');
-    Route::post('/registrar', 'PaymentController@store');
-    Route::get('/historial/{installment_id}', 'PaymentController@history');
-    Route::get('/documento-de-pago', 'PaymentController@payment_document_pdf');
+Route::middleware(['auth'])->prefix('mantenimiento')->group(function () {
+    Route::get('/ciclos-aulas', [HomeController::class, 'mantenimiento'])->name('mantenimiento');
+    Route::get('/alumnos', [HomeController::class, 'mantenimiento'])->name('mantenimiento');
 });
 
-
-// Periodo 
-Route::middleware(['auth'])->prefix('periodo-academico')->group(function () {
-    Route::get('/ciclos', 'PeriodController@index');
-    Route::get('/ciclos-listado', 'PeriodController@listing');
-    Route::get('/nuevo-ciclo', 'PeriodController@create');
-    Route::post('/registrar-ciclo', 'PeriodController@store');
-    Route::get('/ciclos/editar/{id}', 'PeriodController@edit');
-    Route::post('/actualizar-ciclo', 'PeriodController@update');
-
-    Route::post('/cambiar-estado-ciclo', 'PeriodController@status');
-});
-
-Route::middleware(['auth'])->prefix('aulas')->group(function () {
-    Route::get('/aulas/listado/{level_id}', 'ClassroomController@listing')->middleware('auth');
-    Route::post('/aulas/eliminar', 'ClassroomController@destroy')->middleware('auth');
-
-    Route::get('/aulas/nueva/{level_id}', 'ClassroomController@create')->middleware('auth');
-    Route::post('/aulas/registrar', 'ClassroomController@store')->middleware('auth');
-
-    Route::get('/ie/nueva/', 'SchoolController@create')->middleware('auth');
-    Route::post('/ie/registrar', 'SchoolController@store')->middleware('auth');
-
-    Route::get('/levels/filter-by-period', 'PeriodController@level_per_period')->middleware('auth');
-
-    Route::get('/classrooms/filter-by-level', 'ClassroomController@classroom_per_level')->middleware('auth');
-});
-
-/************************************ API - AULAS ************************************/
-Route::middleware(['auth'])->prefix('info-general')->group(function () {
-    Route::get('niveles', 'PeriodController@nivelesGet');
-    Route::get('aulas/{id}', 'PeriodController@aulasGet');
-    //Route::get('/niveles', 'StudentController@otro');
-});
-
-/************************************ Reportes ************************************/
 Route::middleware(['auth'])->prefix('reportes')->group(function () {
-    Route::get('/estudiantes-por-aula', 'StudentController@classroom_students_report');
-    Route::post('/estudiantes-por-aula/buscar', 'StudentController@do_classroom_students');
-
-    Route::get('/recaudo-por-usuario', 'PaymentController@users_collection_report');
-    Route::post('/recaudo-por-usuario/buscar', 'PaymentController@do_users_collection');
-
-    Route::get('/Alumnos-por-ciclo', 'EnrollmentController@period_enrollments_report');
-    Route::post('/Alumnos-por-ciclo/buscar', 'EnrollmentController@do_period_enrollments');
-
-    //Route::get('/reportes/prueba','HomeController@prueba')->middleware('auth');
-    Route::get('/ficha-matricula-download/{id}', 'ReportController@fichaMatricula');
-
-    Route::get('/info-alumnos-apoderados', 'ReportController@alumnos_y_apoderados');
-    Route::get('/descargar-info-alumnos-apoderados/{id}/{descargar?}', 'ReportController@show_alumnos_y_apoderados');
-
-    //:::::::::::::::::: Reportes Incidentes ::::::::::::::::::
-    Route::get('/incidentes', 'ReportController@reportIncidentes');
-    Route::post('/incidentes/general', 'ReportController@incidentesGeneral');
-    Route::post('/incidentes/especifico', 'ReportController@incidentesEspecifico');
+    Route::get('/', [HomeController::class, 'reportes'])->name('reportes');
 });
 
-/********** Rutas modulo de Incidencias **********/
-Route::middleware(['auth'])->prefix('incidentes')->group(function () {
-    Route::get('/search-incidentes', 'IncidenteController@search');
-    Route::get('/search-incidentes/{param}', 'IncidenteController@search_enrollment');
-    Route::get('/info-incidentes/{id_enrollment}', 'IncidenteController@infoIncidentes');
-    Route::post('/report-download', 'IncidenteController@reportIncidentes');
-
-    Route::get('/{id}', 'IncidenteController@index');
-    Route::post('/', 'IncidenteController@store');
-    Route::put('/{id}', 'IncidenteController@update');
-    Route::delete('/{id}', 'IncidenteController@destroy');
+Route::middleware(['auth'])->prefix('incidencias')->group(function () {
+    Route::get('/', [HomeController::class, 'incidencias'])->name('incidencias');
 });
 
-/********** Rutas modulo de Incidencias - evidencias **********/
-Route::middleware(['auth'])->prefix('evidencias')->group(function () {
-    Route::post('/', 'EvidenciaController@store');
-    Route::put('/{id}', 'EvidenciaController@update');
-    Route::delete('/{id}', 'EvidenciaController@destroy');
-    Route::get('/{id}', 'EvidenciaController@index'); // Id de incidente
-});
+
+
+
 
 // php info
 Route::get('/phpinfo', function () {
