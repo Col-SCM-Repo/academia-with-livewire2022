@@ -26,9 +26,11 @@
             <li>
                 <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Matricula</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li><a href="">Buscar</a></li>
-                    <li><a href="">Nueva matricula</a></li>
-                    <li><a href="">Pagos</a></li>
+                    <li><a href="{{ route('matricula.buscar') }}">Buscar</a></li>
+                    <li><a href="{{ route('matricula.nueva') }}">Nueva</a></li>
+                    <li><a href="{{ route('matricula.pagos') }}">Pagos</a></li>
+                    <li><a href="{{ route('matricula.alumno') }}">Alumnos</a></li>
+                    <li><a href="{{ route('matricula.apoderado') }}">Apoderados</a></li>
                 </ul>
             </li>
             <li>

@@ -28,15 +28,12 @@
             </div>
             <div class="row  border-bottom white-bg dashboard-header">
                 @yield('header')
-                <div class="col-md-3">
-                    <h2>Welcome Amelia</h2>
-                    <small>You have 42 messages and 6 notifications.</small>
-                </div>
             </div>
         <div class="row">
             <div class="col-lg-12">
-                <div class="wrapper wrapper-content">
+                <div class="wrapper wrapper-content animated fadeInRight">
                     @yield('content')
+                    {{ $slot }}
                 </div>
                 @include('layouts.partials.footer')
             </div>
@@ -62,7 +59,7 @@
 
     <!-- Custom and plugin javascript -->
     <script src="{{ asset('inspinia_admin/js/inspinia.js') }}"></script>
-    <script src="{{ asset('inpinia_admin/js/plugins/pace/pace.min.js') }}"></script>
+    <script src="{{ asset('inspinia_admin/js/plugins/pace/pace.min.js') }}"></script>
 
     <!-- jQuery UI -->
     <script src="{{ asset('inspinia_admin/js/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
@@ -73,7 +70,7 @@
     <!-- Toastr -->
     <script src="{{ asset('inspinia_admin/js/plugins/toastr/toastr.min.js') }}"></script>
 
-    <script>
+    {{-- <script>
         $(document).ready(function() {
             setTimeout(function() {
                 toastr.options = {
@@ -86,7 +83,7 @@
 
             }, 1300);
         });
-    </script>
+    </script> --}}
 
     <script>
         $(document).ready(function () {
