@@ -8,8 +8,13 @@
                     </div>
                     <br>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                    <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Academia Preuniversitaria Cabrera</strong>
-                    </span> <span class="text-muted text-xs block text-capitalize"> {{ Auth::user()->type }} <b class="caret"></b></span> </span> </a>
+                        <span class="clear"> 
+                            <span class="block m-t-xs"> 
+                                <strong class="font-bold">Academia Preuniversitaria Cabrera</strong>
+                            </span> 
+                            <span class="text-muted text-xs block text-capitalize"> {{ Auth::user()->type }} <b class="caret"></b></span> 
+                        </span> 
+                    </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
                         <li><a href="profile.html">Perfil</a></li>
                         <li class="divider"></li>
@@ -21,10 +26,14 @@
                 </div>
             </li>
             <li>
-                <a href="layouts.html"><i class="fa fa-diamond"></i> <span class="nav-label">Dashboard</span></a>
+                <a href="layouts.html">
+                    <i class="fa fa-diamond"></i> <span class="nav-label">Dashboard</span>
+                </a>
             </li>
             <li>
-                <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Matricula</span> <span class="fa arrow"></span></a>
+                <a href="index.html">
+                    <i class="fa fa-th-large"></i> <span class="nav-label">Matricula</span> <span class="fa arrow"></span>
+                </a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ route('matricula.buscar') }}">Buscar</a></li>
                     <li><a href="{{ route('matricula.nueva') }}">Nueva</a></li>
@@ -34,7 +43,9 @@
                 </ul>
             </li>
             <li>
-                <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Evaluaciones</span> <span class="fa arrow"></span></a>
+                <a href="index.html">
+                    <i class="fa fa-th-large"></i> <span class="nav-label">Evaluaciones</span> <span class="fa arrow"></span>
+                </a>
                 <ul class="nav nav-second-level">
                     <li><a href="">Option 1</a></li>
                     <li><a href="">Option 2</a></li>
@@ -42,7 +53,9 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Mantenimiento</span><span class="fa arrow"></span></a>
+                <a href="#">
+                    <i class="fa fa-bar-chart-o"></i> <span class="nav-label">Mantenimiento</span> <span class="fa arrow"></span>
+                </a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="">Ciclos y aulas</a></li>
                     <li><a href="">Usuarios</a></li>
@@ -50,7 +63,9 @@
                 </ul>
             </li>
             <li>
-                <a href="mailbox.html"><i class="fa fa-envelope"></i> <span class="nav-label">Reportes </span><span class="label label-warning pull-right">16/24</span></a>
+                <a href="mailbox.html">
+                    <i class="fa fa-envelope"></i> <span class="nav-label">Reportes </span><span class="label label-warning pull-right">16/24</span>
+                </a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="">Alumnos por aula</a></li>
                     <li><a href="">Recaudado por usuario</a></li>
@@ -59,39 +74,14 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">Incidencias</span><span class="fa arrow"></span></a>
+                <a href="#">
+                    <i class="fa fa-edit"></i> <span class="nav-label">Incidencias</span><span class="fa arrow"></span>
+                </a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="">Incidencias</a></li>
                     <li><a href="">Reportes</a></li>
                 </ul>
             </li>
-            
-            {{-- <li>
-                <a href="#"><i class="fa fa-sitemap"></i> <span class="nav-label">Menu Levels </span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li>
-                        <a href="#" id="damian">Third Level <span class="fa arrow"></span></a>
-                        <ul class="nav nav-third-level">
-                            <li>
-                                <a href="#">Third Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level Item</a>
-                            </li>
-
-                        </ul>
-                    </li>
-                    <li><a href="#">Second Level Item</a></li>
-                    <li>
-                        <a href="#">Second Level Item</a></li>
-                    <li>
-                        <a href="#">Second Level Item</a></li>
-                </ul>
-            </li> --}}
         </ul>
-
     </div>
 </nav>

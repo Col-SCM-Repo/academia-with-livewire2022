@@ -19,11 +19,28 @@
     @push('styles')
         <link href="{{ asset('inspinia_admin/css/plugins/iCheck/custom.css') }}" rel="stylesheet">
         <link href="{{ asset('inspinia_admin/css/plugins/steps/jquery.steps.css') }}" rel="stylesheet">
+
+        <style>
+            .wizard .content {
+                min-height: 100px;
+            }
+            .wizard .content > .body {
+                width: 100%;
+                height: auto;
+                padding: 15px;
+                position: absolute;
+            }
+            .wizard .content .body.current {
+                position: relative;
+            }
+
+        </style>
+
     @endpush
 
-    <div class="row">
+    <div class="row" >
         <div class="col-lg-12">
-            <div class="ibox">
+            <div class="ibox" style="min-width: 60vh;">
                 <div class="ibox-content">
                     <div id="wizard">
                         <h1>Crear alumno</h1>

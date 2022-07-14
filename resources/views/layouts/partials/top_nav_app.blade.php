@@ -7,17 +7,15 @@
             </div>
         </form>
     </div>
-        <ul class="nav navbar-top-links navbar-right">
-            <li>
-                <span class="m-r-sm text-muted welcome-message">Bienvenido, {{ Auth::user()->nombreCompleto() }} .</span>
-            </li>
-            
+    <ul class="nav navbar-top-links navbar-right">
+        <li>
+            <span class="m-r-sm text-muted welcome-message"> Bienvenido, {{ Auth::user()->nombreCompleto() }} .</span>
+        </li>
+        <li>
+            <a href="login.html">
+                <i class="fa fa-sign-out"></i> Cerrar Sesión
+            </a>
+        </li>
+    </ul>
+</nav>
 
-            <li>
-                <a href="login.html">
-                    <i class="fa fa-sign-out"></i> Cerrar Sesión
-                </a>
-            </li>
-        </ul>
-
-    </nav>

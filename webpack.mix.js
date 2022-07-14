@@ -14,10 +14,10 @@ const mix = require("laravel-mix");
 mix.js("resources/js/app.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .sourceMaps();
-
+/* 
 //Enrollment
 mix.js("resources/js/enrollment/create.js", "public/js/enrollment/create.js");
 mix.js("resources/js/enrollment/edit.js", "public/js/enrollment/edit.js");
 
 //Incidentes
-mix.js("resources/js/incidentes/index.js", "public/js/incidentes/index.js");
+mix.js("resources/js/incidentes/index.js", "public/js/incidentes/index.js"); */
