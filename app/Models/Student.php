@@ -3,10 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    //
+    use SoftDeletes;
+
+    protected $fillable = [
+        'entity_id',
+        'school_id',
+        'graduation_year',
+        'photo_file',
+    ];
 
     public function entity()
     {

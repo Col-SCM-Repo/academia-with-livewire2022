@@ -18,6 +18,7 @@ class CreateDistrictsTable extends Migration
 			$table->bigInteger('id', true)->unsigned();
 			$table->string('name');
 			$table->bigInteger('province_id')->unsigned()->index('districts_province_id_foreign');
+			$table->timestamps();
 		});
 	}
 

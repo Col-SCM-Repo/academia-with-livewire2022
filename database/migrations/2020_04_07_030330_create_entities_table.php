@@ -32,6 +32,7 @@ class CreateEntitiesTable extends Migration
 			$table->enum('marital_status', array('single', 'married', 'divorcied', 'widower'))->nullable();
 			$table->enum('instruction_degree', array('none', 'elementary_school', 'high_school', 'universitary_education'))->nullable();
 			$table->string('photo_path', 100)->default('avatar_default.png');
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

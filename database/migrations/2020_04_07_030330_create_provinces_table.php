@@ -18,6 +18,7 @@ class CreateProvincesTable extends Migration
 			$table->bigInteger('id', true)->unsigned();
 			$table->string('name');
 			$table->bigInteger('state_id')->unsigned()->index('provinces_state_id_foreign');
+			$table->timestamps();
 		});
 	}
 

@@ -24,6 +24,7 @@ class CreatePaymentsTable extends Migration
 			$table->bigInteger('payment_id')->nullable()->index('FK_payments_payments');
 			$table->string('serie', 50)->nullable();
 			$table->string('numeration', 50)->nullable();
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

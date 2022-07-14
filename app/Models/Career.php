@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Career extends Model
 {
+    protected $fillable = [
+        'group_id',
+        'career',
+        'nmonico',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
     public function group()
     {

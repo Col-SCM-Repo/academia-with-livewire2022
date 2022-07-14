@@ -3,9 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Entity extends Model
 {
+    use SoftDeletes;
+
+    protected $fillable = [
+        'father_lastname',
+        'mother_lastname',
+        'name',
+        'address',
+        'district_id',
+        'telephone',
+        'mobile_phone',
+        'email',
+        'birth_date',
+        'gender',
+        'country_id',
+        'document_type',
+        'document_number',
+        'marital_status',
+        'instruction_degree',
+        'photo_path',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function district()
     {
         return $this->belongsTo(District::class);

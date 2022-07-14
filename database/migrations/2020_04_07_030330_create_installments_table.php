@@ -21,6 +21,8 @@ class CreateInstallmentsTable extends Migration
 			$table->enum('type', array('enrollment', 'installment'));
 			$table->decimal('amount', 10);
 			$table->string('state')->nullable();
+			$table->softDeletes();
+			$table->timestamps();
 		});
 	}
 

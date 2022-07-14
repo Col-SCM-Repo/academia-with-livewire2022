@@ -20,6 +20,7 @@ class CreateStudentsTable extends Migration
 			$table->bigInteger('school_id')->unsigned()->index('FK_students_schools');
 			$table->integer('graduation_year');
 			$table->text('photo_file', 65535);
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

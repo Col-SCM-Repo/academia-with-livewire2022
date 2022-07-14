@@ -3,13 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Enrollment extends Model
 {
-    //
+    use SoftDeletes;
+
     protected $table = 'enrollments';
     protected $primaryKey = 'id';
     //public $timestamps = false;
+
+    protected $fillable = [
+        'id',
+        'code',
+        'type',
+        'student_id',
+        'classroom_id',
+        'relative_id',
+        'relative_relationship',
+        'user_id',
+        'career_id',
+        'paymennt_type',
+        'fees_quantity',
+        'period_cost',
+        'cancelled',
+        'observations'
+    ];
+
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at'
+    ];
 
     public function installments()
     {
@@ -70,26 +93,6 @@ class Enrollment extends Model
         }
         return $current_date <= $this->classroom->level->end_date ? 'Vigente' : 'Concluida';
     }
-    protected $fillable = [
-        'id',
-        'code',
-        'type',
-        'student_id',
-        'classroom_id',
-        'relative_id',
-        'relative_relationship',
-        'user_id',
-        'career_id',
-        'paymennt_type',
-        'fees_quantity',
-        'period_cost',
-        'cancelled',
-        'observations'
-    ];
-
-    protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at'
-    ];
 
     public function incidentes()
     {

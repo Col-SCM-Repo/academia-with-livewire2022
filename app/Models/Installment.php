@@ -3,13 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Installment extends Model
 {
     //
+    use SoftDeletes;
+
     protected $table = 'installments';
     protected $primaryKey = 'id';
-    public $timestamps = false;
+
+    protected $fillable = [
+        'enrollment_id',
+        'order',
+        'type',
+        'amount',
+        'state',
+    ];
 
     public function payments()
     {

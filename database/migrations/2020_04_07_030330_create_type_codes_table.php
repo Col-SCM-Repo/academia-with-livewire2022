@@ -18,6 +18,7 @@ class CreateTypeCodesTable extends Migration
 			$table->bigInteger('id', true);
 			$table->text('description', 65535)->nullable();
 			$table->text('type', 65535)->nullable();
+			$table->timestamps();
 		});
 	}
 

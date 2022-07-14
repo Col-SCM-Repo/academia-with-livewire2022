@@ -9,9 +9,10 @@ class Alumno extends Component
 
     public $id_alumno;
 
+    public $dni, $f_nac, $telefono, $distrito, $direccion, $nombres, $ap_paterno, $Ie_procedencia, $anio_egreso, $ap_materno, $sexo, $pais;
 
+    public $lista_distritos, $lista_ie_procedencia, $lista_paises;
 
-    public $dni, $f_nac, $telefono, $distrito, $direccion, $nombres, $ap_paterno, $Ie_procedencia, $anio_egreso, $ap_materno;
 
     public function initialState()
     {
@@ -40,6 +41,18 @@ class Alumno extends Component
 
     public function create()
     {
+        $this->validate([
+            $this->dni => "required | string | min: 4",
+            $this->f_nac => "required | string | min: 4",
+            $this->telefono => "required | string | min: 4",
+            $this->distrito => "required | string ",
+            $this->direccion => "required | string | min: 4",
+            $this->nombres => "required | string | min: 4",
+            $this->ap_paterno => "required | string | min: 4",
+            $this->ap_materno => "required | string | min: 4",
+            $this->Ie_procedencia => "required | string | min: 4",
+            $this->anio_egreso => "required | string | min: 4",
+        ]);
     }
 
     public function update()

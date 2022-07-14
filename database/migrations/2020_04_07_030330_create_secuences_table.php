@@ -21,6 +21,7 @@ class CreateSecuencesTable extends Migration
 			$table->integer('length')->nullable();
 			$table->integer('current')->nullable()->default(1);
 			$table->integer('status')->nullable();
+			$table->timestamps();
 		});
 	}
 

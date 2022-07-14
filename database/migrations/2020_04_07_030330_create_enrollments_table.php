@@ -30,6 +30,7 @@ class CreateEnrollmentsTable extends Migration
 			$table->decimal('period_cost', 10);
 			$table->integer('cancelled')->default(0);
 			$table->text('observations', 65535)->nullable();
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

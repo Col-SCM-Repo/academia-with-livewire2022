@@ -18,6 +18,7 @@ class CreateCountriesTable extends Migration
 			$table->bigInteger('id', true)->unsigned();
 			$table->string('name');
 			$table->string('code');
+			$table->timestamps();
 		});
 	}
 

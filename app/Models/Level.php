@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Level extends Model
 {
     //
+    protected $fillable = [
+        'type_id',
+        'period_id',
+        'start_date',
+        'end_date',
+        'price',
+    ];
 
     public function period()
     {
