@@ -6,29 +6,29 @@ use App\Models\Country;
 
 class CountryEJB extends Country
 {
-    public function buscarPais($param)
+    public function buscarPais($nombrePais)
     {
-        return Country::where('name', $param)
-            ->orWhere('code', $param)
+        return Country::where('name', $nombrePais)
+            ->orWhere('code', $nombrePais)
             ->firts();
     }
 
-    public function registrarPais($nombre, $codigoPais)
+    public function registrarPais($nombrePais, $codigoPais)
     {
-        $pais = self::buscarPais($nombre);
+        $pais = self::buscarPais($nombrePais);
         if (!$pais) {
             $pais = new Country();
-            $pais->name = $nombre;
+            $pais->name = $nombrePais;
             $pais->code = $codigoPais;
             $pais->save();
         }
         return $pais;
     }
 
-    public function obtenerIdPais($nombre)
+    public function obtenerIdPais($nombrePais)
     {
         // Solo puede encontrar el ID del pais (no crea)
-        $pais = self::buscarPais($nombre);
+        $pais = self::buscarPais($nombrePais);
         return $pais ? $pais->id : null;
     }
 
