@@ -14,6 +14,7 @@
         <link href="{{ asset('inspinia_admin/css/animate.css') }}" rel="stylesheet">
         <link href="{{ asset('inspinia_admin/css/style.css') }}" rel="stylesheet">
 
+        <link href="{{ asset('inspinia_admin/css/plugins/iCheck/custom.css') }}" rel="stylesheet">
         @livewireStyles
         @stack('styles')
     </head>
@@ -69,6 +70,8 @@
         <!-- Toastr -->
         <script src="{{ asset('inspinia_admin/js/plugins/toastr/toastr.min.js') }}"></script>
 
+        <script src="{{ asset('inspinia_admin/js/plugins/iCheck/icheck.min.js') }}"></script>
+        
         <!-- Application (laravel) -->
         <script src="{{ asset('js/app.js') }}"></script>
 
@@ -96,9 +99,9 @@
                 });
             });
         </script>
+        @livewireScripts
 
         @stack('scripts')
-        @livewireScripts
 
         <!------ Alerts ------>
         <script>

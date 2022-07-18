@@ -1,4 +1,13 @@
 <div>
+    @push('styles')
+        
+        <link href="{{ asset('inspinia_admin/css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
+    @endpush
+    @push('scripts')
+        <!-- Data picker -->
+        <script src="{{ asset('inspinia_admin/js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
+    @endpush
+
     @section('header')
         <div class="col-md-3">
             <h2>Alumno</h2>
