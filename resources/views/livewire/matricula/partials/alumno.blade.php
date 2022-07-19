@@ -46,7 +46,7 @@
                     </div>
                     <div class="form-group"><label class="col-lg-2 control-label">Distrito</label>
                         <div class="col-lg-10">
-                            <input type="text" wire:model.defer="distrito" id="distrito" placeholder="Ingrese el distrito de procedencia. " class="form-control">
+                            <input type="text" autocomplete="of" wire:model.defer="distrito" id="distrito" placeholder="Ingrese el distrito de procedencia. " class="form-control">
                             @error('distrito') <div class="alert alert-danger" role="alert"> {{ $message }} </div> @enderror
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                     <div class="form-group">
                         <label class="col-lg-2 control-label">I.E. Proc.</label>
                         <div class="col-lg-10">
-                            <input type="text" wire:model.defer="Ie_procedencia" placeholder="Ingresa la instituciòn educativa de procedencia" id="Ie_procedencia" class="form-control typeahead" data-provide="typeahead"> 
+                            <input type="text" autocomplete="of" wire:model.defer="Ie_procedencia" placeholder="Ingresa la instituciòn educativa de procedencia" id="Ie_procedencia" class="form-control typeahead" data-provide="typeahead"> 
                             @error('Ie_procedencia') <div class="alert alert-danger" role="alert"> {{ $message }} </div> @enderror
                         </div>
                     </div>
@@ -92,6 +92,7 @@
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                 <input type="text" autocomplete="of"  wire:model.defer="anio_egreso"  class="form-control" placeholder="2022" id="datepicker-year">
+                                
                             </div>
                             @error('anio_egreso') <div class="alert alert-danger" role="alert"> {{ $message }} </div> @enderror
                         </div>
@@ -114,6 +115,7 @@
                 <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{  $id_alumno? 'Actualizar': 'Guardar'}} informaciòn del alumno </button>
             </div>
         </form>
+        
     </div>
     @push('scripts')
         <script>
@@ -139,14 +141,32 @@
         </script>
         
         <script>
-            Livewire.on('data-autocomplete', (data)=>{
+           /*  Livewire.on('data-autocomplete', (data)=>{
                 console.log(data);
-                $('#Ie_procedencia').typeahead( { source: data.lista_ie_procedencia } );
-                $('#distrito').typeahead( { source: data.lista_distritos } );
+                $('#Ie_procedencia').typeahead( { source: data.lista_ie_procedencia } )
+                .on('typeahead:selected', function(e, item) {
+                        console.log(item);
+                        $('#Ie_procedencia').val(item.name) ;
+                });
+                
+                $('#distrito').typeahead( { 
+                    classNames: {
+                        input: 'Typeahead-input',
+                        hint: 'Typeahead-hint',
+                        selectable: 'Typeahead-selectable'
+                    },
+                    source: data.lista_distritos
+                });
+                $('#distrito').bind('typeahead:select', function(ev, item) {
+                    console.log('Selection: ' + item);
+                    $('#Ie_procedencia').val(item.name) ;
+                });
+
+
                 //$('#Ie_procedencia').typeahead( { source: data.lista_ie_procedencia } );
             })
 
-            $(()=>{ Livewire.emit( 'ya-cargue', 666); })
+            $(()=>{ Livewire.emit( 'ya-cargue', 666); }) */
 
         </script>
 

@@ -104,18 +104,6 @@ class Alumno extends Component
         $this->emit('alert-danger', (object) ['titulo' => 'prueba', 'mensaje' => $this->nombres]);
 
         return 0;
-        /* 
-        'dni' => '123123123',
-        'f_nac' => '2022-07-09',
-        'telefono' => 'asdasdasd',
-        'distrito' => 'SAN ISIDRO DE MAINO',
-        'direccion' => 'asdasdasd',
-        'nombres' => 'asdasdasda',
-        'ap_paterno' => 'sdasdasda',
-        'Ie_procedencia' => 'Colegio Cabrera',
-        'anio_egreso' => '2112',
-        'ap_materno' => 'sdasdasd',
- */
 
         $this->entityEJB->registrarEntidad($this);
     }
