@@ -11,26 +11,37 @@ use Livewire\Component;
 
 class Alumno extends Component
 {
-
     public $id_alumno;
-
-    public $dni, $f_nac, $telefono, $distrito, $direccion, $nombres, $ap_paterno, $Ie_procedencia, $anio_egreso, $ap_materno, $sexo, $pais;
+    public $formularioAlumno;
 
     public $lista_distritos, $lista_ie_procedencia;
-    //, $lista_paises
     private $distritosEJB, $ie_procedenciaEJB,  $entityEJB;
-    //$paisesEJB,
-    public function __construct()
-    {
-        $this->distritosEJB = new DistrictEJB();
-        $this->ie_procedenciaEJB = new SchoolEJB();
-        //$this->paisesEJB = new CountryEJB();
-        $this->entityEJB = new EntityEJB();
-    }
 
     protected $listeners = [
         'ya-cargue' => 'getDatosAutocomplete'
     ];
+
+    protected $rules = [
+        'formularioAlumno.dni' => "required | integer | min:8",
+        'formularioAlumno.f_nac' => "required | date_format:Y-m-d",
+        'formularioAlumno.telefono' => "required | string | min: 4",
+        'formularioAlumno.distrito' => "required | string ",
+        'formularioAlumno.direccion' => "required | string | min: 4",
+        'formularioAlumno.nombres' => "required | string | min: 4",
+        'formularioAlumno.ap_paterno' => "required | string | min: 4",
+        'formularioAlumno.ap_materno' => "required | string | min: 4",
+        'formularioAlumno.Ie_procedencia' => "required | string | min: 4",
+        'formularioAlumno.anio_egreso' => "required | date_format:Y",
+        'formularioAlumno.sexo' => "required | string | min:4 | max:8",
+    ];
+
+    public function __construct()
+    {
+        $this->distritosEJB = new DistrictEJB();
+        $this->ie_procedenciaEJB = new SchoolEJB();
+        $this->entityEJB = new EntityEJB();
+    }
+
 
     public function getDatosAutocomplete()
     {
@@ -43,23 +54,10 @@ class Alumno extends Component
 
     public function initialState()
     {
-        $this->id_alumno = null;
-        $this->dni = "";
-        $this->f_nac = "";
-        $this->telefono = "";
-        $this->distrito = "";
-        $this->direccion = "";
-        $this->nombres = "";
-        $this->ap_paterno = "";
-        $this->Ie_procedencia = "";
-        $this->anio_egreso = "";
-        $this->ap_materno = "";
-        $this->sexo = "";
-        $this->pais = "";
+        $this->reset(["formularioAlumno"]);
 
         $this->lista_distritos = $this->distritosEJB->listaDistritos();
         $this->lista_ie_procedencia = $this->ie_procedenciaEJB->listarEscuelas();
-        // $this->lista_paises = $this->paisesEJB->listaPaises();
     }
 
     public function mount()
@@ -74,38 +72,18 @@ class Alumno extends Component
 
     public function create()
     {
-        Log::debug([
-            "dni" => $this->dni,
-            "f_nac" => $this->f_nac,
-            "telefono" => $this->telefono,
-            "distrito" => $this->distrito,
-            "direccion" => $this->direccion,
-            "nombres" => $this->nombres,
-            "ap_paterno" => $this->ap_paterno,
-            "Ie_procedencia" => $this->Ie_procedencia,
-            "anio_egreso" => $this->anio_egreso,
-            "ap_materno" => $this->ap_materno,
-        ]);
+        $this->validate();
+        $this->emit('alert-danger', (object) ['titulo' => 'prueba', 'mensaje' => ((object)$this->formularioAlumno)->dni]);
 
-        $this->validate([
-            'dni' => "required | integer ",
-            'f_nac' => "required | date_format:Y-m-d",
-            'telefono' => "required | string | min: 4",
-            'distrito' => "required | string ",
-            'direccion' => "required | string | min: 4",
-            'nombres' => "required | string | min: 4",
-            'ap_paterno' => "required | string | min: 4",
-            'ap_materno' => "required | string | min: 4",
-            'Ie_procedencia' => "required | string | min: 4",
-            'anio_egreso' => "required | date_format:Y",
-            'sexo' => "required | string | min:4 | max:5",
-        ]);
-        Log::debug("Hola mindo");
-        $this->emit('alert-danger', (object) ['titulo' => 'prueba', 'mensaje' => $this->nombres]);
+        Log::debug((array)$this->formularioAlumno);
 
-        return 0;
+        $entidad = $this->entityEJB->registrarEntidad((object) $this->formularioAlumno);
+        Log::debug($entidad);
+    }
 
-        $this->entityEJB->registrarEntidad($this);
+    public function updated($nombre_var)
+    {
+        $this->validateOnly($nombre_var);
     }
 
     public function update()

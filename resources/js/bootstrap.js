@@ -31,6 +31,17 @@ toastr.options = {
     hideMethod: "fadeOut",
 };
 
+/* window.consultaApiReniec = async (numeroDni) => {
+    const url =
+        "https://quertium.com/api/v1/reniec/dni/" +
+        numeroDni +
+        "?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MTE5MQ.lP8EKqTUblmUB5DDWkqakaYZ8DJtIa06dCZJBPtIW1E";
+    const response = await axios(url, {
+        headers: { "Access-Control-Allow-Origin": "*" },
+    });
+    return response.data;
+}; */
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

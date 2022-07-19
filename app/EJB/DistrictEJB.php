@@ -19,7 +19,7 @@ class DistrictEJB extends District
         return District::where('name', $nombreDistrito)->first();
     }
 
-    public function registrarDistrito($nombreDistrito, $nombreProvincia)
+    public function registraroBuscarDistrito($nombreDistrito, $nombreProvincia = null)
     {
         $distrito = self::buscarDistrito($nombreDistrito);
         if (!$distrito) {
