@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Models\Entity;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class EntityRepository extends Entity
 {
@@ -49,37 +50,31 @@ class EntityRepository extends Entity
         return $entidad;
     }
 
-    public function actualizarEntidad($obj)
+    public function actualizarEntidad($idEntidad, $objEntidad)
     {
-        $entidad = self::buscarEntidad($obj->dni);
-        if (!$entidad) {
-            $distrito = $this->distritoRepository->registraroBuscarDistrito($obj->distrito);
+        $entidad = Entity::find($idEntidad);
+        if ($entidad) {
+            $distrito = $this->distritoRepository->registraroBuscarDistrito($objEntidad->distrito);
             $pais = 173;
 
-            $entidad = new Entity();
-            $entidad->document_number = $obj->dni;
-            $entidad->birth_date = $obj->f_nac;
+            $entidad->document_number = $objEntidad->dni;
+            $entidad->birth_date = $objEntidad->f_nac;
             $entidad->district_id = $distrito->id;
-            $entidad->telephone = $obj->telefono;
-            $entidad->mobile_phone = $obj->telefono;
-            $entidad->address = $obj->direccion;
-            $entidad->name = $obj->nombres;
-            $entidad->father_lastname = $obj->ap_paterno;
-            $entidad->mother_lastname = $obj->ap_materno;
+            $entidad->telephone = $objEntidad->telefono;
+            $entidad->mobile_phone = $objEntidad->telefono;
+            $entidad->address = $objEntidad->direccion;
+            $entidad->name = $objEntidad->nombres;
+            $entidad->father_lastname = $objEntidad->ap_paterno;
+            $entidad->mother_lastname = $objEntidad->ap_materno;
             $entidad->document_type = 'dni';
-            $entidad->gender = $obj->sexo;
-            $entidad->marital_status = isset($obj->estado_marital) ? $obj->estado_marital : 'single';
+            $entidad->gender = $objEntidad->sexo;
+            $entidad->marital_status = isset($objEntidad->estado_marital) ? $objEntidad->estado_marital : 'single';
             $entidad->country_id = $pais;
-            $entidad->email = isset($obj->email) ? $obj->email : null;
-            $entidad->instruction_degree = isset($obj->grado_instruccion) ? $obj->grado_instruccion : 'none';
+            $entidad->email = isset($objEntidad->email) ? $objEntidad->email : null;
+            $entidad->instruction_degree = isset($objEntidad->grado_instruccion) ? $objEntidad->grado_instruccion : 'none';
             $entidad->save();
+            return $entidad;
         }
-        return $entidad;
+        throw new NotFoundResourceException('Error, no se encontro al estudiante');
     }
 }
-
-
-/*
-    // Buscar o registrar ie_procedencia
-    // Buscar o registrar pais
-*/

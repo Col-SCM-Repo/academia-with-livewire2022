@@ -69,8 +69,20 @@ class StudentRepository extends Student
         return $estudiante;
     }
 
-    public function actualizarEstudiante()
+    public function actualizarEstudiante($objEstudiante, $idEstudiante)
     {
+        $estudiante = Student::find($idEstudiante);
+        if (!$estudiante) throw new NotFoundResourceException('Error, no se encontro al estudiante');
+
+        $escuela = $this->escuelaRepository->registrarBuscarEscuela($objEstudiante->Ie_procedencia);
+
+        $estudiante->school_id = $escuela->id;
+        $estudiante->graduation_year = $objEstudiante->anio_egreso;
+
+        $entidadActualizada = $this->entidadRepository->actualizarEntidad($estudiante->entity_id, $objEstudiante);
+        $estudiante->save();
+
+        return $entidadActualizada ? true : false;
     }
 
     public function eliminarEstudiante($idEstudiante)

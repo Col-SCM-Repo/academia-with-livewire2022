@@ -88,7 +88,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-lg-2 control-label">Año. egreso</label>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                 <input type="text" autocomplete="of"  wire:model.defer="formularioAlumno.anio_egreso"  class="form-control" placeholder="2022" id="datepicker-year">
@@ -98,9 +98,9 @@
                         </div>
                         
                         <label class="col-lg-2 control-label">Sexo</label>
-                        <div class="col-lg-5">
+                        <div class="col-lg-4">
                             <select wire:model.defer="formularioAlumno.sexo" class="form-control">
-                                <option value="">--Seleccione--</option>
+                                <option value="">Seleccione</option>
                                 <option value="male">Masculino</option>
                                 <option value="female">Femenino</option>
                             </select>

@@ -75,21 +75,27 @@ class Alumno extends Component
     public function create()
     {
         $this->validate();
-        $this->emit('alert-danger', (object) ['titulo' => 'prueba', 'mensaje' => ((object)$this->formularioAlumno)->dni]);
-
         Log::debug((array)$this->formularioAlumno);
-
         $entidad = $this->entityRepository->registrarEntidad((object) $this->formularioAlumno);
         $estudiante = $this->estudianteRepository->registrarEstudiante((object) $this->formularioAlumno, $entidad);
 
-        /*  Log::debug((array)$entidad);
-        Log::debug((array)$estudiante); */
+        if ($estudiante)
+            $this->emit('alert-sucess', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno registrado correctamente. ']);
+        else
+            $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
 
         $this->reset(["formularioAlumno", "idEstudiante"]);
     }
 
     public function update()
     {
+        $this->validate();
+        $seActualizo = $this->estudianteRepository->actualizarEstudiante((object) $this->formularioAlumno, $this->idEstudiante);
+
+        if ($seActualizo)
+            $this->emit('alert-sucess', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno se actualizo correctamente. ']);
+        else
+            $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
     }
 
     public function buscar_interno()
@@ -118,5 +124,6 @@ class Alumno extends Component
 
     public function buscar_reniec()
     {
+        // -- PENDIENTE --
     }
 }
