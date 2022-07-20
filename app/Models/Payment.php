@@ -9,6 +9,9 @@ class Payment extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'payments';
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'installment_id',
         'amount',

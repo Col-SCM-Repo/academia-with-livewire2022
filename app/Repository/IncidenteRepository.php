@@ -1,16 +1,16 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Incidente;
 use Illuminate\Support\Facades\Auth;
 
-class IncidenteEJB extends Incidente
+class IncidenteRepository extends Incidente
 {
 
-    public function builderModelEJB()
+    public function builderModelRepository()
     {
-        $modelEJB = [
+        $modelRepository = [
             'id' => 0,
             'enrollment_id' => 0,
             'auxiliar_id' => null,
@@ -22,7 +22,7 @@ class IncidenteEJB extends Incidente
             'estado' => 0,
             'fecha_reporte' => null,
         ];
-        return $modelEJB;
+        return $modelRepository;
     }
 
     public function crearIncidente($obj)

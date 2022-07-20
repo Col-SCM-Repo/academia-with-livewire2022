@@ -1,10 +1,10 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Country;
 
-class CountryEJB extends Country
+class CountryRepository extends Country
 {
     public function buscarPais($nombrePais)
     {
@@ -13,7 +13,7 @@ class CountryEJB extends Country
             ->firts();
     }
 
-    public function registrarPais($nombrePais, $codigoPais)
+    public function registrarBuscarPais($nombrePais, $codigoPais = "-")
     {
         $pais = self::buscarPais($nombrePais);
         if (!$pais) {

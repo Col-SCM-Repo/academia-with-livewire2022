@@ -1,11 +1,11 @@
 <div class="ibox">
     <div class="ibox-title">
         <span>
-            <h5> {{  $id_alumno? 'Datos del alumno' : 'Nuevo alumno' }} </h5>
+            <h5> {{  $idEstudiante? 'Datos del alumno' : 'Nuevo alumno' }} </h5>
         </span>
     </div>
     <div class="ibox-content">
-        <form class="row " wire:submit.prevent = "{{ $id_alumno? 'update' : 'create' }}" >
+        <form class="row " wire:submit.prevent = "{{ $idEstudiante? 'update' : 'create' }}" >
             <div class="col-lg-6">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -111,8 +111,9 @@
                 </div>
             </div>
             <div class="col-12 text-center  "  > 
+                <span wire:loading wire:target="buscar_interno"  >  Buscando alumno ...</span>
                 <span wire:loading wire:target="update, create"  > Guardando ...</span>
-                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{  $id_alumno? 'Actualizar': 'Guardar'}} informaciòn del alumno </button>
+                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{  $idEstudiante? 'Actualizar': 'Guardar'}} informaciòn del alumno </button>
             </div>
         </form>
         

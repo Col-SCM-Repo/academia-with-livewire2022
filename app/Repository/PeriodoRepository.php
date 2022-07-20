@@ -1,22 +1,22 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Classroom;
 use App\Models\Period;
 
-class PeriodoEJB extends Period
+class PeriodoRepository extends Period
 {
 
-    public function builderModelEJB()
+    public function builderModelRepository()
     {
-        $modelEJB = [
+        $modelRepository = [
             'id' => 0,
             'name' => '0',
             'year' => 2022,
             'active' => 0,
         ];
-        return $modelEJB;
+        return $modelRepository;
     }
 
 

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Secuence;
 use Illuminate\Support\Facades\DB;
 
-class PaymentEJB extends Payment
+class PaymentRepository extends Payment
 {
-    public function builderModelEJB()
+    public function builderModelRepository()
     {
-        $modelEJB = [
+        $modelRepository = [
             'id' => 0,
             'installmet_id' => null,
             'amount' => null,
@@ -22,7 +22,7 @@ class PaymentEJB extends Payment
             'serie' => null,
             'numeration' => null,
         ];
-        return $modelEJB;
+        return $modelRepository;
     }
 
     public function to_pay_installment($objPago)

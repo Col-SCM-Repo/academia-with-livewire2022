@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Entity extends Model
 {
     use SoftDeletes;
+    protected $table = "entities";
+    protected $primariKey = "id";
 
     protected $fillable = [
         'father_lastname',
@@ -40,7 +42,7 @@ class Entity extends Model
 
     public function student()
     {
-        return $this->hasOne(Student::class);
+        return $this->hasOne(Student::class, 'entity_id', 'id');
     }
 
     public function relative()

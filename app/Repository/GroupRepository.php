@@ -1,10 +1,10 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Group;
 
-class GroupEJB extends Group
+class GroupRepository extends Group
 {
     public function buscarGrupo($nombreGrupo)
     {

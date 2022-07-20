@@ -1,10 +1,10 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\State;
 
-class StateEJB extends State
+class StateRepository extends State
 {
     public function buscarDepartamento($nombreDepartamento)
     {

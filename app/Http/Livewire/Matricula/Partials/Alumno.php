@@ -2,20 +2,21 @@
 
 namespace App\Http\Livewire\Matricula\Partials;
 
-use App\EJB\CountryEJB;
-use App\EJB\DistrictEJB;
-use App\EJB\EntityEJB;
-use App\EJB\SchoolEJB;
+use App\Repository\CountryRepository;
+use App\Repository\DistrictRepository;
+use App\Repository\EntityRepository;
+use App\Repository\SchoolRepository;
+use App\Repository\StudentRepository;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Alumno extends Component
 {
-    public $id_alumno;
+    public $idEstudiante;
     public $formularioAlumno;
 
     public $lista_distritos, $lista_ie_procedencia;
-    private $distritosEJB, $ie_procedenciaEJB,  $entityEJB;
+    private $distritosRepository, $ie_procedenciaRepository,  $entityRepository, $estudianteRepository;
 
     protected $listeners = [
         'ya-cargue' => 'getDatosAutocomplete'
@@ -37,9 +38,10 @@ class Alumno extends Component
 
     public function __construct()
     {
-        $this->distritosEJB = new DistrictEJB();
-        $this->ie_procedenciaEJB = new SchoolEJB();
-        $this->entityEJB = new EntityEJB();
+        $this->distritosRepository = new DistrictRepository();
+        $this->ie_procedenciaRepository = new SchoolRepository();
+        $this->entityRepository = new EntityRepository();
+        $this->estudianteRepository = new StudentRepository();
     }
 
 
@@ -56,8 +58,8 @@ class Alumno extends Component
     {
         $this->reset(["formularioAlumno"]);
 
-        $this->lista_distritos = $this->distritosEJB->listaDistritos();
-        $this->lista_ie_procedencia = $this->ie_procedenciaEJB->listarEscuelas();
+        $this->lista_distritos = $this->distritosRepository->listaDistritos();
+        $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
     }
 
     public function mount()
@@ -77,13 +79,13 @@ class Alumno extends Component
 
         Log::debug((array)$this->formularioAlumno);
 
-        $entidad = $this->entityEJB->registrarEntidad((object) $this->formularioAlumno);
-        Log::debug($entidad);
-    }
+        $entidad = $this->entityRepository->registrarEntidad((object) $this->formularioAlumno);
+        $estudiante = $this->estudianteRepository->registrarEstudiante((object) $this->formularioAlumno, $entidad);
 
-    public function updated($nombre_var)
-    {
-        $this->validateOnly($nombre_var);
+        /*  Log::debug((array)$entidad);
+        Log::debug((array)$estudiante); */
+
+        $this->reset(["formularioAlumno", "idEstudiante"]);
     }
 
     public function update()
@@ -92,8 +94,26 @@ class Alumno extends Component
 
     public function buscar_interno()
     {
-        //$this->emit('alert-danger', (object) ['titulo' => 'prueba', 'mensaje' => 'Ejemplo de alerta']);
+        $informacionAlumno = $this->estudianteRepository->getInformacionEstudiante($this->formularioAlumno['dni']);
 
+        if ($informacionAlumno) {
+            $this->formularioAlumno = [
+                'dni' => $informacionAlumno->dni,
+                'f_nac' => $informacionAlumno->fechaNacimiento,
+                'telefono' => $informacionAlumno->telefono,
+                'distrito' => $informacionAlumno->distrito,
+                'direccion' => $informacionAlumno->direccion,
+                'nombres' => $informacionAlumno->nombre,
+                'ap_paterno' => $informacionAlumno->apPaterno,
+                'ap_materno' => $informacionAlumno->apMaterno,
+                'Ie_procedencia' => $informacionAlumno->ieProcedencia,
+                'anio_egreso' => $informacionAlumno->anioGraduacion,
+                'sexo' => $informacionAlumno->sexo,
+            ];
+            $this->idEstudiante = $informacionAlumno->idEstudiante;
+        } else {
+            $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
+        }
     }
 
     public function buscar_reniec()

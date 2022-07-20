@@ -1,16 +1,16 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Province;
 
-class ProvinceEJB extends Province
+class ProvinceRepository extends Province
 {
-    private $departamentoEJB;
+    private $departamentoRepository;
 
     public function __construct()
     {
-        $this->departamentoEJB = new StateEJB();
+        $this->departamentoRepository = new StateRepository();
     }
 
     public function buscarProvincia($nombreProvincia)
@@ -24,7 +24,7 @@ class ProvinceEJB extends Province
         if (!$provincia) {
             $provincia = new Province();
             $provincia->name = $nombreProvincia;
-            $provincia->state_id = $this->departamentoEJB->obtenerIdDepartamento($nombreDepartamento);
+            $provincia->state_id = $this->departamentoRepository->obtenerIdDepartamento($nombreDepartamento);
             $provincia->save();
         }
         return $provincia;

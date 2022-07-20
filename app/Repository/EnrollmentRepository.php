@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Enrollment;
 use App\Models\Entity;
@@ -20,18 +20,18 @@ use stdClass;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class EnrollmentEJB extends Enrollment
+class EnrollmentRepository extends Enrollment
 {
-    protected $paymentEJB;
+    protected $paymentRepository;
 
     public function __construct()
     {
-        $this->paymentEJB = new PaymentEJB();
+        $this->paymentRepository = new PaymentRepository();
     }
 
-    public function builderModelEJB()
+    public function builderModelRepository()
     {
-        $modelEJB = [
+        $modelRepository = [
             'id' => 0,
             'code' => '0',
             'type' => 'normal',
@@ -47,7 +47,7 @@ class EnrollmentEJB extends Enrollment
             'cancelled' => 0,
             'observations' =>  '',
         ];
-        return $modelEJB;
+        return $modelRepository;
     }
 
     public function createEnrollment($data)
@@ -287,7 +287,7 @@ class EnrollmentEJB extends Enrollment
                                 $objPago->concept_type = "partial";
                                 $objPago->amount = $monto_pagado;
                             }
-                            $pago = $this->paymentEJB->to_pay_installment($objPago);
+                            $pago = $this->paymentRepository->to_pay_installment($objPago);
                             if (!$pago["success"])
                                 throw new Error("Error al pagar la matricula");
 
@@ -311,7 +311,7 @@ class EnrollmentEJB extends Enrollment
                                 $objPago->concept_type = "partial";
                                 $objPago->amount = $monto_pagado;
                             }
-                            $pago = $this->paymentEJB->to_pay_installment($objPago);
+                            $pago = $this->paymentRepository->to_pay_installment($objPago);
                             if (!$pago["success"])
                                 throw new Error("Error al pagar la matricula");
                             $monto_pagado -= $new_installments[$i]->amount;
@@ -329,7 +329,7 @@ class EnrollmentEJB extends Enrollment
                             $objPago->concept_type = "partial";
                             $objPago->amount = $monto_pagado;
 
-                            $pago = $this->paymentEJB->to_pay_installment($objPago);
+                            $pago = $this->paymentRepository->to_pay_installment($objPago);
                             if ($pago["success"])
                                 $ultimo_pago_id =  $pago["payment_id"];
                             else
@@ -344,7 +344,7 @@ class EnrollmentEJB extends Enrollment
                             $objPago->concept_type = "partial";
                             $objPago->amount = $monto_pagado;
 
-                            $pago = $this->paymentEJB->to_pay_installment($objPago);
+                            $pago = $this->paymentRepository->to_pay_installment($objPago);
                             if (!$pago["success"])
                                 throw new Error("Error crear nota de pago(devolucaion)");
                         }

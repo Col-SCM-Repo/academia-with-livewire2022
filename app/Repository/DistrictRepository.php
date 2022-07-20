@@ -1,17 +1,17 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\District;
 
-class DistrictEJB extends District
+class DistrictRepository extends District
 {
 
-    private $provinciaEJB;
+    private $provinciaRepository;
 
     public function __construct()
     {
-        $this->provinciaEJB = new ProvinceEJB();
+        $this->provinciaRepository = new ProvinceRepository();
     }
 
     public function buscarDistrito($nombreDistrito)
@@ -23,12 +23,11 @@ class DistrictEJB extends District
     {
         $distrito = self::buscarDistrito($nombreDistrito);
         if (!$distrito) {
-            $provincia  = $this->provinciaEJB->buscarProvincia($nombreProvincia);
+            $provincia  = $nombreProvincia ? $this->provinciaRepository->buscarProvincia($nombreProvincia) : null;
             // la provincia debe existir
-            if (!$provincia) return null;
             $distrito = new District();
             $distrito->name = $nombreDistrito;
-            $distrito->province_id = $provincia->id;
+            $distrito->province_id = $provincia ? $provincia->id : null;
             $distrito->save();
         }
         return $distrito;

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Career extends Model
 {
+    protected $table = "careers";
+    protected $primariKey = "id";
+
     protected $fillable = [
         'group_id',
         'career',

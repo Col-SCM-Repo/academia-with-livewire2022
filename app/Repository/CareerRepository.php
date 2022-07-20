@@ -1,16 +1,16 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Career;
 
-class CareerEJB
+class CareerRepository extends Career
 {
-    private $grupoEJB;
+    private $grupoRepository;
 
     public function __construct()
     {
-        $this->grupoEJB = new GroupEJB();
+        $this->grupoRepository = new GroupRepository();
     }
 
     public function buscarCarrera($nombreCarrera)
@@ -22,7 +22,7 @@ class CareerEJB
     {
         $carrera = self::buscarCarrera($nombreCarrera);
         if (!$carrera) {
-            $grupo = $this->grupoEJB->buscarGrupo($nombreGrupo);
+            $grupo = $this->grupoRepository->buscarGrupo($nombreGrupo);
             $carrera->group_id = $grupo->id;
             $carrera->career = $nombreCarrera;
             $carrera->nmonico = $nemonico;

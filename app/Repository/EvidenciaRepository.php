@@ -1,16 +1,16 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\Evidencia;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class EvidenciaEJB extends Evidencia
+class EvidenciaRepository extends Evidencia
 {
-    public function builderModelEJB()
+    public function builderModelRepository()
     {
-        $modelEJB = [
+        $modelRepository = [
             'id' => 0,
             'incidente_id' => '0',
             'evidencia_descripcion' => null,
@@ -18,7 +18,7 @@ class EvidenciaEJB extends Evidencia
             'estado' => '0',
             'user_id' => null
         ];
-        return $modelEJB;
+        return $modelRepository;
     }
 
     public function registrarEvidencias($data)

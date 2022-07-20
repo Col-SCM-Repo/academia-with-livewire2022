@@ -1,18 +1,18 @@
 <?php
 
-namespace App\EJB;
+namespace App\Repository;
 
 use App\Models\School;
 
-class SchoolEJB extends School
+class SchoolRepository extends School
 {
-    private $distritoEJB;
-    private $paisEJB;
+    private $distritoRepository;
+    private $paisRepository;
 
     public function __construct()
     {
-        $this->distritoEJB = new DistrictEJB();
-        $this->paisEJB = new CountryEJB();
+        $this->distritoRepository = new DistrictRepository();
+        $this->paisRepository = new CountryRepository();
     }
 
     public function buscarEscuela($nombreEscuela)
@@ -20,20 +20,19 @@ class SchoolEJB extends School
         return School::where('name', $nombreEscuela)->first();
     }
 
-    public function registrarEscuela($nombreEscuela, $direccion, $nombreDistrito, $nombrePais)
+    public function registrarBuscarEscuela($nombreEscuela, $direccion = null, $nombreDistrito = null, $nombrePais = null)
     {
         $escuela = self::buscarEscuela($nombreEscuela);
         if (!$escuela) {
-            $distrito = $this->distritoEJB->buscarDistrito($nombreDistrito);
-            $pais = $this->paisEJB->buscarPais($nombrePais);
 
-            if (!($distrito && $pais)) return null;
+            $distrito = $nombreDistrito ? $this->distritoRepository->registraroBuscarDistrito($nombreDistrito)->id : null;
+            $pais = $nombrePais ? $this->paisRepository->registrarBuscarPais($nombrePais)->id : 173;
 
             $escuela = new School();
             $escuela->name = $nombreEscuela;
             $escuela->address = $direccion;
-            $escuela->district_id = $distrito->id;
-            $escuela->country_id = $pais->id;
+            $escuela->district_id = $distrito;
+            $escuela->country_id = $pais;
             $escuela->save();
         }
         return $escuela;

@@ -9,6 +9,9 @@ class Classroom extends Model
 {
     use SoftDeletes;
 
+    protected $table = "classrooms";
+    protected $primariKey = "id";
+
     protected $fillable = [
         'name',
         'level_id',
