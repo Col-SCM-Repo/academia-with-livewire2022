@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Models\Student;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class StudentRepository extends Student
@@ -50,10 +52,10 @@ class StudentRepository extends Student
         ];
     }
 
-    public function registrarEstudiante($objEstudiante, $entidad)
+    public function registrarEstudiante($objEstudiante)
     {
-        if (!$entidad) throw new NotFoundResourceException("Error, No se encontro a la entidad");
-        $estudiante = $this::where('entity_id', $entidad->id)->first();
+        $entidad = $this->entidadRepository->registrarEntidad($objEstudiante);
+        $estudiante = Student::where('entity_id', $entidad->id)->first();
 
         if (!$estudiante) {
             $escuela = $this->escuelaRepository->registrarBuscarEscuela($objEstudiante->Ie_procedencia);
@@ -69,7 +71,7 @@ class StudentRepository extends Student
         return $estudiante;
     }
 
-    public function actualizarEstudiante($objEstudiante, $idEstudiante)
+    public function actualizarEstudiante($idEstudiante, $objEstudiante)
     {
         $estudiante = Student::find($idEstudiante);
         if (!$estudiante) throw new NotFoundResourceException('Error, no se encontro al estudiante');
@@ -79,10 +81,9 @@ class StudentRepository extends Student
         $estudiante->school_id = $escuela->id;
         $estudiante->graduation_year = $objEstudiante->anio_egreso;
 
-        $entidadActualizada = $this->entidadRepository->actualizarEntidad($estudiante->entity_id, $objEstudiante);
+        $this->entidadRepository->actualizarEntidad($estudiante->entity_id, $objEstudiante);
         $estudiante->save();
-
-        return $entidadActualizada ? true : false;
+        return true;
     }
 
     public function eliminarEstudiante($idEstudiante)
@@ -93,5 +94,26 @@ class StudentRepository extends Student
             return true;
         }
         return false;
+    }
+
+    public function getListaAlumnos($parameto = "")
+    {
+        $listaAlumnos = Student::join('entities', 'entities.id', 'students.entity_id')
+            ->where('entities.name', 'like', '%' . $parameto . '%')
+            ->orWhere('entities.father_lastname', 'like', '%' . $parameto . '%')
+            ->orWhere('entities.mother_lastname', 'like', '%' . $parameto . '%')
+            ->orWhere('entities.document_number', 'like', '%' . $parameto . '%')
+            ->select([
+                "students.id as id ",
+                "entities.father_lastname",
+                "entities.mother_lastname",
+                "entities.name",
+                "entities.telephone",
+                "entities.birth_date",
+                "entities.gender",
+                "entities.document_number",
+                "students.graduation_year",
+            ])->get();
+        return $listaAlumnos;
     }
 }

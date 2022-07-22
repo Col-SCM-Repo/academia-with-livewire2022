@@ -21,12 +21,12 @@ class Student extends Model
 
     public function entity()
     {
-        return $this->belongsTo(Entity::class);
+        return $this->belongsTo(Entity::class, 'entity_id', 'id');
     }
 
     public function school()
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(School::class, 'entity_id', 'id');
     }
 
     public function enrollment()

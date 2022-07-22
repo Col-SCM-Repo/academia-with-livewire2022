@@ -1,7 +1,7 @@
 <div class="ibox">
     <div class="ibox-title">
         <span>
-            <h5> {{  $idEstudiante? 'Datos del alumno' : 'Nuevo alumno' }} </h5>
+            <h5> {{  $idEstudiante? 'Alumno existente' : 'Nuevo alumno' }} </h5>
         </span>
     </div>
     <div class="ibox-content">
@@ -16,11 +16,6 @@
                                 <span class="input-group-btn"> 
                                     <button type="button" wire:click = "buscar_interno" class="btn btn-outline btn-primary" title="Buscar en la base de datos interna del colegio">
                                         <i class="fa fa-search" aria-hidden="true"></i> 
-                                    </button> 
-                                </span> 
-                                <span class="input-group-btn"> 
-                                    <button type="button" wire:click = "buscar_reniec" class="btn btn-outline btn-warning" title="Buscar en la RENIEC (solo para ciudadanos de nacionalidad Peruana )">
-                                        <i class="fa fa-university" aria-hidden="true"></i> 
                                     </button> 
                                 </span> 
                             </div>
@@ -87,14 +82,12 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">Año. egreso</label>
+                        <label class="col-lg-2 control-label">Egreso</label>
                         <div class="col-lg-4">
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="text" autocomplete="of"  wire:model.defer="formularioAlumno.anio_egreso"  class="form-control" placeholder="2022" id="datepicker-year">
-                                
+                                <input type="text" autocomplete="of"  wire:model.defer="formularioAlumno.anio_egreso"  class="form-control" title="Año de egreso" placeholder="2022" id="datepicker-year">
                             </div>
-                            @error('formularioAlumno.anio_egreso') <div class="pr-1 text-danger" role="alert"> * {{ $message }} </div> @enderror
                         </div>
                         
                         <label class="col-lg-2 control-label">Sexo</label>
@@ -104,9 +97,14 @@
                                 <option value="male">Masculino</option>
                                 <option value="female">Femenino</option>
                             </select>
-                            @error('formularioAlumno.sexo') <div class="pr-1 text-danger" role="alert"> * {{ $message }} </div> @enderror
                         </div>
-
+                        <br>
+                        <div class="col-lg-6">
+                            @error('formularioAlumno.anio_egreso') <div class="pr-1 text-danger" role="alert"> * El año de egreso es requerido </div> @enderror
+                        </div>
+                        <div class="col-lg-6">
+                            @error('formularioAlumno.sexo') <div class="pr-1 text-danger" role="alert"> * El campo sexo es requerido </div> @enderror
+                        </div>
                     </div>
                 </div>
             </div>
@@ -114,6 +112,11 @@
                 <span wire:loading wire:target="buscar_interno"  >  Buscando alumno ...</span>
                 <span wire:loading wire:target="update, create"  > Guardando ...</span>
                 <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{  $idEstudiante? 'Actualizar': 'Guardar'}} informaciòn del alumno </button>
+                
+                @if ($idEstudiante)
+                    <button class="btn btn-sm btn-success" type="button" style="padding: .75rem 3rem" wire:click="initialState" > Limpiar formulario </button>
+                @endif
+
             </div>
         </form>
         

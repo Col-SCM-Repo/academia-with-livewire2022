@@ -17,7 +17,7 @@ class CreateRelativesTable extends Migration
 		Schema::create('relatives', function (Blueprint $table) {
 			$table->bigInteger('id', true)->unsigned();
 			$table->bigInteger('entity_id')->unsigned()->index('relatives_entity_id_foreign');
-			$table->text('occupation', 65535);
+			$table->bigInteger('occupation_id');
 			$table->timestamps();
 		});
 	}

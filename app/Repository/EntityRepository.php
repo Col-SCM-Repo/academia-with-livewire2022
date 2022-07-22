@@ -78,3 +78,17 @@ class EntityRepository extends Entity
         throw new NotFoundResourceException('Error, no se encontro al estudiante');
     }
 }
+/*
+    Data que requiere
+        *  sexo
+        *  estado_marital
+        *  ocupacion
+        *  ap_materno
+        *  ap_paterno
+        *  nombres
+        *  direccion
+        *  distrito
+        *  telefono
+        *  f_nac
+        *  dni
+*/

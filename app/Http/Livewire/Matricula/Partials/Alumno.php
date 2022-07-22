@@ -2,12 +2,9 @@
 
 namespace App\Http\Livewire\Matricula\Partials;
 
-use App\Repository\CountryRepository;
 use App\Repository\DistrictRepository;
-use App\Repository\EntityRepository;
 use App\Repository\SchoolRepository;
 use App\Repository\StudentRepository;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Alumno extends Component
@@ -16,7 +13,7 @@ class Alumno extends Component
     public $formularioAlumno;
 
     public $lista_distritos, $lista_ie_procedencia;
-    private $distritosRepository, $ie_procedenciaRepository,  $entityRepository, $estudianteRepository;
+    private $distritosRepository, $ie_procedenciaRepository, $estudianteRepository;
 
     protected $listeners = [
         'ya-cargue' => 'getDatosAutocomplete'
@@ -40,8 +37,10 @@ class Alumno extends Component
     {
         $this->distritosRepository = new DistrictRepository();
         $this->ie_procedenciaRepository = new SchoolRepository();
-        $this->entityRepository = new EntityRepository();
         $this->estudianteRepository = new StudentRepository();
+
+        $this->lista_distritos = $this->distritosRepository->listaDistritos();
+        $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
     }
 
 
@@ -56,10 +55,7 @@ class Alumno extends Component
 
     public function initialState()
     {
-        $this->reset(["formularioAlumno"]);
-
-        $this->lista_distritos = $this->distritosRepository->listaDistritos();
-        $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
+        $this->reset(["formularioAlumno", "idEstudiante"]);
     }
 
     public function mount()
@@ -75,31 +71,33 @@ class Alumno extends Component
     public function create()
     {
         $this->validate();
-        Log::debug((array)$this->formularioAlumno);
-        $entidad = $this->entityRepository->registrarEntidad((object) $this->formularioAlumno);
-        $estudiante = $this->estudianteRepository->registrarEstudiante((object) $this->formularioAlumno, $entidad);
+        // Reglas de validacion
+        // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
+        $data = convertArrayUpperCase($this->formularioAlumno);
+        if ($this->estudianteRepository->registrarEstudiante($data)) {
 
-        if ($estudiante)
             $this->emit('alert-sucess', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno registrado correctamente. ']);
-        else
-            $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
+            self::initialState();
+        } else
+            $this->emit('alert-warning', (object) ['titulo' => 'Error', 'mensaje' => 'Hubo un error al registrar al alumno. ']);
 
-        $this->reset(["formularioAlumno", "idEstudiante"]);
+        self::initialState();
     }
 
     public function update()
     {
         $this->validate();
-        $seActualizo = $this->estudianteRepository->actualizarEstudiante((object) $this->formularioAlumno, $this->idEstudiante);
-
-        if ($seActualizo)
-            $this->emit('alert-sucess', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno se actualizo correctamente. ']);
-        else
-            $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
+        $data = convertArrayUpperCase($this->formularioAlumno);
+        if ($this->estudianteRepository->actualizarEstudiante($this->idEstudiante, $data)) {
+            $this->emit('alert-sucess', (object) ['mensaje' => 'El alumno se actualizo correctamente.']);
+            self::initialState();
+        } else
+            $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontradp.']);
     }
 
     public function buscar_interno()
     {
+        $this->validateOnly('formularioAlumno.dni');
         $informacionAlumno = $this->estudianteRepository->getInformacionEstudiante($this->formularioAlumno['dni']);
 
         if ($informacionAlumno) {
@@ -117,13 +115,9 @@ class Alumno extends Component
                 'sexo' => $informacionAlumno->sexo,
             ];
             $this->idEstudiante = $informacionAlumno->idEstudiante;
+            $this->validate();
         } else {
             $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
         }
-    }
-
-    public function buscar_reniec()
-    {
-        // -- PENDIENTE --
     }
 }

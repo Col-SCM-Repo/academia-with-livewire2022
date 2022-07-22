@@ -106,15 +106,15 @@
         <!------ Alerts ------>
         <script>
             Livewire.on('alert-sucess', (informacion)=>{
-                toastr.success(informacion.mensaje, informacion.titulo);
+                toastr.success(informacion.mensaje, informacion.titulo? informacion.titulo : "Alerta" );
             });
 
             Livewire.on('alert-danger', (informacion)=>{
-                toastr.success(informacion.mensaje, informacion.titulo);
+                toastr.success(informacion.mensaje, informacion.titulo? informacion.titulo : "Error" );
             });
             
             Livewire.on('alert-warning', (informacion)=>{
-                toastr.warning(informacion.mensaje, informacion.titulo);
+                toastr.warning(informacion.mensaje, informacion.titulo? informacion.titulo : "Alerta" );
             });
 
             Livewire.on('change-modal', (modal) => {

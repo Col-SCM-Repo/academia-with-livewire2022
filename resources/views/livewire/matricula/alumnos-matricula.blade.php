@@ -46,7 +46,26 @@
                     </div>
                     <div>
                         <p>Resultados de busqueda para {{ $search }} </p>
-                        ---- Lista de alumnos ------ 
+                        <table class="table table-sm table-responsive table-striped">
+                            <thead>
+                                <tr>
+                                    <th> Nombre </th>
+                                    <th> Apellidos </th>
+                                    <th> DNI </th>
+                                    <th> Acciones </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($alumnos as $alumno)
+                                    <tr>
+                                        <td> {{ $alumno->name }} </td>
+                                        <td> {{ $alumno->father_lastname.' '.$alumno->mother_lastname  }}  </td>
+                                        <td> {{ $alumno->document_number }} </td>
+                                        <td></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -62,5 +81,4 @@
             </div>
         </div>
     </div>
-
 </div>

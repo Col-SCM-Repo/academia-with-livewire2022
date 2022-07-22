@@ -47,7 +47,7 @@ class Entity extends Model
 
     public function relative()
     {
-        return $this->hasOne(Relative::class);
+        return $this->hasOne(Relative::class, 'entity_id', 'id');
     }
 
     public function user()
