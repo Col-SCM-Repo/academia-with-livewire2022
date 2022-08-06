@@ -11,7 +11,7 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    public function dashboard()
+    public function index()
     {
         return view('index');
     }
@@ -26,6 +26,10 @@ class HomeController extends Controller
     public function mantenimiento()
     {
         return "mantenimiento";
+    }
+    
+    public function ciclosAulas (){
+        return view('modulos.ciclosyAulas.main');
     }
 
     // reportes

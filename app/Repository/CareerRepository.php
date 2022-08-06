@@ -6,11 +6,11 @@ use App\Models\Career;
 
 class CareerRepository extends Career
 {
-    private $grupoRepository;
+    private $_grupoRepository;
 
     public function __construct()
     {
-        $this->grupoRepository = new GroupRepository();
+        $this->_grupoRepository = new GroupRepository();
     }
 
     public function buscarCarrera($nombreCarrera)
@@ -22,7 +22,7 @@ class CareerRepository extends Career
     {
         $carrera = self::buscarCarrera($nombreCarrera);
         if (!$carrera) {
-            $grupo = $this->grupoRepository->buscarGrupo($nombreGrupo);
+            $grupo = $this->_grupoRepository->buscarGrupo($nombreGrupo);
             $carrera->group_id = $grupo->id;
             $carrera->career = $nombreCarrera;
             $carrera->nmonico = $nemonico;

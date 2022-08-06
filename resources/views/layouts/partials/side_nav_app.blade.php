@@ -2,18 +2,20 @@
     <div class="sidebar-collapse">
         <ul class="nav metismenu" id="side-menu">
             <li class="nav-header">
-                <div class="dropdown profile-element"> 
+                <div class="dropdown profile-element">
                     <div class="text-center">
-                        <img alt="image" class="img-circle" width="100px;" src="https://scontent.flim10-1.fna.fbcdn.net/v/t1.18169-9/26238769_333394743844244_6939617783275579729_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=GmdspAAer_QAX8QAl6L&_nc_ht=scontent.flim10-1.fna&oh=00_AT_S2z4t074KsUI3FOP9R7iZp-w6_S_y1dq4I1Kwx02H3g&oe=62F2504D" />
+                        <img alt="image" class="img-circle" width="100px;"
+                            src="https://scontent.flim10-1.fna.fbcdn.net/v/t1.18169-9/26238769_333394743844244_6939617783275579729_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=GmdspAAer_QAX8QAl6L&_nc_ht=scontent.flim10-1.fna&oh=00_AT_S2z4t074KsUI3FOP9R7iZp-w6_S_y1dq4I1Kwx02H3g&oe=62F2504D" />
                     </div>
                     <br>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                        <span class="clear"> 
-                            <span class="block m-t-xs"> 
+                        <span class="clear">
+                            <span class="block m-t-xs">
                                 <strong class="font-bold">Academia Preuniversitaria Cabrera</strong>
-                            </span> 
-                            <span class="text-muted text-xs block text-capitalize"> {{ Auth::user()->type }} <b class="caret"></b></span> 
-                        </span> 
+                            </span>
+                            <span class="text-muted text-xs block text-capitalize"> {{ Auth::user()->type }} <b
+                                    class="caret"></b></span>
+                        </span>
                     </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
                         <li><a href="profile.html">Perfil</a></li>
@@ -32,7 +34,8 @@
             </li>
             <li>
                 <a href="index.html">
-                    <i class="fa fa-th-large"></i> <span class="nav-label">Matricula</span> <span class="fa arrow"></span>
+                    <i class="fa fa-th-large"></i> <span class="nav-label">Matricula</span> <span
+                        class="fa arrow"></span>
                 </a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ route('matricula.buscar') }}">Buscar</a></li>
@@ -44,7 +47,8 @@
             </li>
             <li>
                 <a href="index.html">
-                    <i class="fa fa-th-large"></i> <span class="nav-label">Evaluaciones</span> <span class="fa arrow"></span>
+                    <i class="fa fa-th-large"></i> <span class="nav-label">Evaluaciones</span> <span
+                        class="fa arrow"></span>
                 </a>
                 <ul class="nav nav-second-level">
                     <li><a href="">Option 1</a></li>
@@ -54,17 +58,19 @@
             </li>
             <li>
                 <a href="#">
-                    <i class="fa fa-bar-chart-o"></i> <span class="nav-label">Mantenimiento</span> <span class="fa arrow"></span>
+                    <i class="fa fa-bar-chart-o"></i> <span class="nav-label">Mantenimiento</span> <span
+                        class="fa arrow"></span>
                 </a>
                 <ul class="nav nav-second-level collapse">
-                    <li><a href="">Ciclos y aulas</a></li>
+                    <li><a href="{{ route('mantenimiento.ciclos-y-aulas') }}">Ciclos y aulas</a></li>
                     <li><a href="">Usuarios</a></li>
                     <li><a href="">Base de datos</a></li>
                 </ul>
             </li>
             <li>
                 <a href="mailbox.html">
-                    <i class="fa fa-envelope"></i> <span class="nav-label">Reportes </span><span class="label label-warning pull-right">16/24</span>
+                    <i class="fa fa-envelope"></i> <span class="nav-label">Reportes </span><span
+                        class="label label-warning pull-right">16/24</span>
                 </a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="">Alumnos por aula</a></li>

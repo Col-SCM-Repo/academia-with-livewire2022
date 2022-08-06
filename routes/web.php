@@ -13,13 +13,11 @@ use Illuminate\Support\Facades\Route;
 //Route::get('temp/{id}', 'IncidenteController@temp'); // Id de incidente
 
 Route::get('/', [AdministratorController::class, 'showLoginForm']);
-
-Route::get('/dni/{dni}', [AdministratorController::class, 'dni']);
-Route::get('/quertium/{dni}', [AdministratorController::class, 'quertium']);
+// Route::get('/quertium/{dni}', [AdministratorController::class, 'quertium']);
 
 Auth::routes();
 
-Route::get('/main', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('/main', [HomeController::class, 'index'])->name('dashboard');
 
 Route::middleware(['auth'])->prefix('matricula')->group(function () {
     Route::get('/buscar', BuscarMatricula::class)->name('matricula.buscar');
@@ -29,7 +27,12 @@ Route::middleware(['auth'])->prefix('matricula')->group(function () {
     Route::get('/apoderados', ApoderadosMatricula::class)->name('matricula.apoderado');
 });
 
+Route::middleware(['auth'])->prefix('mantenimiento')->group(function () {
+    Route::get('/ciclos-y-aulas', [HomeController::class, 'ciclosAulas'])->name('mantenimiento.ciclos-y-aulas');
 
+});
+/* 
+mantenimiento.ciclos-aulas.index */
 
 
 
@@ -41,10 +44,6 @@ Route::middleware(['auth'])->prefix('mantenimiento')->group(function () {
 
 Route::middleware(['auth'])->prefix('reportes')->group(function () {
     Route::get('/', [HomeController::class, 'reportes'])->name('reportes');
-});
-
-Route::middleware(['auth'])->prefix('incidencias')->group(function () {
-    Route::get('/', [HomeController::class, 'incidencias'])->name('incidencias');
 });
 
 

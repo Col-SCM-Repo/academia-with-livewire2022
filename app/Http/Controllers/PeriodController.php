@@ -12,7 +12,8 @@ use App\Models\Classroom;
 
 class PeriodController extends Controller
 {
-    public function index()
+
+    /* public function index()
     {
         $periods = Period::all()->sortByDesc('active');
         return view('periods.index')->with('periods', $periods);
@@ -152,9 +153,9 @@ class PeriodController extends Controller
         $levels = Level::with('level_type')->where('period_id', $_GET['period_id'])->get();
         return $levels;
     }
-
+ */
     /* API */
-    public function nivelesGet()
+   /*  public function nivelesGet()
     {
         return Type_code::all();
     }
@@ -167,5 +168,5 @@ class PeriodController extends Controller
         foreach ($levels as $level) {
         }
         return [...$classrooms];
-    }
+    } */
 }

@@ -20,17 +20,17 @@ class Level extends Model
 
     public function period()
     {
-        return $this->belongsTo(Period::class);
+        return $this->belongsTo(Period::class, 'period_id', 'id');
     }
 
     public function classrooms()
     {
-        return $this->hasMany(Classroom::class);
+        return $this->hasMany(Classroom::class, 'level_id', 'id');
     }
 
     public function level_type()
     {
-        return $this->belongsTo(Type_code::class, 'type_id');
+        return $this->belongsTo(Type_code::class, 'type_id', 'id');
     }
 
     public function enrollments()

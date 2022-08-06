@@ -26,7 +26,7 @@ class Student extends Model
 
     public function school()
     {
-        return $this->belongsTo(School::class, 'entity_id', 'id');
+        return $this->belongsTo(School::class, 'school_id', 'id');
     }
 
     public function enrollment()

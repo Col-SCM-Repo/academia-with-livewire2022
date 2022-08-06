@@ -63,7 +63,6 @@ class Apoderado extends Component
             $this->emit('alert-sucess', (object) ['mensaje' => 'El apoderado se registró correctamente. ']);
         else
             $this->emit('alert-warning', (object) ['mensaje' => 'Verifique que halla realizado la busqueda en el sistema. ']);
-        $this->initialState();
     }
 
     public function update()
@@ -71,8 +70,7 @@ class Apoderado extends Component
         $this->validate();
         $data = convertArrayUpperCase($this->formularioApoderado);
         if ($this->apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
-            $this->emit('alert-sucess', (object) ['mensaje' => 'El apoderado se registró correctamente.']);
-            $this->initialState();
+            $this->emit('sweet-success', (object) [ 'titulo'=> 'Actualizado', 'mensaje' => 'El apoderado se actualizo correctamente. ']);
         } else
             $this->emit('alert-warning', (object) ['mensaje' => 'Verifique que el apodeado exista.']);
     }
@@ -97,10 +95,10 @@ class Apoderado extends Component
                 'estado_marital' => $informacionApoderado->estado_marital,
             ];
             $this->idRelacionApoderado  = $informacionApoderado->idRelacionApoderado;
-
-            $this->emit('alert-success', (object) ['mensaje' => 'Si se encontro infornacion.']);
+            $this->validate();
         } else {
-            $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontradp.']);
+            $this->emit('alert-warning', (object) ['mensaje' => 'El apoderado no fue encontrado.']);
+            $this->initialState();
         }
     }
 }

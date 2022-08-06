@@ -26,12 +26,12 @@ class Classroom extends Model
 
     public function level()
     {
-        return $this->belongsTo(Level::class);
+        return $this->belongsTo(Level::class, 'level_id', 'id');
     }
 
     public function enrollments()
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->hasMany(Enrollment::class, 'classroom_id', 'id');
     }
 
     // public function full_description(){

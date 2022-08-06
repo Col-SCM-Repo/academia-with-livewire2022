@@ -16,7 +16,7 @@ class Alumno extends Component
     private $distritosRepository, $ie_procedenciaRepository, $estudianteRepository;
 
     protected $listeners = [
-        'ya-cargue' => 'getDatosAutocomplete'
+        'reset-form-alumno' => 'initialState'
     ];
 
     protected $rules = [
@@ -44,15 +44,6 @@ class Alumno extends Component
     }
 
 
-    public function getDatosAutocomplete()
-    {
-        $this->emit('data-autocomplete', (object)[
-            'lista_distritos' => $this->lista_distritos,
-            'lista_ie_procedencia' => $this->lista_ie_procedencia,
-            //'lista_paises' => $this->lista_paises
-        ]);
-    }
-
     public function initialState()
     {
         $this->reset(["formularioAlumno", "idEstudiante"]);
@@ -75,13 +66,9 @@ class Alumno extends Component
         // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
         $data = convertArrayUpperCase($this->formularioAlumno);
         if ($this->estudianteRepository->registrarEstudiante($data)) {
-
-            $this->emit('alert-sucess', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno registrado correctamente. ']);
-            self::initialState();
+            $this->emit('sweet-success', (object) [ 'titulo'=> 'Creado', 'mensaje' => 'El alumno se registro correctamente. ']);
         } else
-            $this->emit('alert-warning', (object) ['titulo' => 'Error', 'mensaje' => 'Hubo un error al registrar al alumno. ']);
-
-        self::initialState();
+            $this->emit('alert-warning', (object) ['mensaje' => 'Hubo un error al registrar al alumno. ']);
     }
 
     public function update()
@@ -89,8 +76,7 @@ class Alumno extends Component
         $this->validate();
         $data = convertArrayUpperCase($this->formularioAlumno);
         if ($this->estudianteRepository->actualizarEstudiante($this->idEstudiante, $data)) {
-            $this->emit('alert-sucess', (object) ['mensaje' => 'El alumno se actualizo correctamente.']);
-            self::initialState();
+            $this->emit('sweet-success', (object) [ 'titulo'=> 'Actualizado', 'mensaje' => 'El alumno se actualizo correctamente.']);
         } else
             $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontradp.']);
     }
@@ -117,7 +103,7 @@ class Alumno extends Component
             $this->idEstudiante = $informacionAlumno->idEstudiante;
             $this->validate();
         } else {
-            $this->emit('alert-warning', (object) ['titulo' => 'Alerta', 'mensaje' => 'El alumno no fue encontradp. ']);
+            $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontrado. ']);
         }
     }
 }

@@ -12,9 +12,10 @@ class CreateLevelsTable extends Migration
 			$table->bigInteger('id', true);
 			$table->bigInteger('type_id')->index('FK_levels_type_codes');
 			$table->bigInteger('period_id')->index('FK_levels_periods');
-			$table->date('start_date');
-			$table->date('end_date');
-			$table->decimal('price', 10);
+			$table->date('start_date')->nullable();
+			$table->date('end_date')->nullable();
+			$table->decimal('price', 10)->nullable();
+			$table->bigInteger('status');
 			$table->timestamps();
 		});
 	}

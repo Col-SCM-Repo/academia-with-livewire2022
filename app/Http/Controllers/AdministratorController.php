@@ -4,31 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
-use Peru\Http\ContextClient;
-use Peru\Jne\{Dni, DniParser};
 use App\Models\District;
 
 class AdministratorController extends Controller
 {
-    //
     use AuthenticatesUsers;
 
     public function showLoginForm()
     {
         if (Auth::user() != null) return redirect('/main');
         return view('auth.login');
-    }
-
-
-    public function dni($dni)
-    {
-        $cs = new Dni(new ContextClient(), new DniParser());
-        $person = $cs->get($dni);
-        // return $person;
-        if (!$person) {
-            return array('success' => false);
-        }
-        return array('success' => true, 'person' => $person);
     }
 
     public function quertium($dni)

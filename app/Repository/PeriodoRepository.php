@@ -2,38 +2,99 @@
 
 namespace App\Repository;
 
-use App\Models\Classroom;
 use App\Models\Period;
+use Illuminate\Database\Eloquent\Collection;
 
 class PeriodoRepository extends Period
 {
+    private $_nivelRepository;
+
+    public function __construct()
+    {
+        $this->_nivelRepository = new LevelRepository();
+    }
 
     public function builderModelRepository()
     {
-        $modelRepository = [
-            'id' => 0,
-            'name' => '0',
-            'year' => 2022,
-            'active' => 0,
+        return (object) [
+            'id' => null,
+            'nombre' => '', //name
+            'anio' => null, //year
+            'activo' => 1,  //active - 1 es activo y  0 es inactivo
         ];
-        return $modelRepository;
     }
 
+    public function buscarPeriodo( string $nombrePeriodo  ) : Period | null {
+        return Period::where('name', $nombrePeriodo)->first();
+    }
 
+    public function registrarPeriodo ( object $obj ) : Period | null {
+        $periodo = self::buscarPeriodo($obj->nombre);
+        if(!$periodo){
+            $periodo = new Period();
+            $periodo->name = $obj->nombre;
+            $periodo->year = $obj->anio;
+            $periodo->active = $obj->activo;
+            $periodo->save();
+            $this->_nivelRepository->generarNiveles($periodo->id);
+        }
+        return $periodo;
+    }
+    
+    public function actualizarPeriodo ( int $periodo_id, object $obj ) : Period | null {
+        $periodo = Period::find($periodo_id);
+        if($periodo){
+            $periodo->name = $obj->nombre;
+            $periodo->year = $obj->anio;
+            $periodo->active = $obj->activo;
+            $periodo->save();
+        }
+        return $periodo;
+    }
+
+    public function cambiarEstado ( int $idPeriodo, int $estado ) : bool {
+        $periodo = Period::find($idPeriodo);
+        if($periodo){
+            $periodo->active = $estado;
+            $periodo->save();
+            return true;
+        }
+        return false;
+    }
+
+    public function listaPeriodos ( int $estado=null ) : Collection | null {
+        if($estado)
+            return Period::where('active', $estado)->get();
+        else
+            return Period::all();
+    }
+
+    public function cicloVigente ( int $anio_id = null ) : Period | null {
+        if($anio_id){
+            return Period::find($anio_id);
+        }
+        $cicloVigente = Period::orderBy('id', 'DESC')->where('active', 1)->first();
+        if($cicloVigente)
+            return $cicloVigente;
+        return Period::orderBy('id', 'DESC')->first();
+    }
+
+/* 
     public function getPeriodoEnrollment($id)
     {
         return Period::with(['levels.enrollments', 'levels.classrooms.enrollments', 'levels.level_type'])->whereId($id)->firstOrFail();
     }
 
-    /* Devuelve informacion de todos los periodos activos  */
+    // Devuelve informacion de todos los periodos activos 
     public function getPeriodosAndLevels()
     {
         return Period::with('classrooms.level.level_type')->where('active', 1)->get();
     }
 
-    /* Recibe el ID una clase y muestra informacion de los alumnos y sus apoderados */
+    // recibe el ID una clase y muestra informacion de los alumnos y sus apoderados 
     public function getStudentsAndParents($id)
     {
         return Classroom::with('level.level_type', 'enrollments.student.entity', 'enrollments.relative.entity')->whereId($id)->firstOrFail();
-    }
+    } 
+*/
 }

@@ -90,7 +90,7 @@ class RelativeRepository extends Relative
                 "ocupacion" => $apoderado->occupation->name,
             ];
         }
-        throw new NotFoundResourceException('El apoderado no se encuentra registrado');
+        return null;
     }
 
     public function getListaApoderados()
