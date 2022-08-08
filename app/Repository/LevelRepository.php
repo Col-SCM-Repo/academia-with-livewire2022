@@ -3,10 +3,12 @@
 namespace App\Repository;
 
 use App\Models\Level;
+use App\Models\Period;
 use App\Models\Type_code;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class LevelRepository extends Level
 {
@@ -23,112 +25,82 @@ class LevelRepository extends Level
         ];
     }
 
-    public function getNivelPorId( int $nivel_id ) : Level | null {
+    public function getNivelPorId(int $nivel_id)
+    {
         return Level::find($nivel_id);
     }
 
-    public function buscarNiveles( int $periodo_id, int $estado = -5 ) : Collection{
+    public function buscarNiveles(int $periodo_id, int $estado = -5)
+    {
         return Level::join('type_codes', 'levels.type_id', '=', 'type_codes.id')
-        ->where('period_id', $periodo_id)
-        ->where(function ( $query ) use ($estado){
-            if($estado != -5){
-                $query->where('levels.status', '=', $estado);
-            }
-        }, )
-        ->select([
-            'levels.id',
-            'levels.period_id',
-            'type_codes.description',
-            'type_codes.type',
-            'levels.start_date',
-            'levels.end_date',
-            'levels.price',
-            'levels.status',
-        ])->get();
+            ->where('period_id', $periodo_id)
+            ->where(function ($query) use ($estado) {
+                if ($estado != -5) {
+                    $query->where('levels.status', '=', $estado);
+                }
+            },)
+            ->select([
+                'levels.id',
+                'levels.period_id',
+                'type_codes.description',
+                'type_codes.type',
+                'levels.start_date',
+                'levels.end_date',
+                'levels.price',
+                'levels.status',
+            ])->get();
     }
 
-    public function buscarAulasPorNivel( int $periodo_id ) : array{
-        $aulas = array();
-        $aulasData = Level::join('type_codes', 'levels.type_id', '=', 'type_codes.id')
-        ->leftJoin('classrooms', 'levels.id', '=', 'classrooms.level_id')        
-        ->where('period_id', $periodo_id)
-        ->where('levels.status', '=', 1)
-        ->select(
-            'levels.id AS level_id',
-            'levels.period_id AS period_id',
-            'type_codes.description',
-            'type_codes.type',
-            'levels.start_date',
-            'levels.end_date',
-            'levels.price',
-            'levels.status',
-            'classrooms.id AS classroom_id',
-            'classrooms.name',
-            'classrooms.vacancy',
-        )->get();
+    public function buscarAulasPorNivel(int $periodo_id)
+    {
+        $periodoActual = Period::find($periodo_id);
+        if (!$periodoActual) throw new NotFoundResourceException("Error, no se encontró el periodo indicado");
 
-        Log::debug($aulasData);
-        /*
-        'formularioAula.nombre' => 'required | string | min:1 ',
-        'formularioAula.nivel_id' => 'required | integer | min:0 ',
-        'formularioAula.vacantes' => 'required | integer | min:1 ',
-        */
-
-        $nombreNivel='';
-        $aulasTemp = array();
-        foreach ($aulasData as $aula) {
-            $aulaTemp = [
-                'id' => $aula->classroom_id,
-                'nombre' => $aula->name,
-                'nivel_id' => $aula->level_id,
-                'vacantes' => $aula->vacancy,
-                'costo' => $aula->price,
-                'fInicio' => $aula->start_date,
-                'fFin' => $aula->end_date,
-                'periodo_id' => $aula->period_id,
+        $dataNiveles  = array();
+        foreach ($periodoActual->levels as $nivel) {
+            if ($nivel->status != 1) continue;
+            $nivelTemp = [
+                'periodo_id' => $periodoActual->id,
+                'nivel_id' => $nivel->id,
+                'nivel_nombre' => $nivel->level_type->description,
+                'costo' => $nivel->price,
+                'fInicio' => $nivel->start_date,
+                'fFin' => $nivel->end_date,
+                'aulas' => array(),
             ];
-            if( $nombreNivel == $aula->description ){
-                $aulasTemp [] = $aulaTemp;
+            foreach ($nivel->classrooms as $clase) {
+                $nivelTemp['aulas'][] = (object) [
+                    'id' => $clase->id,
+                    'nombre' => $clase->name,
+                    'vacantes' => $clase->vacancy,
+                ];
             }
-            else{
-                $nombreNivel =$aula->description;
-                $aulas[ $nombreNivel ] = $aulasTemp; 
-                $aulasTemp [] = array();
-                if( $aula->classroom_id ){
-                    $aulasTemp [] = $aulaTemp;
-                }
-                else{
-                    $aulas[ $nombreNivel ] = $aulasTemp; 
-                }
-            }
+            $dataNiveles[] = (object) $nivelTemp;
         }
-
-        if( count( $aulasTemp ) > 0){
-                $aulas[ $nombreNivel ] = $aulasTemp; 
-        }
-        Log::debug($aulas);
-        return $aulas;
+        return $dataNiveles;
     }
 
 
-    public function informacionNivel( int $nivel_id ) : object{
+    public function informacionNivel(int $nivel_id)
+    {
         return Level::join('type_codes', 'levels.type_id', '=', 'type_codes.id')
-        ->where('levels.id', $nivel_id)
-        ->select([
-            'levels.id',
-            'levels.period_id',
-            'type_codes.description',
-            'type_codes.type',
-            'levels.start_date',
-            'levels.end_date',
-            'levels.price',
-            'levels.status',
-        ])->first();
+            ->where('levels.id', $nivel_id)
+            ->select([
+                'levels.id',
+                'levels.period_id',
+                'type_codes.description',
+                'type_codes.type',
+                'levels.start_date',
+                'levels.end_date',
+                'levels.price',
+                'levels.status',
+            ])->first();
     }
 
-    public function generarNiveles ( int $periodo_id) : bool {
+    public function generarNiveles(int $periodo_id)
+    {
         $nivelesGenerados = self::buscarNiveles($periodo_id);
-        if(count($nivelesGenerados)==0){
+        if (count($nivelesGenerados) == 0) {
             $nivelesAcademicos = Type_code::all();
             foreach ($nivelesAcademicos as $nivel) {
                 $nivelGenerado = new Level();
@@ -137,29 +109,31 @@ class LevelRepository extends Level
                 $nivelGenerado->start_date = null;
                 $nivelGenerado->end_date = null;
                 $nivelGenerado->price = null;
-                $nivelGenerado->status = 0 ;
+                $nivelGenerado->status = 0;
                 $nivelGenerado->save();
             }
         }
         return false;
     }
 
-    public function actualizarNivel (int $nivel_id, object $obj) : bool {
+    public function actualizarNivel(int $nivel_id, object $obj): bool
+    {
         $nivel = Level::find($nivel_id);
-        if($nivel) {
+        if ($nivel) {
             $nivel->start_date = $obj->fInicio;
             $nivel->end_date = $obj->fFin;
             $nivel->price = $obj->costo;
-            $nivel->status = $obj->estado ;
+            $nivel->status = $obj->estado;
             $nivel->save();
             return true;
         }
         return false;
     }
 
-    public function cambiarEstado ( int $nivel_id, int $estado ) : bool {
+    public function cambiarEstado(int $nivel_id, int $estado): bool
+    {
         $nivel = Level::find($nivel_id);
-        if($nivel){
+        if ($nivel) {
             $nivel->status = $estado;
             return true;
         }

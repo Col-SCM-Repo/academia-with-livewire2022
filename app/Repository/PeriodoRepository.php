@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Models\Period;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class PeriodoRepository extends Period
 {
@@ -24,13 +25,16 @@ class PeriodoRepository extends Period
         ];
     }
 
-    public function buscarPeriodo( string $nombrePeriodo  ) : Period | null {
+    public function buscarPeriodo(string $nombrePeriodo)
+    {
         return Period::where('name', $nombrePeriodo)->first();
     }
 
-    public function registrarPeriodo ( object $obj ) : Period | null {
+    public function registrarPeriodo(object $obj)
+    {
+        Log::debug("eNTRO A REGISTRAR PERIODO");
         $periodo = self::buscarPeriodo($obj->nombre);
-        if(!$periodo){
+        if (!$periodo) {
             $periodo = new Period();
             $periodo->name = $obj->nombre;
             $periodo->year = $obj->anio;
@@ -40,10 +44,11 @@ class PeriodoRepository extends Period
         }
         return $periodo;
     }
-    
-    public function actualizarPeriodo ( int $periodo_id, object $obj ) : Period | null {
+
+    public function actualizarPeriodo(int $periodo_id, object $obj)
+    {
         $periodo = Period::find($periodo_id);
-        if($periodo){
+        if ($periodo) {
             $periodo->name = $obj->nombre;
             $periodo->year = $obj->anio;
             $periodo->active = $obj->activo;
@@ -52,9 +57,10 @@ class PeriodoRepository extends Period
         return $periodo;
     }
 
-    public function cambiarEstado ( int $idPeriodo, int $estado ) : bool {
+    public function cambiarEstado(int $idPeriodo, int $estado)
+    {
         $periodo = Period::find($idPeriodo);
-        if($periodo){
+        if ($periodo) {
             $periodo->active = $estado;
             $periodo->save();
             return true;
@@ -62,32 +68,35 @@ class PeriodoRepository extends Period
         return false;
     }
 
-    public function listaPeriodos ( int $estado=null ) : Collection | null {
-        if($estado)
+    public function listaPeriodos(int $estado = null)
+    {
+        if ($estado)
             return Period::where('active', $estado)->get();
         else
-            return Period::orderBy('year','DESC')->get();
+            return Period::orderBy('year', 'DESC')->get();
     }
 
-    public function cicloVigente ( int $anio_id = null ) : Period | null {
-        if($anio_id){
+    public function cicloVigente(int $anio_id = null)
+    {
+        if ($anio_id) {
             return Period::find($anio_id);
         }
         $cicloVigente = Period::orderBy('year', 'DESC')->where('active', 1)->first();
-        if($cicloVigente)
+        if ($cicloVigente)
             return $cicloVigente;
         return Period::orderBy('year', 'DESC')->first();
     }
 
-    public function eliminarPeriodo( int $periodod_id ) : bool{
+    public function eliminarPeriodo(int $periodod_id)
+    {
         $periodoEliminar = self::find($periodod_id);
-        if($periodoEliminar){
+        if ($periodoEliminar) {
             $periodoEliminar->delete();
             return true;
         }
         return false;
     }
-/* 
+    /* 
     public function getPeriodoEnrollment($id)
     {
         return Period::with(['levels.enrollments', 'levels.classrooms.enrollments', 'levels.level_type'])->whereId($id)->firstOrFail();

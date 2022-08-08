@@ -1,12 +1,23 @@
 <?php
+
 namespace App\Enums;
 
-enum EstadosAlertas : string {
+abstract class EstadosAlertasEnum
+{
+    const SUCCESS  = 'success';
+    const WARNING  =  'warning';
+    const ERROR  = 'error';
+}
+
+/* 
+enum EstadosAlertas
+{
     case SUCCESS  = 'success';
     case WARNING  =  'warning';
     case ERROR  = 'error';
 
-    public static function getEstado ( self $value ) : string{
+    public static function getEstado(self $value): string
+    {
         return match ($value) {
             EstadosAlertas::SUCCESS => 'correcto',
             EstadosAlertas::WARNING => 'peligro',
@@ -16,8 +27,5 @@ enum EstadosAlertas : string {
     // name es el nombre y value es el valor que tine
     // EstadosAlertas::getEstado(EstadosAlertas::SUCCESS)
 
-} 
-
-
-
-
+}
+ */

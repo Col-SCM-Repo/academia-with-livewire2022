@@ -142,7 +142,11 @@
             });
         });
 
+        $(document).ready(()=>{
+            console.log("el doc esta listo")
+        });
     </script>
+    
 </body>
 
 </html>

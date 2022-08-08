@@ -17,40 +17,43 @@ class ClassroomRepository extends Classroom
     public function builderModelRepository()
     {
         return (object) [
-            'id' => null,            
+            'id' => null,
             'nombre' => null,       // name
             'nivel_id' => null,     // level_id
             'vacantes' => null,     // vacancy
         ];
     }
 
-    public function getInformacionClase ( int $clase_id ) : object | null{
-        $clase = Classroom::find( $clase_id );
-        if($clase){
+    public function getInformacionClase(int $clase_id)
+    {
+        $clase = Classroom::find($clase_id);
+        if ($clase) {
             return (object) [
-                'id' => $clase->id, 
-                'nombre' => $clase->name, 
-                'nivel_id' => $clase->level_id, 
-                'nivel' => $clase->level->level_type->description, 
-                'vacantes' => $clase->vacancy, 
+                'id' => $clase->id,
+                'nombre' => $clase->name,
+                'nivel_id' => $clase->level_id,
+                'nivel' => $clase->level->level_type->description,
+                'vacantes' => $clase->vacancy,
             ];
-        }else
+        } else
             return null;
     }
 
-    public function getClasesPorNivel ( int $nivel_id ) : object | null{
+    public function getClasesPorNivel(int $nivel_id)
+    {
         $nivel = $this->_nivelRepository->getNivelPorId($nivel_id);
-        if($nivel){
+        if ($nivel) {
             $clases = array();
-            foreach( $nivel->classrooms as $clase ){
-                $clases[] = self::getInformacionClase( $clase->id );
+            foreach ($nivel->classrooms as $clase) {
+                $clases[] = self::getInformacionClase($clase->id);
             }
-            return count($nivel->classrooms)>0? $clases : null;
-        }else
+            return count($nivel->classrooms) > 0 ? $clases : null;
+        } else
             return null;
     }
 
-    public function registrarClase ( object $obj ) : Classroom {
+    public function registrarClase(object $obj)
+    {
         $claseNueva = new Classroom();
         $claseNueva->name = $obj->nombre;
         $claseNueva->level_id = $obj->nivel_id;
@@ -59,9 +62,10 @@ class ClassroomRepository extends Classroom
         return $claseNueva;
     }
 
-    public function actualizarClase ( int $clase_id, object $obj ) : Classroom | null {
+    public function actualizarClase(int $clase_id, object $obj)
+    {
         $claseActualizar = Classroom::find($clase_id);
-        if($claseActualizar){
+        if ($claseActualizar) {
             $claseActualizar->name = $obj->nombre;
             $claseActualizar->vacancy = $obj->vacantes;
             $claseActualizar->save();
@@ -70,9 +74,10 @@ class ClassroomRepository extends Classroom
         return null;
     }
 
-    public function eliminarClase ( int $clase_id ) : bool {
+    public function eliminarClase(int $clase_id)
+    {
         $claseEliminar = Classroom::find($clase_id);
-        if($claseEliminar){
+        if ($claseEliminar) {
             $claseEliminar->delete();
             return true;
         }

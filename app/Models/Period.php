@@ -14,7 +14,7 @@ class Period extends Model
 
     public function levels()
     {
-        return $this->hasMany(Level::class);
+        return $this->hasMany(Level::class, 'period_id', 'id');
     }
 
     public function classrooms()

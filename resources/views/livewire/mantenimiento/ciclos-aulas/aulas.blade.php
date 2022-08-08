@@ -7,32 +7,45 @@
     <div class="ibox-content">
         <ul class="list-group">
             @if (count ($listaNivelesActivos)>0)
-            @foreach ($listaNivelesActivos as $key=> $nivelActivo)
+            @foreach ($listaNivelesActivos as $nivelActivo)
             <li class="list-group-item " style=" padding-bottom: 3rem">
                 <div style="display: flex;">
-                    <p class="text-info" style="flex-grow: 1">
+                    <p class="text-primary" style="flex-grow: 1">
                         <span class="label label-primary"><i class="fa fa-university" aria-hidden="true"></i></span>
                         &nbsp;
-                        {{ $key }}
+                            {{ $nivelActivo->nivel_nombre }}
                     </p>
                     <button class="btn btn-sm text-success"
                         style="background: transparent; padding: 0; margin: 0; border: none"
-                        wire:click="openModalNuevaAula({{ 45}})">
+                        wire:click="openModalNuevaAula({{ $nivelActivo->nivel_id }})">
                         <i class="fa fa-plus" aria-hidden="true"></i> Nuevo
                     </button>
                 </div>
                 <div>
-
-                    <small class="block text-muted">
-                        <i class="fa fa-clock-o"></i> 1 minuts ago
-                    </small>
-
+                    <div class="row text-left">
+                        @if (count($nivelActivo->aulas) > 0)
+                            @foreach ($nivelActivo->aulas as $aula)
+                                <div class="col-xs-3 d-flex" style="padding: 0; padding-left:1rem" >
+                                    <div class="btn btn-sm btn-outline btn-primary dim " style="width: 100%" wire:click="openModalEditaAula({{ $aula->id }})">
+                                        <button class="btn btn-sm text-danger btn-aula-delete" data-target='{{ $aula->id }}' data-targetName='{{ $aula->nombre }}'
+                                            style="padding: 0; margin: 0; background: transparent; font-size:1.25rem; font-weight: 900; float: right; line-height: 1rem" >
+                                            X
+                                        </button>
+                                        <span class="font-bold block" style="font-size: 1.25rem">Aula: {{ $aula->nombre }} </span>
+                                        <small class="  block"> {{ $aula->vacantes }} Vacantes</small>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <h5 style="padding-left:1rem">Aun no se encuentran aulas registradas</h5>
+                        @endif
+                    </div>
                 </div>
 
             </li>
             @endforeach
             @else
-            <h3>No se encontro niveles activos</h3>
+            <h3>No se encontrò niveles activos</h3>
             @endif
 
         </ul>
@@ -68,9 +81,65 @@
     </x-modal-form>
     <!-- end: Modal ciclo -->
 
-    @push('scripts')
     <script>
 
+document.addEventListener("DOMContentLoaded", () => {
+            Livewire.hook('message.processed', (msg, {fingerprint}) => {
+                if(fingerprint.name == 'mantenimiento.ciclos-aulas.aulas'){
+                    [...document.getElementsByClassName('btn-aula-delete')].forEach((el)=>{
+                        console.log(el);
+                        el.addEventListener('click', (event)=>{
+                            event.stopPropagation();
+                            const target = event.target;
+                            if( target.dataset.targetname ){
+                                swal({
+                                title: "Estas Seguro?",
+                                text: "Se eliminara el aula "+target.dataset.targetname,
+                                icon: "warning",
+                                buttons: true,
+                                buttons: ["Cancelar", "Eliminar"],
+                                dangerMode: true,
+                                })
+                                .then((willDelete) => {
+                                if (willDelete) {
+                                    Livewire.emit('eliminar-aula', target.dataset.target)
+                                } 
+                            });
+                            }
+
+                    })
+                })
+                }
+            });
+        }); 
+
+    </script>
+
+    @push('scripts')
+    <script>
+[...document.getElementsByClassName('btn-aula-delete')].forEach((el)=>{
+                        console.log(el);
+                        el.addEventListener('click', (event)=>{
+                            event.stopPropagation();
+                            const target = event.target;
+                            if( target.dataset.targetname ){
+                                swal({
+                                title: "Estas Seguro?",
+                                text: "Se eliminara el aula "+target.dataset.targetname,
+                                icon: "warning",
+                                buttons: true,
+                                buttons: ["Cancelar", "Eliminar"],
+                                dangerMode: true,
+                                })
+                                .then((willDelete) => {
+                                if (willDelete) {
+                                    Livewire.emit('eliminar-aula', target.dataset.target)
+                                } 
+                            });
+                            }
+
+                    })
+                })
     </script>
     @endpush
 </div>

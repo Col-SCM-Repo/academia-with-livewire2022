@@ -22,7 +22,7 @@ class OccupationRepository extends Occupation
         return $Ocupacion;
     }
 
-    public function eliminarOcupacion($nombreOcupacion): bool
+    public function eliminarOcupacion($nombreOcupacion)
     {
         $Ocupacion = self::buscarOcupacion($nombreOcupacion);
         if ($Ocupacion) {

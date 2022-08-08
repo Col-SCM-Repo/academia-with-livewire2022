@@ -1,11 +1,13 @@
 <?php
 
-use App\Enums\EstadosAlertas;
-use App\Enums\EstadosEntidad;
+use App\Enums\EstadosAlertasEnum;
+use App\Enums\EstadosEntidadEnum;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 function convertArrayUpperCase(array $array, bool $wantObject = true)
 {
+    Log::debug("inicio conversion a array");
     $temp = array();
     foreach ($array as $key => $value) {
         $temp[$key] = strtoupper($value);
@@ -13,79 +15,86 @@ function convertArrayUpperCase(array $array, bool $wantObject = true)
     return $wantObject ? (object) $temp : $temp;
 }
 
-function  openModal( Component $context, string $query, bool $open = true  ){
+function  openModal(Component $context, string $query, bool $open = true)
+{
     $context->emit('change-modal', (object)[
         'query' => $query,
-        'estado' => $open? 'show': 'hide'
+        'estado' => $open ? 'show' : 'hide'
     ]);
 }
 
-function sweetAlert( Component $context, string $nombreEntidad , EstadosEntidad $accion ,EstadosAlertas $tipoAlerta = EstadosAlertas::SUCCESS ){
+function sweetAlert(Component $context, string $nombreEntidad, string $accion, string $tipoAlerta = EstadosAlertasEnum::SUCCESS)
+{
     $titulo = 'Alerta';
     $mensaje = null;
-    $evento = 'sweet-'.$tipoAlerta->value;
-    switch($tipoAlerta){
-        case EstadosAlertas::SUCCESS :
+    $evento = 'sweet-' . $tipoAlerta;
+    switch ($tipoAlerta) {
+        case EstadosAlertasEnum::SUCCESS:
             $titulo = 'Correcto';
-            $mensaje = "El $nombreEntidad fue ".$accion->value."do correctamente";
-        break;
-        case EstadosAlertas::WARNING :
+            $mensaje = "El $nombreEntidad fue " . $accion . "do correctamente";
+            break;
+        case EstadosAlertasEnum::WARNING:
             $titulo = 'Alerta';
-            $mensaje = "No se puede $accion->value"."ar el $nombreEntidad";
-        break;
-        case EstadosAlertas::ERROR :
+            $mensaje = "No se puede $accion" . "ar el $nombreEntidad";
+            break;
+        case EstadosAlertasEnum::ERROR:
             $titulo = 'Error';
-            $mensaje = "Error al $accion->value"."ar el $nombreEntidad";
-        break;
-        default: return ;
+            $mensaje = "Error al $accion" . "ar el $nombreEntidad";
+            break;
+        default:
+            return;
     }
-    $context->emit( $evento , (object) [ 
-        'titulo'=> $titulo , 
+    $context->emit($evento, (object) [
+        'titulo' => $titulo,
         'mensaje' => $mensaje
     ]);
 }
 
-function toastAlert( Component $context,string $mensaje, EstadosAlertas $tipoAlerta = EstadosAlertas::ERROR ){
+function toastAlert(Component $context, string $mensaje, string $tipoAlerta = EstadosAlertasEnum::ERROR)
+{
     $titulo = 'Alerta';
-    $evento = 'alert-'.$tipoAlerta->value;
-    switch($tipoAlerta){
-        case EstadosAlertas::SUCCESS :
+    $evento = 'alert-' . $tipoAlerta;
+    switch ($tipoAlerta) {
+        case EstadosAlertasEnum::SUCCESS:
             $titulo = 'Correcto';
-        case EstadosAlertas::WARNING :
+        case EstadosAlertasEnum::WARNING:
             $titulo = 'Alerta';
-        break;
-        case EstadosAlertas::ERROR :
+            break;
+        case EstadosAlertasEnum::ERROR:
             $titulo = 'Error';
-        break;
-        default: return ;
+            break;
+        default:
+            return;
     }
-    $context->emit( $evento , (object) [ 
-        'titulo'=> $titulo , 
+    $context->emit($evento, (object) [
+        'titulo' => $titulo,
         'mensaje' => $mensaje
     ]);
 }
 
-function toastAlertAvanzado( Component $context, string $nombreEntidad , EstadosEntidad $accion ,EstadosAlertas $tipoAlerta = EstadosAlertas::ERROR ){
+function toastAlertAvanzado(Component $context, string $nombreEntidad, string $accion, string $tipoAlerta = EstadosAlertasEnum::ERROR)
+{
     $titulo = 'Alerta';
     $mensaje = null;
-    $evento = 'alert-'.$tipoAlerta->value;
-    switch($tipoAlerta){
-        case EstadosAlertas::SUCCESS :
+    $evento = 'alert-' . $tipoAlerta;
+    switch ($tipoAlerta) {
+        case EstadosAlertasEnum::SUCCESS:
             $titulo = 'Correcto';
-            $mensaje = "El $nombreEntidad fue ".$accion->value."do correctamente";
-        break;
-        case EstadosAlertas::WARNING :
+            $mensaje = "El $nombreEntidad fue " . $accion . "do correctamente";
+            break;
+        case EstadosAlertasEnum::WARNING:
             $titulo = 'Alerta';
-            $mensaje = "No se puede $accion->value"."ar el $nombreEntidad";
-        break;
-        case EstadosAlertas::ERROR :
+            $mensaje = "No se puede $accion" . "ar el $nombreEntidad";
+            break;
+        case EstadosAlertasEnum::ERROR:
             $titulo = 'Error';
-            $mensaje = "Error al $accion->value"."ar el $nombreEntidad";
-        break;
-        default: return ;
+            $mensaje = "Error al $accion" . "ar el $nombreEntidad";
+            break;
+        default:
+            return;
     }
-    $context->emit( $evento , (object) [ 
-        'titulo'=> $titulo , 
+    $context->emit($evento, (object) [
+        'titulo' => $titulo,
         'mensaje' => $mensaje
     ]);
 }

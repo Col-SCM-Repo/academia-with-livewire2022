@@ -2,9 +2,8 @@
 
 namespace App\Http\Livewire\Mantenimiento\CiclosAulas;
 
-use App\Enums\EstadosEntidad;
+use App\Enums\EstadosEntidadEnum;
 use App\Repository\LevelRepository;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
@@ -24,7 +23,7 @@ class Niveles extends Component
     ];
 
     protected $listeners = [
-        'periodo-actualizado'=>'render'
+        'periodo-actualizado' => 'render'
     ];
 
     public function __construct()
@@ -32,49 +31,49 @@ class Niveles extends Component
         $this->_nivelRepository = new LevelRepository();
     }
 
-    public function initialState(){
-        $this->reset([ 'formularioNivel' ]);
+    public function initialState()
+    {
+        $this->reset(['formularioNivel']);
     }
 
-    public function modalOpenEdit($nivel_id){
+    public function modalOpenEdit($nivel_id)
+    {
         self::initialState();
         $nivelTemp = $this->_nivelRepository->informacionNivel($nivel_id);
-        Log::debug($nivel_id);
-        Log::debug($nivelTemp);
-        if($nivelTemp){
+        if ($nivelTemp) {
             $this->nivelEditar_id = $nivel_id;
             $this->formularioNivel = [
-                'descripcion' =>  $nivelTemp->description, 
-                'costo' =>  $nivelTemp->price, 
-                'fInicio' =>  $nivelTemp->start_date, 
-                'fFin' =>  $nivelTemp->end_date, 
+                'descripcion' =>  $nivelTemp->description,
+                'costo' =>  $nivelTemp->price,
+                'fInicio' =>  $nivelTemp->start_date,
+                'fFin' =>  $nivelTemp->end_date,
                 'estado' => $nivelTemp->status,
 
-            ]; 
+            ];
             openModal($this, '#form-modal-nivel');
-            $this->validate();
-        }
-        else{
+            $this->validateOnly('');
+        } else {
             toastAlert($this, 'Error al actualizar el nivel');
-
         }
     }
 
-    public function update (){
+    public function update()
+    {
         $this->validate();
-        if( $this->_nivelRepository->actualizarNivel($this->nivelEditar_id, (object)$this->formularioNivel) ){
+        if ($this->_nivelRepository->actualizarNivel($this->nivelEditar_id, (object)$this->formularioNivel)) {
             $this->emitTo(Aulas::class, 'nivel-actualizado');
             openModal($this, '#form-modal-nivel', false);
-            sweetAlert($this, 'nivel', EstadosEntidad::UPDATED);
+            sweetAlert($this, 'nivel', EstadosEntidadEnum::UPDATED);
         }
-
     }
 
     public function render()
     {
-        if(Session::has('periodo')){
-            $this->lista_niveles = $this->_nivelRepository->buscarNiveles( Session::get('periodo')->id);
-        }
+        if (Session::has('periodo')) {
+            $this->lista_niveles = $this->_nivelRepository->buscarNiveles(Session::get('periodo')->id);
+        } else
+            $this->lista_niveles  = [];
+
         return view('livewire.mantenimiento.ciclos-aulas.niveles');
     }
 }

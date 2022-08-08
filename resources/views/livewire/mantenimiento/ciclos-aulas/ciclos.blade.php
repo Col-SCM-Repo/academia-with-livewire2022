@@ -108,11 +108,12 @@
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Estado</label>
                 <div class=" col-lg-10">
-                    <select wire:model.defer="formularioCiclo.estado" class="form-control">
+                    <select wire:model.defer="formularioCiclo.activo" class="form-control">
+                        <option value="">-- Seleccione un estado --</option>
                         <option value="1">ACTIVO</option>
                         <option value="0">INACTIVO</option>
                     </select>
-                    <x-input-error variable='formularioCiclo.estado'></x-input-error>
+                    <x-input-error variable='formularioCiclo.activo'></x-input-error>
                 </div>
             </div>
             <div class=" text-right ">
@@ -163,7 +164,7 @@
                         if( target.dataset.targetname ){
                             swal({
                             title: "Estas Seguro?",
-                            text: "Se eliminara el ciclo"+target.dataset.targetname,
+                            text: "Se eliminara el ciclo "+target.dataset.targetname,
                             icon: "warning",
                             buttons: true,
                             buttons: ["Cancelar", "Eliminar"],
@@ -172,9 +173,9 @@
                             .then((willDelete) => {
                             if (willDelete) {
                                 Livewire.emit('eliminar-ciclo', target.dataset.target)
-                                swal("Poof! Your imaginary file has been deleted!", {
+                                /* swal("Poof! Your imaginary file has been deleted!", {
                                 icon: "success",
-                                });
+                                }); */
                             } 
                         });
                         }
