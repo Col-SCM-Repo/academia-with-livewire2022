@@ -81,7 +81,7 @@ class PeriodoRepository extends Period
         if ($anio_id) {
             return Period::find($anio_id);
         }
-        $cicloVigente = Period::orderBy('year', 'DESC')->where('active', 1)->first();
+        $cicloVigente = Period::orderBy('year', 'DESC')->where('active', 1)->where('deleted_at', null)->first();
         if ($cicloVigente)
             return $cicloVigente;
         return Period::orderBy('year', 'DESC')->first();

@@ -5,8 +5,6 @@ namespace App\Repository;
 use App\Models\Level;
 use App\Models\Period;
 use App\Models\Type_code;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
