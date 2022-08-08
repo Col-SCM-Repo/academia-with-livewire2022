@@ -66,19 +66,27 @@ class PeriodoRepository extends Period
         if($estado)
             return Period::where('active', $estado)->get();
         else
-            return Period::all();
+            return Period::orderBy('year','DESC')->get();
     }
 
     public function cicloVigente ( int $anio_id = null ) : Period | null {
         if($anio_id){
             return Period::find($anio_id);
         }
-        $cicloVigente = Period::orderBy('id', 'DESC')->where('active', 1)->first();
+        $cicloVigente = Period::orderBy('year', 'DESC')->where('active', 1)->first();
         if($cicloVigente)
             return $cicloVigente;
-        return Period::orderBy('id', 'DESC')->first();
+        return Period::orderBy('year', 'DESC')->first();
     }
 
+    public function eliminarPeriodo( int $periodod_id ) : bool{
+        $periodoEliminar = self::find($periodod_id);
+        if($periodoEliminar){
+            $periodoEliminar->delete();
+            return true;
+        }
+        return false;
+    }
 /* 
     public function getPeriodoEnrollment($id)
     {

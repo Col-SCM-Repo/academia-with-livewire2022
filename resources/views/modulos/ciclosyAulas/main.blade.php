@@ -4,6 +4,7 @@ $slot = ''
 @endphp
 
 @push('styles')
+<link href="{{ asset('inspinia_admin/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 <style>
     #cabecera-pagina {
         display: none;
@@ -14,6 +15,11 @@ $slot = ''
     }
 </style>
 @endpush
+
+@push('scripts')
+<script src=" {{ asset('inspinia_admin/js/plugins/dataTables/datatables.min.js') }} "></script>
+@endpush
+
 
 @section('content')
 <div>
