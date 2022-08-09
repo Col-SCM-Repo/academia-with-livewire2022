@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula\Partials;
+namespace App\Http\Livewire\Matricula\Apoderado;
 
 use App\Repository\DistrictRepository;
 use App\Repository\OccupationRepository;
@@ -42,7 +42,7 @@ class Apoderado extends Component
 
     public function render()
     {
-        return view('livewire.matricula.partials.apoderado');
+        return view('livewire.matricula.apoderado.apoderado');
     }
 
     public function initialState()
@@ -70,7 +70,7 @@ class Apoderado extends Component
         $this->validate();
         $data = convertArrayUpperCase($this->formularioApoderado);
         if ($this->apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
-            $this->emit('sweet-success', (object) [ 'titulo'=> 'Actualizado', 'mensaje' => 'El apoderado se actualizo correctamente. ']);
+            $this->emit('sweet-success', (object) ['titulo' => 'Actualizado', 'mensaje' => 'El apoderado se actualizo correctamente. ']);
         } else
             $this->emit('alert-warning', (object) ['mensaje' => 'Verifique que el apodeado exista.']);
     }

@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\HomeController;
-use App\Http\Livewire\Matricula\AlumnosMatricula;
-use App\Http\Livewire\Matricula\ApoderadosMatricula;
-use App\Http\Livewire\Matricula\BuscarMatricula;
-use App\Http\Livewire\Matricula\NuevaMatricula;
-use App\Http\Livewire\Matricula\PagosMatricula;
+use App\Http\Livewire\Matricula\Alumno\Alumno;
+use App\Http\Livewire\Matricula\Apoderado\Apoderado;
+use App\Http\Livewire\Matricula\Matricula\Buscar;
+use App\Http\Livewire\Matricula\Matricula\Nueva;
+use App\Http\Livewire\Matricula\Pago\Pago;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -20,16 +20,15 @@ Auth::routes();
 Route::get('/main', [HomeController::class, 'index'])->name('dashboard');
 
 Route::middleware(['auth'])->prefix('matricula')->group(function () {
-    Route::get('/buscar', BuscarMatricula::class)->name('matricula.buscar');
-    Route::get('/nueva', NuevaMatricula::class)->name('matricula.nueva');
-    Route::get('/pagos', PagosMatricula::class)->name('matricula.pagos');
-    Route::get('/alumnos', AlumnosMatricula::class)->name('matricula.alumno');
-    Route::get('/apoderados', ApoderadosMatricula::class)->name('matricula.apoderado');
+    Route::get('/buscar', Buscar::class)->name('matricula.buscar');
+    Route::get('/nueva', Nueva::class)->name('matricula.nueva');
+    Route::get('/pagos', Pago::class)->name('matricula.pagos');
+    Route::get('/alumnos', Alumno::class)->name('matricula.alumno');
+    Route::get('/apoderados', Apoderado::class)->name('matricula.apoderado');
 });
 
 Route::middleware(['auth'])->prefix('mantenimiento')->group(function () {
     Route::get('/ciclos-y-aulas', [HomeController::class, 'ciclosAulas'])->name('mantenimiento.ciclos-y-aulas');
-
 });
 /* 
 mantenimiento.ciclos-aulas.index */

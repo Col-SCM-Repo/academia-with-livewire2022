@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Livewire\Matricula;
+namespace App\Http\Livewire\Matricula\Apoderado;
 
 use App\Repository\RelativeRepository;
 use Livewire\Component;
 
-class ApoderadosMatricula extends Component
+class ApoderadosTEMP
 {
     public $search = "";
     public $apoderados = [];
@@ -17,8 +17,10 @@ class ApoderadosMatricula extends Component
         $this->apoderadoRepository = new RelativeRepository();
     }
 
+    /*  
     public function render()
     {
         return view('livewire.matricula.apoderados-matricula');
-    }
+    } 
+    */
 }

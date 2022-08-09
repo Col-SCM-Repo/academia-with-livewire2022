@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula\Partials;
+namespace App\Http\Livewire\Matricula\Alumno;
 
 use App\Repository\DistrictRepository;
 use App\Repository\SchoolRepository;
@@ -56,7 +56,7 @@ class Alumno extends Component
 
     public function render()
     {
-        return view('livewire.matricula.partials.alumno');
+        return view('livewire.matricula.alumno.alumno');
     }
 
     public function create()
@@ -66,7 +66,7 @@ class Alumno extends Component
         // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
         $data = convertArrayUpperCase($this->formularioAlumno);
         if ($this->estudianteRepository->registrarEstudiante($data)) {
-            $this->emit('sweet-success', (object) [ 'titulo'=> 'Creado', 'mensaje' => 'El alumno se registro correctamente. ']);
+            $this->emit('sweet-success', (object) ['titulo' => 'Creado', 'mensaje' => 'El alumno se registro correctamente. ']);
         } else
             $this->emit('alert-warning', (object) ['mensaje' => 'Hubo un error al registrar al alumno. ']);
     }
@@ -76,7 +76,7 @@ class Alumno extends Component
         $this->validate();
         $data = convertArrayUpperCase($this->formularioAlumno);
         if ($this->estudianteRepository->actualizarEstudiante($this->idEstudiante, $data)) {
-            $this->emit('sweet-success', (object) [ 'titulo'=> 'Actualizado', 'mensaje' => 'El alumno se actualizo correctamente.']);
+            $this->emit('sweet-success', (object) ['titulo' => 'Actualizado', 'mensaje' => 'El alumno se actualizo correctamente.']);
         } else
             $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontradp.']);
     }

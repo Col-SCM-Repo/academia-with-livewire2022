@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Livewire\Matricula\Partials;
+namespace App\Http\Livewire\Matricula\Matricula;
 
 use App\Repository\EnrollmentRepository;
 use Livewire\Component;
 
-class Matricula extends Component
+class MatriculaTEMP extends Component
 {
     public $relative_id, $student_id;
-    public $formularioMatricula; 
+    public $formularioMatricula;
     public $lista_classrooms, $lista_carreras;
-    public $_classroomRepository,  $_careersRepository, $enrollmentRepository; 
+    public $_classroomRepository,  $_careersRepository, $enrollmentRepository;
 
     protected $rules = [
         'relative_id' => 'required | integer',
@@ -31,8 +31,9 @@ class Matricula extends Component
         $this->enrollmentRepository = new EnrollmentRepository();
     }
 
-    public function initialState(){
-        $this->reset([ 'relative_id', 'student_id', 'formularioMatricula']);
+    public function initialState()
+    {
+        $this->reset(['relative_id', 'student_id', 'formularioMatricula']);
     }
 
     public function render()
