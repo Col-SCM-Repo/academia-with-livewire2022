@@ -1,5 +1,10 @@
-<div>
-    @section('header')
+@extends('layouts.app')
+
+@php
+$slot = ''
+@endphp
+
+@section('header')
     <div class="col-md-3">
         <h2>Buscar matricula</h2>
         <ol class="breadcrumb">
@@ -14,7 +19,9 @@
             </li>
         </ol>
     </div>
-    @endsection
+@endsection
+
+@section('content')
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox">
@@ -34,4 +41,5 @@
             </div>
         </div>
     </div>
-</div>
+@endsection
+

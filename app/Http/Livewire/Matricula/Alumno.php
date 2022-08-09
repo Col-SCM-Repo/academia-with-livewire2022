@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Livewire\Matricula\Alumno;
+namespace App\Http\Livewire\Matricula;
 
 use App\Repository\DistrictRepository;
 use App\Repository\SchoolRepository;
 use App\Repository\StudentRepository;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Alumno extends Component
 {
+    // checar eso del ID ESTUDIANTE *WARNING*
     public $idEstudiante;
     public $formularioAlumno;
 
@@ -33,8 +35,11 @@ class Alumno extends Component
         'formularioAlumno.sexo' => "required | string | min:4 | max:8",
     ];
 
-    public function __construct()
+    public function mount($ambito = 0) // 1 = extermp  <> 0 = componente interno
     {
+        self::initialState();
+        Log::debug("Ambito " . $ambito);
+
         $this->distritosRepository = new DistrictRepository();
         $this->ie_procedenciaRepository = new SchoolRepository();
         $this->estudianteRepository = new StudentRepository();
@@ -43,29 +48,23 @@ class Alumno extends Component
         $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
     }
 
+    public function render()
+    {
+        return view('livewire.matricula.alumno');
+    }
 
     public function initialState()
     {
         $this->reset(["formularioAlumno", "idEstudiante"]);
     }
 
-    public function mount()
-    {
-        self::initialState();
-    }
-
-    public function render()
-    {
-        return view('livewire.matricula.alumno.alumno');
-    }
-
+    // CRUD alumno
     public function create()
     {
         $this->validate();
         // Reglas de validacion
         // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
-        $data = convertArrayUpperCase($this->formularioAlumno);
-        if ($this->estudianteRepository->registrarEstudiante($data)) {
+        if ($this->estudianteRepository->registrarEstudiante(convertArrayUpperCase($this->formularioAlumno))) {
             $this->emit('sweet-success', (object) ['titulo' => 'Creado', 'mensaje' => 'El alumno se registro correctamente. ']);
         } else
             $this->emit('alert-warning', (object) ['mensaje' => 'Hubo un error al registrar al alumno. ']);
@@ -105,5 +104,9 @@ class Alumno extends Component
         } else {
             $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontrado. ']);
         }
+    }
+
+    public function buscar_externo()
+    {
     }
 }

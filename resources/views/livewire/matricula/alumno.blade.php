@@ -1,12 +1,15 @@
 <!------------------------------- Begin: alumno ------------------------------->
 <div class="ibox" wire:ignore.self>
+
+    <div class='loader'></div>
+
     <div class="ibox-title">
         <span>
-            <h5> {{ $alumno_id? 'Alumno existente' : 'Nuevo alumno' }} </h5>
+            <h5> {{ $idEstudiante? 'Alumno existente' : 'Nuevo alumno' }} </h5>
         </span>
     </div>
     <div class="ibox-content">
-        <form class="row "  wire:submit.prevent="{{ $alumno_id? 'updateAlumno' : 'createAlumno' }}">
+        <form class="row "  wire:submit.prevent="{{ $idEstudiante? 'update' : 'create' }}">
             <div class="col-lg-6 form-horizontal" >
                 <div class="form-group">
                     <label class="col-lg-2 control-label">DNI</label>
@@ -16,14 +19,12 @@
                                 placeholder="DNI o carnet de extranjeria "
                                 class="form-control ">
                             <span class="input-group-btn">
-                                <button type="button" wire:click="searchAlumnoInterno"
-                                    class="btn btn-outline btn-primary"
-                                    title="Buscar en la base de datos interna del colegio">
+                                <button type="button" wire:click="buscar_interno"
+                                    class="btn btn-outline btn-primary" title="Buscar en la base de datos interna">
                                     <i class="fa fa-search" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" wire:click="searchAlumnoExterno"
-                                    class="btn btn-outline btn-warning"
-                                    title="Buscar en la base de datos externa">
+                                <button type="button" wire:click="buscar_externo"
+                                    class="btn btn-outline btn-warning" title="Buscar en la base de datos externa">
                                     <i class="fa fa-archive" aria-hidden="true"></i>
                                 </button>
                             </span>
@@ -126,10 +127,10 @@
                 </div>
             </div>
             <div class="col-12 text-right" >
-                <span wire:loading wire:target="searchAlumnoInterno, searchAlumnoExterno"> Buscando alumno ...</span>
-                <span wire:loading wire:target="updateAlumno, createAlumno"> Guardando ...</span>
+                <span wire:loading wire:target="buscar_interno, buscar_externo"> Buscando alumno ...</span>
+                <span wire:loading wire:target="update, create"> Guardando ...</span>
                 <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> 
-                    {{ $alumno_id? 'Actualizar': 'Guardar'}} 
+                    {{ $idEstudiante? 'Actualizar': 'Guardar'}} 
                 </button>
             </div>
         </form>

@@ -8,6 +8,6 @@ class Pago extends Component
 {
     public function render()
     {
-        return view('livewire.matricula.pago.pago');
+        return view('livewire.matricula.pago');
     }
 }

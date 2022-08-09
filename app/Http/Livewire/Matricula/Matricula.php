@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Livewire\Matricula\Matricula;
+namespace App\Http\Livewire\Matricula;
 
 use App\Repository\EnrollmentRepository;
 use Livewire\Component;
 
-class MatriculaTEMP extends Component
+class Matricula extends Component
 {
     public $relative_id, $student_id;
     public $formularioMatricula;
@@ -24,21 +24,22 @@ class MatriculaTEMP extends Component
         'formularioMatricula.observaciones' => 'string',
     ];
 
-    public function __construct()
+    public function mount()
     {
         /* $this->_classroomRepository = new (); */
         $this->_careersRepository = new EnrollmentRepository();
         $this->enrollmentRepository = new EnrollmentRepository();
+
+        self::initialState();
+    }
+
+    public function render()
+    {
+        return view('livewire.matricula.matricula');
     }
 
     public function initialState()
     {
         $this->reset(['relative_id', 'student_id', 'formularioMatricula']);
-    }
-
-    public function render()
-    {
-        self::initialState();
-        return view('livewire.matricula.partials.matricula');
     }
 }

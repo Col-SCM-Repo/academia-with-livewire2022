@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class HomeController extends Controller
 {
     public function __construct()
@@ -11,25 +9,52 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
+    // Home
     public function index()
     {
         return view('index');
     }
 
-    // matriculas
-    public function matriculas()
+    /********************** Modulo mantenimiento **********************/
+    public function ciclosAulas() // mantenimiento/ciclos-y-aulas 
     {
-        return "matriculas";
+        return view('modulos.ciclosyAulas.main');
     }
+
+    /********************** Modulo Matricula **********************/
+    public function nuevaMatricula()
+    {
+        return view('modulos.matricula.nueva');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // mantenimiento
     public function mantenimiento()
     {
         return "mantenimiento";
     }
-    
-    public function ciclosAulas (){
-        return view('modulos.ciclosyAulas.main');
+
+    // Modulo matriculas
+    public function matriculas()
+    {
+        return "matriculas";
     }
 
     // reportes

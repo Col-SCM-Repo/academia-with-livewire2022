@@ -21,6 +21,9 @@
         .modal-backdrop {
             background: #00000085;
         }
+        input[type=text] {
+            text-transform: uppercase
+        }
     </style>
     @stack('styles')
 </head>

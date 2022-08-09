@@ -17,8 +17,6 @@ use Livewire\Component;
 
 class Nueva extends Component
 {
-    public  $formularioAlumno, $formularioApoderado, $formularioMatricula;
-
     public  $alumno_id,
         $apoderado_id,  // relative_ID
         $matricula_id;

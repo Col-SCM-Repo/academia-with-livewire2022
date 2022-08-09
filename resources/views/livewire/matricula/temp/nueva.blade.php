@@ -25,70 +25,7 @@
     @endpush
 
     @push('scripts')
-        <!-- Steps -->
-        <script src="{{ asset('inspinia_admin/js/plugins/steps/jquery.steps.min.js') }}"></script>
 
-        <!-- Jquery Validate -->
-        <script src="{{ asset('inspinia_admin/js/plugins/validate/jquery.validate.min.js') }}"></script>
-
-        <!-- Data picker -->
-        <script src="{{ asset('inspinia_admin/js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
-
-        <!-- Typehead -->
-        <script src="{{ asset('inspinia_admin/js/plugins/typehead/bootstrap3-typeahead.min.js') }}"></script>
-
-        <script>
-            var settings = {
-                stepsOrientation: $.fn.steps.stepsOrientation.horizontal,
-
-                /* Behaviour */
-                autoFocus: false,
-                enableAllSteps: false,
-                enableKeyNavigation: true,
-                enablePagination: false,
-                suppressPaginationOnFocus: true,
-                enableContentCache: true,
-                enableCancelButton: true,
-                enableFinishButton: true,
-                preloadContent: false,
-                showFinishButtonAlways: false,
-                forceMoveForward: false,
-                saveState: false,
-                startIndex: 0,
-
-                /* Transition Effects */
-                /* 
-                none or 0	No transition animation	String or Integer
-                fade or 1	Fade out/in transition	String or Integer
-                slide or 2	Slide down/up transition	String or Integer
-                slideLeft or 3 
-                */
-                transitionEffect: $.fn.steps.transitionEffect.slideLeft,
-                transitionEffectSpeed: 200,
-
-                onStepChanging: function (event, currentIndex, newIndex) { 
-                    return true; },
-                onStepChanged: function (event, currentIndex, priorIndex) {
-
-                }, 
-                onCanceled: function (event) {
-
-                },
-                onFinishing: function (event, currentIndex) {
-                    return true; }, 
-                onFinished: function (event, currentIndex) {
-
-                    toastr.success('Se creo la matricula correctamente', 'Alerta')
-                }
-            };
-            $("#wizard").steps(settings);
-
-
-            Livewire.on('wizzard-step', step => {
-                $("#wizard").steps(step);
-            } );
-
-        </script>
 
     @endpush
 
@@ -131,7 +68,6 @@
             </div>
         </div>
     </div>
-
 
 {{-- 
     <script>

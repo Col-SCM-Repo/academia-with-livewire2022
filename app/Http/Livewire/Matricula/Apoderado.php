@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula\Apoderado;
+namespace App\Http\Livewire\Matricula;
 
 use App\Repository\DistrictRepository;
 use App\Repository\OccupationRepository;
@@ -14,13 +14,6 @@ class Apoderado extends Component
 
     public $lista_distritos, $lista_ocupaciones;
     protected $distritosRepository, $ocupacionRepository,  $entityRepository, $apoderadoRepository;
-
-    public function __construct()
-    {
-        $this->apoderadoRepository = new RelativeRepository();
-        $this->distritosRepository = new DistrictRepository();
-        $this->ocupacionRepository = new OccupationRepository();
-    }
 
     protected $listeners = [
         'ya-cargue' => 'getDatosAutocomplete'
@@ -40,9 +33,18 @@ class Apoderado extends Component
         'formularioApoderado.estado_marital' => "required | string | min:4",
     ];
 
+    public function mount()
+    {
+        $this->apoderadoRepository = new RelativeRepository();
+        $this->distritosRepository = new DistrictRepository();
+        $this->ocupacionRepository = new OccupationRepository();
+
+        self::initialState();
+    }
+
     public function render()
     {
-        return view('livewire.matricula.apoderado.apoderado');
+        return view('livewire.matricula.apoderado');
     }
 
     public function initialState()
@@ -50,10 +52,6 @@ class Apoderado extends Component
         $this->reset(['formularioApoderado', 'idRelacionApoderado']);
     }
 
-    public function mount()
-    {
-        self::initialState();
-    }
 
     public function create()
     {
