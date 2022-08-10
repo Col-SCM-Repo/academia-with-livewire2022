@@ -36,6 +36,10 @@ class DistrictRepository extends District
     public function listaDistritos()
     {
         return District::all();
+        $distritos  = array();
+        foreach (District::all() as $district)
+            $distrito[] = $district->name;
+        return $distrito;
     }
 
     public function eliminarDistrito($nombreDistrito)

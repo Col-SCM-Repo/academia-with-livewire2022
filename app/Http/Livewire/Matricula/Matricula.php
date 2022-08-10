@@ -24,12 +24,16 @@ class Matricula extends Component
         'formularioMatricula.observaciones' => 'string',
     ];
 
-    public function mount()
+
+    public function __construct()
     {
         /* $this->_classroomRepository = new (); */
         $this->_careersRepository = new EnrollmentRepository();
         $this->enrollmentRepository = new EnrollmentRepository();
+    }
 
+    public function mount()
+    {
         self::initialState();
     }
 

@@ -40,7 +40,10 @@ class SchoolRepository extends School
 
     public function listarEscuelas()
     {
-        return School::all();
+        $escuelas = array();
+        foreach (School::all() as $school)
+            $escuelas[] = $school->name;
+        return $escuelas;
     }
 
     public function eliminarEscuela($nombreEscuela)

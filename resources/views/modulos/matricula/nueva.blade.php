@@ -37,6 +37,9 @@ $slot = ''
     <!-- Data table -->
     <script src=" {{ asset('inspinia_admin/js/plugins/dataTables/datatables.min.js') }} "></script>
     
+    <!-- Typehead -->
+    <script src="{{ asset('inspinia_admin/js/plugins/typehead/bootstrap3-typeahead.min.js') }}"></script>
+    
     <script>
         var settings = {
             stepsOrientation: $.fn.steps.stepsOrientation.horizontal,
@@ -105,7 +108,7 @@ $slot = ''
                     <div id="wizard" wire:ignore.self>
                         <h1>Crear alumno</h1>
                         <div>
-                            @livewire('matricula.alumno', [ "ambito"=> 1 ] )
+                            @livewire('matricula.alumno')
                         </div>
                         <h1>Crear apoderado</h1>
                         <div>

@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Matricula;
 
+use App\Enums\EstadosAlertasEnum;
+use App\Enums\EstadosEntidadEnum;
 use App\Repository\DistrictRepository;
 use App\Repository\SchoolRepository;
 use App\Repository\StudentRepository;
@@ -15,11 +17,22 @@ class Alumno extends Component
     public $formularioAlumno;
 
     public $lista_distritos, $lista_ie_procedencia;
-    private $distritosRepository, $ie_procedenciaRepository, $estudianteRepository;
+
+    private $distritosRepository, $ie_procedenciaRepository, $_estudianteRepository;
+    private $componenteExterno;
 
     protected $listeners = [
-        'reset-form-alumno' => 'initialState'
+        //    'reset-form-alumno' => 'initialState',
+        'pagina-cargada-getdata' => 'enviarDataAutocomplete',
     ];
+
+    public function enviarDataAutocomplete()
+    {
+        $this->emit('data-autocomplete', (object)[
+            "distritos" => $this->lista_distritos,
+            "instituciones" => $this->lista_ie_procedencia,
+        ]);
+    }
 
     protected $rules = [
         'formularioAlumno.dni' => "required | integer | min:8",
@@ -35,15 +48,18 @@ class Alumno extends Component
         'formularioAlumno.sexo' => "required | string | min:4 | max:8",
     ];
 
-    public function mount($ambito = 0) // 1 = extermp  <> 0 = componente interno
+    public function __construct()
     {
-        self::initialState();
-        Log::debug("Ambito " . $ambito);
-
         $this->distritosRepository = new DistrictRepository();
         $this->ie_procedenciaRepository = new SchoolRepository();
-        $this->estudianteRepository = new StudentRepository();
+        $this->_estudianteRepository = new StudentRepository();
+    }
 
+    public function mount($ambito = 0) // 1 = externo  <> 0 = componente interno
+    {
+        self::initialState();
+
+        $this->componenteExterno = $ambito == 1;
         $this->lista_distritos = $this->distritosRepository->listaDistritos();
         $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
     }
@@ -64,26 +80,44 @@ class Alumno extends Component
         $this->validate();
         // Reglas de validacion
         // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
-        if ($this->estudianteRepository->registrarEstudiante(convertArrayUpperCase($this->formularioAlumno))) {
-            $this->emit('sweet-success', (object) ['titulo' => 'Creado', 'mensaje' => 'El alumno se registro correctamente. ']);
+        $estudianteCreado = $this->_estudianteRepository->registrarEstudiante(convertArrayUpperCase($this->formularioAlumno));
+        if ($estudianteCreado) {
+            sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
+            if ($this->componenteExterno) {
+                openModal($this, 'form-modal-alumno', false);
+                self::initialState();
+
+                // cerrar modal y limpiar formulario
+            } else {
+                // siguiente paso  o habilitar boton
+                $this->emit('alumno_id', $estudianteCreado->id);
+            }
         } else
-            $this->emit('alert-warning', (object) ['mensaje' => 'Hubo un error al registrar al alumno. ']);
+            toastAlert($this, 'Ocurrio un error al registrar alumno');
     }
 
     public function update()
     {
         $this->validate();
-        $data = convertArrayUpperCase($this->formularioAlumno);
-        if ($this->estudianteRepository->actualizarEstudiante($this->idEstudiante, $data)) {
-            $this->emit('sweet-success', (object) ['titulo' => 'Actualizado', 'mensaje' => 'El alumno se actualizo correctamente.']);
+        if ($this->_estudianteRepository->actualizarEstudiante($this->idEstudiante, convertArrayUpperCase($this->formularioAlumno))) {
+            if ($this->componenteExterno) {
+                openModal($this, 'form-modal-alumno', false);
+                self::initialState();
+                // cerrar modal y limpiar formulario
+            } /* else {
+                //  siguiente paso  o habilitar boton
+                //  $this->emit('wizzard-step', 'next');
+            } */
+
+            sweetAlert($this, 'alumno', EstadosEntidadEnum::UPDATED);
         } else
-            $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontradp.']);
+            toastAlert($this, 'Ocurrio un error al actualizar alumno');
     }
 
     public function buscar_interno()
     {
         $this->validateOnly('formularioAlumno.dni');
-        $informacionAlumno = $this->estudianteRepository->getInformacionEstudiante($this->formularioAlumno['dni']);
+        $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($this->formularioAlumno['dni']);
 
         if ($informacionAlumno) {
             $this->formularioAlumno = [
@@ -100,9 +134,11 @@ class Alumno extends Component
                 'sexo' => $informacionAlumno->sexo,
             ];
             $this->idEstudiante = $informacionAlumno->idEstudiante;
+            $this->emit('alumno_id', $informacionAlumno->idEstudiante);
             $this->validate();
         } else {
-            $this->emit('alert-warning', (object) ['mensaje' => 'El alumno no fue encontrado. ']);
+            toastAlert($this, 'El alumno no pudo ser encontrado', EstadosAlertasEnum::WARNING);
+            self::initialState();
         }
     }
 

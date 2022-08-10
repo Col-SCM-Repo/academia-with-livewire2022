@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Matricula;
 
+use App\Enums\EstadosEntidadEnum;
 use App\Repository\DistrictRepository;
 use App\Repository\OccupationRepository;
 use App\Repository\RelativeRepository;
@@ -13,7 +14,8 @@ class Apoderado extends Component
     public $formularioApoderado;
 
     public $lista_distritos, $lista_ocupaciones;
-    protected $distritosRepository, $ocupacionRepository,  $entityRepository, $apoderadoRepository;
+    private $distritosRepository, $ocupacionRepository,  $entityRepository, $apoderadoRepository;
+    private $componenteExterno;
 
     protected $listeners = [
         'ya-cargue' => 'getDatosAutocomplete'
@@ -33,13 +35,17 @@ class Apoderado extends Component
         'formularioApoderado.estado_marital' => "required | string | min:4",
     ];
 
-    public function mount()
+    public function __construct()
     {
         $this->apoderadoRepository = new RelativeRepository();
         $this->distritosRepository = new DistrictRepository();
         $this->ocupacionRepository = new OccupationRepository();
+    }
 
+    public function mount($ambito = 0) // 1 = externo  <> 0 = componente interno
+    {
         self::initialState();
+        $this->componenteExterno = $ambito == 1;
     }
 
     public function render()
@@ -52,15 +58,14 @@ class Apoderado extends Component
         $this->reset(['formularioApoderado', 'idRelacionApoderado']);
     }
 
-
     public function create()
     {
         $this->validate();
         $data = convertArrayUpperCase($this->formularioApoderado);
         if ($this->apoderadoRepository->registrarApoderado($data))
-            $this->emit('alert-sucess', (object) ['mensaje' => 'El apoderado se registró correctamente. ']);
+            sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
         else
-            $this->emit('alert-warning', (object) ['mensaje' => 'Verifique que halla realizado la busqueda en el sistema. ']);
+            toastAlert($this, 'Primero verifique haber realizado la busqueda.');
     }
 
     public function update()
@@ -68,9 +73,9 @@ class Apoderado extends Component
         $this->validate();
         $data = convertArrayUpperCase($this->formularioApoderado);
         if ($this->apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
-            $this->emit('sweet-success', (object) ['titulo' => 'Actualizado', 'mensaje' => 'El apoderado se actualizo correctamente. ']);
+            sweetAlert($this, 'apoderado', EstadosEntidadEnum::UPDATED);
         } else
-            $this->emit('alert-warning', (object) ['mensaje' => 'Verifique que el apodeado exista.']);
+            toastAlert($this, 'No se encontrò al apoderado.');
     }
 
     public function buscar_interno()
@@ -95,7 +100,7 @@ class Apoderado extends Component
             $this->idRelacionApoderado  = $informacionApoderado->idRelacionApoderado;
             $this->validate();
         } else {
-            $this->emit('alert-warning', (object) ['mensaje' => 'El apoderado no fue encontrado.']);
+            toastAlert($this, 'No se encontrò al apoderado.');
             $this->initialState();
         }
     }
