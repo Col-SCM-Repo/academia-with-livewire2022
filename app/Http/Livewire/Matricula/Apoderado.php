@@ -61,10 +61,11 @@ class Apoderado extends Component
     public function create()
     {
         $this->validate();
-        $data = convertArrayUpperCase($this->formularioApoderado);
-        if ($this->apoderadoRepository->registrarApoderado($data))
+        $apoderadoCreado = $this->apoderadoRepository->registrarApoderado(convertArrayUpperCase($this->formularioApoderado));
+        if ($apoderadoCreado) {
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
-        else
+            $this->emit('apòderado_id', $apoderadoCreado->id);
+        } else
             toastAlert($this, 'Primero verifique haber realizado la busqueda.');
     }
 
@@ -98,6 +99,7 @@ class Apoderado extends Component
                 'estado_marital' => $informacionApoderado->estado_marital,
             ];
             $this->idRelacionApoderado  = $informacionApoderado->idRelacionApoderado;
+            $this->emit('apòderado_id', $informacionApoderado->idRelacionApoderado);
             $this->validate();
         } else {
             toastAlert($this, 'No se encontrò al apoderado.');

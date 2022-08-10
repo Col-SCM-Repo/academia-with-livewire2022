@@ -16,14 +16,53 @@
     <link href="{{ asset('inspinia_admin/css/style.css') }}" rel="stylesheet">
 
     <link href="{{ asset('inspinia_admin/css/plugins/iCheck/custom.css') }}" rel="stylesheet">
+    {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     @livewireStyles
     <style>
+
         .modal-backdrop {
             background: #00000085;
         }
         input[type=text] {
             text-transform: uppercase
         }
+
+        /* Inicio : Agregar a estilos globales */
+        .d-block {
+            display: block;
+            width: 100%
+        }
+        
+        .d-inline {
+            display: block !important;
+        }
+
+        .d-inlineblock {
+            display: inline-block !important;
+        }
+
+        
+
+        .p-0{
+            padding: 0 !important;
+        }
+
+        .px-0{
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .py-0{
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .d-inline {
+            display: inline !important
+        }
+
+
+        /* fin : Agregar a estilos globales */
+
     </style>
     @stack('styles')
 </head>
