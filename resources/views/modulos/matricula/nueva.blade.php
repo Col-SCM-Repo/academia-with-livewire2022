@@ -98,6 +98,12 @@ $slot = ''
         </li>
     </ol>
 </div>
+<div class="col-md-7 text-right" style="padding-top: 1rem">
+    <button class="btn btn-sm btn-success din" type="button" id="btnResetComponents"> 
+        Limpiar formulario 
+    </button>
+</div>
+
 @endsection
 
 @section('content')
@@ -118,9 +124,25 @@ $slot = ''
                         <div>
                             @livewire('matricula.matricula')
                         </div>
+                        <h1>Pagos</h1>
+                        <div>
+                            @livewire('matricula.pago')
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(()=>{
+            $('#btnResetComponents').on('click', ()=>{
+                alert("reseteando componentes");
+                Livewire.emit('reset-forms', true); 
+            })
+        })
+    </script>    
+@endpush
+

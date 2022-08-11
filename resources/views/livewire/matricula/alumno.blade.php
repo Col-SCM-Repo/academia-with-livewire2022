@@ -1,8 +1,13 @@
 <div class="ibox">
     <div class="ibox-title">
-        <span>
-            <h5> {{ $idEstudiante? 'Alumno existente' : 'Nuevo alumno' }} </h5>
-        </span>
+            <h5> Formulario alumno </h5>
+            <div class="ibox-tools">
+                @if ($idEstudiante)
+                    <span class="label label-primary pull-right"> Registrado </span>
+                @else
+                    <span class="label label-warning-light pull-right"> Sin registrar </span>
+                @endif
+            </div>
     </div>
     <div class="ibox-content">
         <form class="row " wire:submit.prevent="{{ $idEstudiante? 'update' : 'create' }}">
@@ -131,8 +136,9 @@
             <div class="col-12 text-right  ">
                 <span wire:loading wire:target="buscar_interno"> Buscando alumno ...</span>
                 <span wire:loading wire:target="update, create"> Guardando ...</span>
-                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{ $idEstudiante?
-                    'Actualizar': 'Guardar'}}  </button>
+                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> 
+                    <i class="fa fa-save    "></i> {{ $idEstudiante? 'Actualizar': 'Guardar'}}  
+                </button>
 
                 @if ($idEstudiante)
                 <button class="btn btn-sm btn-success" type="button" style="padding: .75rem 3rem"

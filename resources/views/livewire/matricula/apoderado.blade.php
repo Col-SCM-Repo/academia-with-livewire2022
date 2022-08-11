@@ -1,8 +1,14 @@
 <div class="ibox">
     <div class="ibox-title">
-        <span>
-            <h5> {{  $idRelacionApoderado? 'Apoderado existente' : 'Nuevo apoderado' }} </h5>
-        </span>
+        <h5> Formulario apoderado </h5>
+        <div class="ibox-tools">
+            @if ($idRelacionApoderado)
+                <span class="label label-primary pull-right"> Registrado </span>
+            @else
+                <span class="label label-warning-light pull-right"> Sin registrar </span>
+            @endif
+        </div>
+
     </div>
     <div class="ibox-content">
         <form class="row " wire:submit.prevent = "{{ $idRelacionApoderado? 'update' : 'create' }}" >

@@ -79,6 +79,7 @@ class Matricula extends Component
         $matriculaCreada = $this->_matriculaRepository->registrarMatricula($modelMatricula);
         if ($matriculaCreada) {
             $this->matricula_id = $matriculaCreada->id;
+            $this->emitTo('matricula.pago', 'matricula_id', $matriculaCreada->id);
             sweetAlert($this, 'matricula', EstadosEntidadEnum::CREATED);
         } else
             toastAlert($this, 'Error al registar matricula');

@@ -74,6 +74,9 @@
             <div class="row border-bottom">
                 @include('layouts.partials.top_nav_app')
             </div>
+            <div class="row  border-bottom white-bg dashboard-header">
+                @yield('header')
+            </div>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="wrapper wrapper-content">

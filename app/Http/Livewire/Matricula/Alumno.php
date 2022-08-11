@@ -46,8 +46,6 @@ class Alumno extends Component
         'formularioAlumno.Ie_procedencia' => "required | string | min: 4",
         'formularioAlumno.anio_egreso' => "required | date_format:Y",
         'formularioAlumno.sexo' => "required | string | min:4 | max:8",
-
-        'formularioAlumno.cuotas' => "required | string | min:0 | max:8",
     ];
 
     public function __construct()

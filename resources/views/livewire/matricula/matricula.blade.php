@@ -3,14 +3,13 @@
         <span style="display: flex">
             <div style="flex-grow: 1">
                 <h5 > Nueva matricula </h5>
-                <span class="label label-primary"> {{ $matricula_id ? 'Sin registrar' : 'Registrada' }} </span>
+                <span class="label label-primary"> {{ $matricula_id ? 'Registrada' : 'Sin registrar' }} </span>
             </div>
             <div class="ibox-tools">
-                <button class="btn btn-xs btn-info text-white">
+                <button class="btn btn-xs btn-info " style="color: #fff">
                     Pagos  
                 </button>
-                &nbsp;
-                <button class="btn btn-xs btn-success">
+                <button class="btn btn-xs btn-success ">
                     Descargar  
                 </button>
             </div>
