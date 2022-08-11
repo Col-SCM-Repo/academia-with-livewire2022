@@ -106,14 +106,14 @@ $slot = ''
             <div class="ibox" style="min-width: 60vh;">
                 <div class="ibox-content">
                     <div id="wizard" wire:ignore.self>
-                        {{-- <h1>Crear alumno</h1>
+                        <h1>Crear alumno</h1>
                         <div>
                             @livewire('matricula.alumno')
                         </div>
                         <h1>Crear apoderado</h1>
                         <div>
                             @livewire('matricula.apoderado')
-                        </div> --}}
+                        </div> 
                         <h1>Matricular</h1>
                         <div>
                             @livewire('matricula.matricula')

@@ -1,7 +1,19 @@
 <div class="ibox" wire:ignore.self>
     <div class="ibox-title">
-        <span>
-            <h5> Nueva matricula </h5>
+        <span style="display: flex">
+            <div style="flex-grow: 1">
+                <h5 > Nueva matricula </h5>
+                <span class="label label-primary"> {{ $matricula_id ? 'Sin registrar' : 'Registrada' }} </span>
+            </div>
+            <div class="ibox-tools">
+                <button class="btn btn-xs btn-info text-white">
+                    Pagos  
+                </button>
+                &nbsp;
+                <button class="btn btn-xs btn-success">
+                    Descargar  
+                </button>
+            </div>
         </span>
     </div>
     <div class="ibox-content">
@@ -44,7 +56,7 @@
                     </div>
                     <label class="col-lg-3 control-label">Costo de ciclo:</label>
                     <div class="col-lg-3">
-                        <input type="text" title="Costo del ciclo" wire:mode.defer="formularioMatricula.costo"
+                        <input type="text" title="Costo del ciclo" wire:model.defer="formularioMatricula.costo"
                             class="form-control" id="costo-ciclo">
                         <x-input-error variable='formularioMatricula.costo'> </x-input-error>
                     </div>
@@ -94,8 +106,19 @@
                 </div>
             </div>
             <div class="col-12 text-right">
+                <div class="alert " role="alert">
+                    @error($relative_id)
+                        <p class="text-danger">Debe registrar al <span class="alert-link">apoderado</span></p>
+                    @enderror
+                    @error($student_id)
+                        <p class="text-danger">Debe registrar al <span class="alert-link">alumno</span></p>
+                    @enderror
+                </div>
+            </div>
+            <div class="col-12 text-right">
                 <span wire:loading wire:target="create"> Guardando ...</span>
                 <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem">
+                    <i class="fa fa-save    "></i>
                     Guardar
                 </button>
             </div>

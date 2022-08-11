@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EstadosEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ class CreateInstallmentsTable extends Migration
 			$table->integer('order')->unsigned();
 			$table->enum('type', array('enrollment', 'installment'));
 			$table->decimal('amount', 10);
-			$table->string('state')->nullable();
+			$table->string('status')->default(EstadosEnum::ACTIVO);
 			$table->softDeletes();
 			$table->timestamps();
 		});

@@ -46,6 +46,8 @@ class Alumno extends Component
         'formularioAlumno.Ie_procedencia' => "required | string | min: 4",
         'formularioAlumno.anio_egreso' => "required | date_format:Y",
         'formularioAlumno.sexo' => "required | string | min:4 | max:8",
+
+        'formularioAlumno.cuotas' => "required | string | min:0 | max:8",
     ];
 
     public function __construct()
@@ -82,12 +84,11 @@ class Alumno extends Component
         // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
         $estudianteCreado = $this->_estudianteRepository->registrarEstudiante(convertArrayUpperCase($this->formularioAlumno));
         if ($estudianteCreado) {
+            $this->idEstudiante = $estudianteCreado->id;
             sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
             if ($this->componenteExterno) {
                 openModal($this, 'form-modal-alumno', false);
                 self::initialState();
-
-                // cerrar modal y limpiar formulario
             } else {
                 // siguiente paso  o habilitar boton
                 $this->emit('alumno_id', $estudianteCreado->id);

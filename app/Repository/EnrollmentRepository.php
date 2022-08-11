@@ -2,96 +2,115 @@
 
 namespace App\Repository;
 
+use App\Enums\EstadosEnum;
+use App\Enums\FormasPagoEnum;
 use App\Models\Enrollment;
-use App\Models\Entity;
 use App\Models\Installment;
-use App\Models\Payment;
-use App\Models\Relative;
-use App\Models\Secuence;
-use App\Models\Student;
-use Carbon\Carbon;
-use DateTime;
-use Error;
-use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use stdClass;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EnrollmentRepository extends Enrollment
 {
-    protected $paymentRepository;
+    protected $_cuotasRepository;
+
+    /*
+        Cancelado::estados  (  activo ! 1 cancelado)
+
+        Campos tabla enrollment:
+            id, code, type, student_id, classroom_id, relative_id, relative_relationship, user_id, 
+            career_id, payment_type, fees_quantity, period_cost, cancelled, observations
+
+    */
 
     public function __construct()
     {
-        $this->paymentRepository = new PaymentRepository();
+        $this->_cuotasRepository = new InstallmentRepository();
     }
 
     public function builderModelRepository()
     {
-        $modelRepository = [
-            'id' => 0,
-            'code' => '0',
-            'type' => 'normal',
-            'student_id' => 0,
-            'classroom_id' => 0,
-            'relative_id' => 0,
-            'relative_relationship' => 0,
-            'user_id' => 0,
-            'career_id' => 0,
-            'paymennt_type' => 0,
-            'fees_quantity' => 0,
-            'period_cost' => 0,
-            'cancelled' => 0,
-            'observations' =>  '',
+        return (object) [
+            //'id' => null,                  // id
+            //'codigo' => null,              // code
+            'tipo_matricula' => null,       // type
+            'estudiante_id' => null,        // student_id        
+            'aula_id' => null,              // classroom_id        
+            'apoderado_id' => null,         // relative_id        
+            'relacion_apoderado' => null,   // relative_relationship                    
+            //'usuario_id' => null,         // user_id    
+            'carrera_id' => null,           // career_id        
+            'tipo_pago' => null,            // payment_type        
+            'cantidad_cuotas' => null,      // fees_quantity            
+            'costo_matricula' => null,      // --------------------       
+            'costo_ciclo' => null,          // period_cost        
+            //estado' => null,              // status        
+            'observaciones' => null,        // observations        
         ];
-        return $modelRepository;
     }
 
-    public function createEnrollment($data)
+    public function registrarMatricula($modelEnrollment)
+    {
+        if (self::alumnoEstaMatriculado($modelEnrollment->aula_id, $modelEnrollment->estudiante_id)) return null;
+
+        $matricula = new Enrollment();
+        $matricula->type = $modelEnrollment->tipo_matricula;
+        $matricula->student_id = $modelEnrollment->estudiante_id;
+        $matricula->classroom_id = $modelEnrollment->aula_id;
+        $matricula->relative_id = $modelEnrollment->apoderado_id;
+        $matricula->relative_relationship = $modelEnrollment->relacion_apoderado;
+        $matricula->user_id = Auth::user()->id;
+        $matricula->career_id = $modelEnrollment->carrera_id;
+        $matricula->payment_type = $modelEnrollment->tipo_pago;
+        $matricula->fees_quantity = ($modelEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $modelEnrollment->cantidad_cuotas : 0;
+        $matricula->period_cost = $modelEnrollment->costo_ciclo;
+        $matricula->status = EstadosEnum::ACTIVO;
+        $matricula->observations = $modelEnrollment->observaciones;
+        $matricula->save();
+
+        $matricula->code = str_pad($matricula->id, 6, "0", STR_PAD_LEFT);
+        $matricula->save();
+
+        // generar cuotas de pago
+        $modelInstallment = $this->_cuotasRepository->builderModelRepository();
+        $modelInstallment->matricula_id = $matricula->id;
+        $modelInstallment->tipo_pago = $modelEnrollment->tipo_pago;
+        $modelInstallment->costo_matricula = $modelEnrollment->costo_matricula;
+        $modelInstallment->costo_ciclo = $modelEnrollment->costo_ciclo;
+        $modelInstallment->cuotas = $matricula->fees_quantity;
+
+        return $this->_cuotasRepository->generarCoutasPago($modelInstallment) ? $matricula : null;
+    }
+
+    public function actualizarMatricula($matricula_id, $modelEnrollment)
     {
     }
 
-
-    public function updateMatricula($id, $request)
-    {
-    }
-    public function updateAlumno($id, $alumnoUpdate)
-    {
-    }
-    public function updateApoderado($id, $apoderadoUpdate)
+    public function eliminarMatricula($matricula_id, $modelEnrollment)
     {
     }
 
-    public function cancel($id)
+    public function listaMatriculados($aula_id)
     {
     }
 
-    public function getDataEnrollemnt($id)
+    public function historialMatriculas($aula_id)
     {
     }
 
-    // Busquedas
-    public function search_enrollment($param)
+    public function buscarMatricula(string $dni_estudiante)
     {
     }
 
-
-    public function generate_random_password()
+    public function informacionDeMatricula(int $estudiante_id, string $dni_estudiante)
     {
-        //Se define una cadena de caractares. 
-        $cadena = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    }
 
-        $longitudCadena = strlen($cadena);
-        $pass = "";
-        $longitudPass = 10;
-        //Creamos la contraseña
-        for ($i = 1; $i <= $longitudPass; $i++) {
-            $pos = rand(0, $longitudCadena - 1);
-            $pass .= substr($cadena, $pos, 1);
-        }
-        return $pass;
+    public function alumnoEstaMatriculado(int $aula_id, int $estudiante_id)
+    {
+        $matriculaAlumno = self::where('student_id', $estudiante_id)
+            ->where('classroom_id', $aula_id)
+            ->where('deleted_at', null)
+            ->where('status', EstadosEnum::ACTIVO)
+            ->first();
+        return $matriculaAlumno;
     }
 }

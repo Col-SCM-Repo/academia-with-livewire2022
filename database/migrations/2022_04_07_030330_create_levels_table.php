@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EstadosEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ class CreateLevelsTable extends Migration
 			$table->date('start_date')->nullable();
 			$table->date('end_date')->nullable();
 			$table->decimal('price', 10)->nullable();
-			$table->bigInteger('status');
+			$table->bigInteger('status')->default(EstadosEnum::ACTIVO);
 			$table->timestamps();
 		});
 	}

@@ -14,7 +14,7 @@ class CreatePeriodsTable extends Migration
 			$table->integer('year');
 			$table->integer('active')->default(0);
 			$table->timestamps();
-            $table->softDeletes();
+			$table->softDeletes();
 		});
 	}
 

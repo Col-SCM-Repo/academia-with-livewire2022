@@ -7,7 +7,6 @@ use Livewire\Component;
 
 function convertArrayUpperCase(array $array, bool $wantObject = true)
 {
-    Log::debug("inicio conversion a array");
     $temp = array();
     foreach ($array as $key => $value) {
         $temp[$key] = strtoupper($value);
@@ -97,4 +96,20 @@ function toastAlertAvanzado(Component $context, string $nombreEntidad, string $a
         'titulo' => $titulo,
         'mensaje' => $mensaje
     ]);
+}
+
+function generate_random_password()
+{
+    //Se define una cadena de caractares. 
+    $cadena = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+
+    $longitudCadena = strlen($cadena);
+    $pass = "";
+    $longitudPass = 10;
+    //Creamos la contraseña
+    for ($i = 1; $i <= $longitudPass; $i++) {
+        $pos = rand(0, $longitudCadena - 1);
+        $pass .= substr($cadena, $pos, 1);
+    }
+    return $pass;
 }

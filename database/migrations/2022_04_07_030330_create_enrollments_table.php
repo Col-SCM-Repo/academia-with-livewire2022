@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EstadosEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,7 +22,7 @@ class CreateEnrollmentsTable extends Migration
 			$table->enum('payment_type', array('cash', 'credit'));
 			$table->integer('fees_quantity')->unsigned()->default(0);
 			$table->decimal('period_cost', 10);
-			$table->integer('cancelled')->default(0);
+			$table->integer('status')->default(EstadosEnum::ACTIVO);
 			$table->text('observations', 65535)->nullable();
 			$table->softDeletes();
 			$table->timestamps();
