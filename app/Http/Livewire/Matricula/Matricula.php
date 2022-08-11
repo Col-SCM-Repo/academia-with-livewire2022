@@ -14,16 +14,16 @@ class Matricula extends Component
     private $_classroomRepository,  $_careersRepository, $enrollmentRepository;
 
     protected $rules = [
-        'formularioMatricula.tipo_matricula' => 'in:normal,beca,semi-beca',
-        'formularioMatricula.classroom_id' => 'required | integer | min:1',
-        'formularioMatricula.career_id' => 'required | integer | min:1',
-        'formularioMatricula.tipo_pago' => 'in:cash,credit',
-        'formularioMatricula.cuotas' => 'integer',
-        'formularioMatricula.costo' => 'number | min:0',
+        'formularioMatricula.tipo_matricula' => 'required|in:normal,beca,semi-beca',
+        'formularioMatricula.classroom_id' => 'required|integer|min:1',
+        'formularioMatricula.career_id' => 'required|integer|min:1',
+        'formularioMatricula.tipo_pago' => 'required|in:cash,credit',
+        'formularioMatricula.cuotas' => 'integer|min:0',
+        'formularioMatricula.costo' => 'required|number|min:0',
         'formularioMatricula.observaciones' => 'string',
 
         // otros
-        'formularioMatricula.costo_matricula' => 'number | min:0',
+        'formularioMatricula.costo_matricula' => 'required|number|min:0',
 
     ];
 
@@ -81,3 +81,53 @@ class Matricula extends Component
         $this->student_id = $idAlumno;
     }
 }
+
+/*
+
+        <!------------------------------- End: matricula ------------------------------->
+
+
+        Una Matricula
+
+
+        Dtos requridos
+
+        // Table matricula
+        * code
+        * type
+        * student_id
+        * relative_id
+        * classroom_id
+        * relative_relationship
+        * user_id
+        * career_id
+        * payment_type
+        * fees_quantity
+        * period_cost
+        * cancelled
+        * observations
+
+        <br>
+        // Cuotas (payments) al matricularse se indica las cuotas
+        * enrollment_id
+        * order
+        * type
+        * amount
+        * state
+
+        <br>
+        // Pagos (pagos realizados pòr el alumno)
+        * installment_id
+        * amount
+        * type
+        * concept_type
+        * user_id
+        * payment_id
+        * serie
+        * numeration
+
+        <br>
+        para pagos se tiene en cuenta la tabla secuences
+        * se utiliza un numero de serie (revisar) *
+*/
+
