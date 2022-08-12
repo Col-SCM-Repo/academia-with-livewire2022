@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TiposPagoFacturaEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -21,9 +22,19 @@ class Installment extends Model
         'state',
     ];
 
-    public function payments()
+    /*     public function payments()
     {
         return $this->hasMany(Payment::class)->where('type', '=', 'ticket');
+    } */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class, 'installment_id', 'id')
+            ->where('type', '=', TiposPagoFacturaEnum::TICKET);
+    }
+
+    public function allPayments()
+    {
+        return $this->hasOne(Payment::class, 'installment_id', 'id');
     }
 
     public function note_payments()

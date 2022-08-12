@@ -4,13 +4,13 @@ namespace App\Http\Livewire\Matricula;
 
 use App\Repository\InstallmentRepository;
 use App\Repository\PaymentRepository;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Pago extends Component
 {
     public $matricula_id, $cuotaSeleccionada_id;
     public $formularioPago;
-    public $listaCuotas, $historialCuota;
 
     private $_pagoRepository, $_cuotaRepository;
 
@@ -36,7 +36,9 @@ class Pago extends Component
 
     public function render()
     {
-        return view('livewire.matricula.pago');
+        $informacionCuotas = $this->_cuotaRepository->getInformacionPagosYCuotas($this->matricula_id);
+        Log::debug((array) $informacionCuotas);
+        return view('livewire.matricula.pago')->with('cuotas', $informacionCuotas);
     }
 
     public function abrirModalPagos()
@@ -47,5 +49,7 @@ class Pago extends Component
     // otros en segundo plano 
     public function vincularMatricula($matricula_id)
     {
+        self::initialState();
+        $this->matricula_id = $matricula_id;
     }
 }

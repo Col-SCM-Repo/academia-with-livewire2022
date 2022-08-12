@@ -44,15 +44,15 @@ class InstallmentRepository extends Installment
         switch ($modelInstallment->tipo_pago) {
             case FormasPagoEnum::CONTADO:
             case strtoupper(FormasPagoEnum::CONTADO):
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 0, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => 0.00];
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'type' => TiposCuotaEnum::CICLO, 'amount' => $modelInstallment->costo_ciclo];
+                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => 0.00];
+                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 2, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::CICLO, 'amount' => $modelInstallment->costo_ciclo];
                 break;
             case FormasPagoEnum::CREDITO:
             case strtoupper(FormasPagoEnum::CREDITO):
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 0, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => $modelInstallment->costo_matricula];
+                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => $modelInstallment->costo_matricula];
                 $costo_cuota = round($modelInstallment->costo_ciclo / $modelInstallment->cuotas, 2);
                 for ($i = 0; $i < $modelInstallment->cuotas; $i++) {
-                    $cuotas[] = ['enrollment_id' => $modelInstallment->id, 'order' => ($i + 1), 'type' => TiposCuotaEnum::CICLO, 'amount' => $costo_cuota];
+                    $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => ($i + 2), 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::CICLO, 'amount' => $costo_cuota];
                 }
                 break;
             default:
@@ -78,16 +78,85 @@ class InstallmentRepository extends Installment
         }
     }
 
-
-    public function historialMatriculas(int $aula_id)
+    public function getInformacionPagosYCuotas($matricula_id)
     {
+        $cuotas = Installment::where('enrollment_id', $matricula_id)
+            ->where('status', EstadosEnum::ACTIVO)
+            ->where('deleted_at', null)
+            ->get();
+        if (count($cuotas) == 0) return null;
+
+        $cuotas_matricula = array();
+        $cuotas_ciclo = array();
+        $totalPagado = true;
+
+        foreach ($cuotas as $cuotaIterador) {
+            $cuotaTemp = (object)[
+                'id' => $cuotaIterador->id,
+                'orden' => $cuotaIterador->order,
+                //'matricula_id' => $cuotaIterador->id,
+                'tipo' => '',
+                'monto_cuota' => $cuotaIterador->amount,
+                'pago_id' => null,
+                'monto_pagado' => null,
+                'fecha_pago' => null,
+                'usuario_registro_pago' => null,
+                'total_pagado' => $cuotaIterador->amount == 0,
+                'fecha_matricula' => $cuotaIterador->created_at,
+            ];
+
+            $pago = $cuotaIterador->payment;
+            if ($pago) {
+                $cuotaTemp->pago_id = $pago->id;
+                $cuotaTemp->monto_pagado = $pago->amount;
+                $cuotaTemp->usuario_registro_pago = $pago->user->nombreCompleto();
+                $cuotaTemp->fecha_pago = $pago->created_at;
+                $cuotaTemp->total_pagado = round((float) $pago->amount, 2) >= round((float) $cuotaTemp->monto_cuota, 2);
+            }
+            $totalPagado = $totalPagado && $cuotaTemp->total_pagado;
+
+
+            if ($cuotaIterador->type == TiposCuotaEnum::CICLO) {
+                $cuotaTemp->tipo = 'CICLO';
+                $cuotas_ciclo[] = $cuotaTemp;
+            } else {
+                $cuotaTemp->tipo = 'MATRICULA';
+                $cuotas_matricula[] = $cuotaTemp;
+            }
+        }
+        return ['matricula' => $cuotas_matricula, 'ciclo' => $cuotas_ciclo, 'total_pagado' => $totalPagado];
     }
 
-    public function buscarMatricula(string $dni_estudiante)
+    /* public function getHistorialPagos(int $matricula_id)
     {
-    }
+        $cuotas = Installment::join('payments', 'installments.id', 'payments.installment_id')
+            ->join('')
+            ->where('payments.enrollment_id', $matricula_id)
+            ->where('installments.status', EstadosEnum::ACTIVO)
+            ->where('installments.deleted_at', null)
+            ->where('payments.deleted_at', null)
+            ->select(
+                'installments.id as cuota_id',
+                'installments.order as orden',
+                'installments.type as tipo',
+                'installments.amount as monto_cuota',
+                'payments.id as pago_id',
+                'payments.amount',
+                'payments.concept_type',
+                'payments.serie',
+                'payments.user_id',
+                'payments.numeration',
+            );
+        if (!$cuotas) return null;
 
-    public function informacionDeMatricula(int $estudiante_id, string $dni_estudiante)
+        $historial = array();
+        foreach ($cuotas as $cuota) {
+            $cuotaTemp = (object)[];
+        }
+    } */
+
+    // para la generacion de la boleta
+    public function getInformacionPago(int $cuota_id)
     {
     }
 }

@@ -4,14 +4,16 @@ namespace App\Repository;
 
 use App\Models\Classroom;
 use App\Models\Level;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class ClassroomRepository extends Classroom
 {
-    private $_nivelRepository;
+    private $_nivelRepository, $_periodoRepository;
 
     public function __construct()
     {
         $this->_nivelRepository = new LevelRepository();
+        $this->_periodoRepository = new PeriodoRepository();
     }
 
     public function builderModelRepository()
@@ -50,6 +52,31 @@ class ClassroomRepository extends Classroom
             return count($nivel->classrooms) > 0 ? $clases : null;
         } else
             return null;
+    }
+
+    public function getListaClases(int $periodo_id)
+    {
+        $periodo = $this->_periodoRepository::find($periodo_id);
+        if (!$periodo) throw new NotFoundResourceException('No se encontro el periodo indicado');
+
+        $listaAulas = array();
+        foreach ($periodo->levels as $nivel) {
+            foreach ($nivel->classrooms as $aula) {
+                $alumnosMatriculados = count($aula->enrollments);
+                $listaAulas[$aula->id] = (object)[
+                    'aula_id' =>  $aula->id,
+                    'nombre' =>  $periodo->name . '/' . $nivel->level_type->description . '/' . $aula->name,
+                    'ciclo' =>  $periodo->name,
+                    'nivel' =>  $nivel->level_type->description,
+                    'aula' =>  $aula->name,
+                    'costo' => $nivel->price,
+                    'total_vacantes' => $aula->vacancy,
+                    'vacantes_ocupadas' => $alumnosMatriculados,
+                    'vacantes_disponibles' => $aula->vacancy - $alumnosMatriculados,
+                ];
+            }
+        }
+        return $listaAulas;
     }
 
     public function registrarClase(object $obj)

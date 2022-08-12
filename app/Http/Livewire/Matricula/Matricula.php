@@ -4,14 +4,18 @@ namespace App\Http\Livewire\Matricula;
 
 use App\Enums\EstadosEntidadEnum;
 use App\Enums\TiposParentescosApoderadoEnum;
+use App\Repository\ClassroomRepository;
 use App\Repository\EnrollmentRepository;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class Matricula extends Component
 {
     public $relative_id, $student_id, $matricula_id;
     public $formularioMatricula;
-    public $lista_classrooms, $lista_carreras;
+
+    public $lista_classrooms, $lista_carreras, $vacantes_total, $vacantes_disponible;
     private $_classroomRepository,  $_careersRepository, $_matriculaRepository;
 
     protected $rules = [
@@ -36,7 +40,7 @@ class Matricula extends Component
 
     public function __construct()
     {
-        /* $this->_classroomRepository = new (); */
+        $this->_classroomRepository = new ClassroomRepository();
         //$this->_careersRepository = new CareerRepository();
         $this->_matriculaRepository = new EnrollmentRepository();
     }
@@ -46,8 +50,27 @@ class Matricula extends Component
         self::initialState();
     }
 
+    public function updated($name, $value)
+    {
+        if ($name == 'formularioMatricula.classroom_id') {
+            if ($value != null && $value != "") {
+                $this->vacantes_total = $this->lista_classrooms[$value]['total_vacantes'];
+                $this->vacantes_disponible = $this->lista_classrooms[$value]['vacantes_disponibles'];
+                $this->formularioMatricula['costo'] = $this->lista_classrooms[$value]['costo'];
+            } else {
+                $this->vacantes_total = '';
+                $this->vacantes_disponible = '';
+                $this->formularioMatricula = '';
+            }
+        }
+    }
+
     public function render()
     {
+        if (Session::has('periodo'))
+            $this->lista_classrooms = $this->_classroomRepository->getListaClases(Session::get('periodo')->id);
+        else
+            $this->lista_classrooms = [];
         return view('livewire.matricula.matricula');
     }
 

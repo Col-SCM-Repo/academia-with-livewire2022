@@ -3,110 +3,128 @@
         <span style="display: flex">
             <div style="flex-grow: 1">
                 <h5 > Cuotas de pago </h5>
-                <span class="label label-primary"> 
-                    {{ $matricula_id ? 'Con deuda' : 'Sin deuda' }} 
-                </span>
+                    @if ($cuotas)
+                        @if ( $cuotas['total_pagado'])
+                            <span class="label label-primary"> Sin deuda </span>
+                        @else
+                            <span class="label label-warning-light"> Con deuda </span>
+                        @endif
+                        
+                    @else
+                        <span class="label label-danger"> Sin registrar </span>
+                    @endif
+
             </div>
-            <div class="ibox-tools">
-                <a class="btn btn-xs btn-success " style="color: #FFF">
-                    Ver historial pagos 
-                </a>
-                <button type="button" class="btn btn-xs btn-danger" wire:click="abrirModalPagos()" >
-                    Registrar pago
-                </button>
-            </div>
+            @if ($cuotas)
+                <div class="ibox-tools">
+                    <a class="btn btn-xs btn-success " style="color: #FFF">
+                        Ver historial pagos 
+                    </a>
+                    <button type="button" class="btn btn-xs btn-danger" wire:click="abrirModalPagos()" >
+                        Registrar pago
+                    </button>
+                </div>
+                
+            @endif
         </span>
     </div>
     <div class="ibox-content">
 
         <div class="px-3">
-            <div class="row">
-                <label class="col-md-2 col-sm-3" for=""> Cuota matricula </label>
-                <div class="col-md-10">
-                    <table class="table table-sm table-responsive table-striped table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</t>
-                                <th scope="col">Estado</t>
-                                <th scope="col">Monto cuota</t>
-                                <th scope="col">Monto pagado</t>
-                                <th scope="col">Historial</t>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td scope="row">1</td>
-                                <td scope="row">DEUDA </td>
-                                <td scope="row">300</td>
-                                <td scope="row">200</td>
-                                <td scope="row"> 
-                                    <a class="btn btn-xs btn-info" href="">Editar</a>
-                                    <a class="btn btn-xs btn-info" href="">Comprobante de pago</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            @if ($cuotas)
+                <div class="row">
+                    <label class="col-md-2 col-sm-3" for=""> Cuota matricula </label>
+                    <div class="col-md-10">
+                        <table class="table table-sm table-responsive table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 1rem">#</t>
+                                    <th scope="col" style="width: 20%">Estado</t>
+                                    <th scope="col" style="width: 20%">Monto cuota</t>
+                                    <th scope="col" style="width: 20%">Monto pagado</t>
+                                    <th scope="col">Acciones</t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($cuotas['matricula'])>0)
+                                    @foreach ($cuotas['matricula'] as $cuota)
+                                        <tr>
+                                            <td scope="row"> {{ $cuota->orden }} </td>
+                                            <td scope="row"> 
+                                                @if ($cuota->total_pagado)
+                                                    <span class=" text-success"> PAGADO </span>
+                                                @else
+                                                    <span class=" text-danger"> CON DEUDA </span>
+                                                @endif 
+                                            </td>
+                                            <td scope="row"> {{ $cuota->monto_cuota }} </td>
+                                            <td scope="row"> {{ $cuota->monto_pagado }} </td>
+                                            <td scope="row"> 
+                                                <button class="btn btn-xs btn-info" {{ $cuota->total_pagado? 'disabled':'' }} href="">Editar</button>
+                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado && $cuota->monto_cuota != 0 )? '':'disabled' }} href="">Comprobante de pago</button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td scope="row" colspan="5">
+                                            <h5>No se encontraron cuotas</h5>
+                                        </td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="row">
-                <label class="col-md-2 col-sm-3" for=""> Cuotas ciclo </label>
-                <div class="col-md-10">
-                    <table class="table table-sm table-responsive table-striped table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</t>
-                                <th scope="col">Estado</t>
-                                <th scope="col">Monto cuota</t>
-                                <th scope="col">Monto pagado</t>
-                                <th scope="col">Historial</t>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td scope="row">1</td>
-                                <td>DEUDA </td>
-                                <td>300</td>
-                                <td>200</td>
-                                <td> 
-                                    <a class="btn btn-xs btn-info" href="">Editar</a>
-                                    <a class="btn btn-xs btn-info" href="">Comprobante de pago</a> 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">1</td>
-                                <td>DEUDA </td>
-                                <td>300</td>
-                                <td>200</td>
-                                <td> 
-                                    <a class="btn btn-xs btn-info" href="">Editar</a>
-                                    <a class="btn btn-xs btn-info" href="">Comprobante de pago</a> 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">1</td>
-                                <td>DEUDA </td>
-                                <td>300</td>
-                                <td>200</td>
-                                <td> 
-                                    <a class="btn btn-xs btn-info" href="">Editar</a>
-                                    <a class="btn btn-xs btn-info" href="">Comprobante de pago</a> 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">1</td>
-                                <td>DEUDA </td>
-                                <td>300</td>
-                                <td>200</td>
-                                <td> 
-                                    <a class="btn btn-xs btn-info" href="">Editar</a>
-                                    <a class="btn btn-xs btn-info" href="">Comprobante de pago</a> 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <div class="row">
+                    <label class="col-md-2 col-sm-3" for=""> Cuotas ciclo </label>
+                    <div class="col-md-10">
+                        <table class="table table-sm table-responsive table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 1rem">#</t>
+                                    <th scope="col" style="width: 20%">Estado</t>
+                                    <th scope="col" style="width: 20%">Monto cuota</t>
+                                    <th scope="col" style="width: 20%">Monto pagado</t>
+                                    <th scope="col">Acciones</t>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @if (count($cuotas['ciclo'])>0)
+                                    @foreach ($cuotas['ciclo'] as $cuota)
+                                        <tr>
+                                            <td scope="row"> {{ $cuota->orden }} </td>
+                                            <td scope="row"> 
+                                                @if ($cuota->total_pagado)
+                                                    <span class=" text-success"> PAGADO </span>
+                                                @else
+                                                    <span class=" text-danger"> CON DEUDA </span>
+                                                @endif 
+                                            </td>
+                                            <td scope="row"> {{ $cuota->monto_cuota }} </td>
+                                            <td scope="row"> {{ $cuota->monto_pagado }} </td>
+                                            <td scope="row"> 
+                                                <button class="btn btn-xs btn-info" {{ $cuota->total_pagado? 'disabled':'' }} href="">Editar</button>
+                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }} href="">Comprobante de pago</button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td scope="row" colspan="5">
+                                            <h5>No se encontraron cuotas</h5>
+                                        </td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            @else
+                <h5>No se encontraron cuotas de pago. </h5>
+            @endif
 
         </div>
 

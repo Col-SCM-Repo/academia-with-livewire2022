@@ -3,12 +3,13 @@
         <span style="display: flex">
             <div style="flex-grow: 1">
                 <h5 > Nueva matricula </h5>
-                <span class="label label-primary"> {{ $matricula_id ? 'Registrada' : 'Sin registrar' }} </span>
+                @if ( $matricula_id )
+                    <span class="label label-warning-light"> Sin registrar </span>
+                @else
+                    <span class="label label-primary"> Registrado </span>
+                @endif
             </div>
             <div class="ibox-tools">
-                <button class="btn btn-xs btn-info " style="color: #fff">
-                    Pagos  
-                </button>
                 <button class="btn btn-xs btn-success ">
                     Descargar  
                 </button>
@@ -21,8 +22,15 @@
                 <div class="form-group">
                     <label class="col-lg-3 control-label">Ciclo/Nivel/Aula:</label>
                     <div class="col-lg-9">
-                        <input type="text" title="Ciclo, nivel y aula a matricular"
-                            wire:model.defer="formularioMatricula.classroom_id" class="form-control">
+                        <select wire:model="formularioMatricula.classroom_id" class="form-control" >
+                            <option value="">Seleccione un ciclo</option>
+                                @foreach ($lista_classrooms as $aula)
+                                    <option value="{{$aula->aula_id}}"> {{ $aula->nombre }} </option>
+                                @endforeach
+                        </select>
+                        @if ($vacantes_total && $vacantes_disponible)
+                            <small class="help-block m-b-none text-success">  {{ $vacantes_disponible }} vacantes disponibles de {{ $vacantes_total }} </small>
+                        @endif
                         <x-input-error variable='formularioMatricula.classroom_id'> </x-input-error>
                     </div>
                 </div>
@@ -50,17 +58,16 @@
                     <label class="col-lg-3 control-label">Costo matricula:</label>
                     <div class="col-lg-3">
                         <input type="text" title="Costo de matricula"
-                            wire:model.defer="formularioMatricula.costo_matricula" class="form-control">
+                            wire:model.defer="formularioMatricula.costo_matricula" class="form-control" id="costo-matricula">
                         <x-input-error variable='formularioMatricula.costo_matricula'> </x-input-error>
                     </div>
                     <label class="col-lg-3 control-label">Costo de ciclo:</label>
                     <div class="col-lg-3">
-                        <input type="text" title="Costo del ciclo" wire:model.defer="formularioMatricula.costo"
-                            class="form-control" id="costo-ciclo">
+                        <input type="text" title="Costo del ciclo"  class="form-control" id="costo-ciclo" value="{{ isset($formularioMatricula['costo']) ? $formularioMatricula['costo']:'' }}" disabled>
                         <x-input-error variable='formularioMatricula.costo'> </x-input-error>
                     </div>
                 </div>
-                <div class="form-group pago-credito">
+                <div class="form-group pago-credito" style="display: none;" >
                     <label class="col-lg-3 control-label">Cuotas:</label>
                     <div class="col-lg-3">
                         <input type="number" title="Costo por matricula" wire:model.defer="formularioMatricula.cuotas"
@@ -128,10 +135,16 @@
         document.addEventListener("DOMContentLoaded", () => {
                     Livewire.hook('message.processed', (msg, {fingerprint}) => {
                         if(fingerprint.name == 'matricula.matricula'){
-                            $(".pago-credito").fadeOut();
+                            // $(".pago-credito").fadeOut();
 
-                            if($("#rbtnContado").is(':checked'))  $(".pago-credito").fadeOut();
-                            if($("#rbtnCredito").is(':checked'))  $(".pago-credito").fadeIn();
+                            if($("#rbtnContado").is(':checked'))  {
+                                $(".pago-credito").fadeOut();
+                                $("#costo-matricula").val('');
+                            };
+                            if($("#rbtnCredito").is(':checked'))  {
+                                $(".pago-credito").fadeIn();
+                                $("#costo-matricula").val(50);
+                            };
                         }
                     });
                 }); 
@@ -140,14 +153,22 @@
     @push('scripts')
     <script>
         $(document).ready(()=>{
-            $(".pago-credito").fadeOut();
+            //$(".pago-credito").fadeOut();
 
             $("#rbtnContado").on('change', ({target})=>{
-                if(target.checked) $(".pago-credito").fadeOut()
+                if(target.checked) {
+                    $(".pago-credito").fadeOut()
+
+                    $("#costo-matricula").val('');
+                }
             });
 
             $("#rbtnCredito").on('change', ({target})=>{
-                if(target.checked) $(".pago-credito").fadeIn()
+                if(target.checked) {
+                    $(".pago-credito").fadeIn();
+
+                    $("#costo-matricula").val(50);
+                }
             }); 
 
             const calcularMontoCuota = (e)=>{
