@@ -17,9 +17,10 @@
         </span>
     </div>
     <div class="ibox-content">
-        <form class="row" wire:submit.prevent="create">
+        <form x-data class="row" wire:submit.prevent="create" >
             <div class="col-lg-7 form-horizontal">
                 <div class="form-group">
+             
                     <label class="col-lg-3 control-label">Ciclo/Nivel/Aula:</label>
                     <div class="col-lg-9">
                         <select wire:model="formularioMatricula.classroom_id" class="form-control" >
@@ -39,14 +40,14 @@
                     <div class="col-lg-9 " style="display: flex; flex-wrap: wrap">
                         <div class="form-check">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnContado"
-                                value="cash" wire:model.defer='formularioMatricula.tipo_pago'>
+                                value="cash" wire:model.defer='formularioMatricula.tipo_pago' x-on:change="alert( this.$wire.get('formularioMatricula.costo_matricula') )"  >
                             <label class="form-check-label" for="rbtnContado">
                                 Contado
                             </label>
                         </div>
                         <div class="form-check" style="padding-left: 1rem">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnCredito"
-                                value="credit" wire:model.defer='formularioMatricula.tipo_pago'>
+                                value="credit" wire:model.defer='formularioMatricula.tipo_pago' x-on:change="alert( this.$wire.get('formularioMatricula.costo_matricula') )"  >
                             <label class="form-check-label" for="rbtnCredito">
                                 Credito
                             </label>
@@ -58,10 +59,10 @@
                     <label class="col-lg-3 control-label">Costo matricula:</label>
                     <div class="col-lg-3">
                         <input type="text" title="Costo de matricula"
-                            wire:model.defer="formularioMatricula.costo_matricula" class="form-control" id="costo-matricula">
+                            wire:model.defer="formularioMatricula.costo_matricula" class="form-control" id="costo-matricula"  >
                         <x-input-error variable='formularioMatricula.costo_matricula'> </x-input-error>
                     </div>
-                    <label class="col-lg-3 control-label">Costo de ciclo:</label>
+                    <label class="col-lg-3 control-label" >Costo de ciclo:</label>
                     <div class="col-lg-3">
                         <input type="text" title="Costo del ciclo"  class="form-control" id="costo-ciclo" value="{{ isset($formularioMatricula['costo']) ? $formularioMatricula['costo']:'' }}" disabled>
                         <x-input-error variable='formularioMatricula.costo'> </x-input-error>
@@ -158,16 +159,18 @@
             $("#rbtnContado").on('change', ({target})=>{
                 if(target.checked) {
                     $(".pago-credito").fadeOut()
-
                     $("#costo-matricula").val('');
+                    // console.log( $wire.get( 'formularioMatricula.costo_matricula' ));
+                    
                 }
             });
 
             $("#rbtnCredito").on('change', ({target})=>{
                 if(target.checked) {
                     $(".pago-credito").fadeIn();
-
                     $("#costo-matricula").val(50);
+                    // console.log( $wire.get( 'formularioMatricula.costo_matricula' ));
+                    
                 }
             }); 
 

@@ -67,4 +67,5 @@ class AdministratorController extends Controller
     //     }
     //     return $response;
     // }
+    // = @this.data;
 }
