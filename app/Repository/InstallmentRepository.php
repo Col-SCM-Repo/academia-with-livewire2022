@@ -62,7 +62,7 @@ class InstallmentRepository extends Installment
         return true;
     }
 
-    public function actualizarCoutasPago($matricula_id)
+    /* public function actualizarCoutasPago($matricula_id)
     {
         $cuotas = self::where('enrollment_id', $matricula_id)
             ->where('status', EstadosEnum::ACTIVO)
@@ -76,7 +76,7 @@ class InstallmentRepository extends Installment
             $cuota->status = EstadosEnum::INACTIVO;
             $cuota->save();
         }
-    }
+    } */
 
     public function getInformacionPagosYCuotas($matricula_id)
     {
@@ -89,6 +89,9 @@ class InstallmentRepository extends Installment
         $cuotas_matricula = array();
         $cuotas_ciclo = array();
         $totalPagado = true;
+        $monto_deuda_inicial = 0;   // Costo de la deuda inicial;
+        $monto_pagado = 0;          // Costo de la deuda inicial;
+
 
         foreach ($cuotas as $cuotaIterador) {
             $cuotaTemp = (object)[
@@ -104,6 +107,7 @@ class InstallmentRepository extends Installment
                 'total_pagado' => $cuotaIterador->amount == 0,
                 'fecha_matricula' => $cuotaIterador->created_at,
             ];
+            $monto_deuda_inicial += $cuotaIterador->amount;
 
             $pago = $cuotaIterador->payment;
             if ($pago) {
@@ -112,48 +116,56 @@ class InstallmentRepository extends Installment
                 $cuotaTemp->usuario_registro_pago = $pago->user->nombreCompleto();
                 $cuotaTemp->fecha_pago = $pago->created_at;
                 $cuotaTemp->total_pagado = round((float) $pago->amount, 2) >= round((float) $cuotaTemp->monto_cuota, 2);
-            }
-            $totalPagado = $totalPagado && $cuotaTemp->total_pagado;
 
+                $monto_pagado += $cuotaTemp->monto_pagado;
+            }
 
             if ($cuotaIterador->type == TiposCuotaEnum::CICLO) {
                 $cuotaTemp->tipo = 'CICLO';
-                $cuotas_ciclo[] = $cuotaTemp;
+                $cuotas_ciclo[$cuotaIterador->id] = $cuotaTemp;
             } else {
                 $cuotaTemp->tipo = 'MATRICULA';
-                $cuotas_matricula[] = $cuotaTemp;
+                $cuotas_matricula[$cuotaIterador->id] = $cuotaTemp;
             }
         }
-        return ['matricula' => $cuotas_matricula, 'ciclo' => $cuotas_ciclo, 'total_pagado' => $totalPagado];
+        return [
+            'matricula' => $cuotas_matricula,
+            'ciclo' => $cuotas_ciclo,
+            'monto_deuda_inicial' => $monto_deuda_inicial,
+            'monto_deuda_pagado' => $monto_pagado,
+            'monto_deuda_pendiente' => $monto_deuda_inicial - $monto_pagado,
+            'total_pagado' => $totalPagado,
+        ];
     }
 
     /* public function getHistorialPagos(int $matricula_id)
-    {
-        $cuotas = Installment::join('payments', 'installments.id', 'payments.installment_id')
-            ->join('')
-            ->where('payments.enrollment_id', $matricula_id)
-            ->where('installments.status', EstadosEnum::ACTIVO)
-            ->where('installments.deleted_at', null)
-            ->where('payments.deleted_at', null)
-            ->select(
-                'installments.id as cuota_id',
-                'installments.order as orden',
-                'installments.type as tipo',
-                'installments.amount as monto_cuota',
-                'payments.id as pago_id',
-                'payments.amount',
-                'payments.concept_type',
-                'payments.serie',
-                'payments.user_id',
-                'payments.numeration',
-            );
-        if (!$cuotas) return null;
+        {
+            $cuotas = Installment::join('payments', 'installments.id', 'payments.installment_id')
+                ->join('')
+                ->where('payments.enrollment_id', $matricula_id)
+                ->where('installments.status', EstadosEnum::ACTIVO)
+                ->where('installments.deleted_at', null)
+                ->where('payments.deleted_at', null)
+                ->select(
+                    'installments.id as cuota_id',
+                    'installments.order as orden',
+                    'installments.type as tipo',
+                    'installments.amount as monto_cuota',
+                    'payments.id as pago_id',
+                    'payments.amount',
+                    'payments.concept_type',
+                    'payments.serie',
+                    'payments.user_id',
+                    'payments.numeration',
+                );
+            if (!$cuotas) return null;
 
-        $historial = array();
-        foreach ($cuotas as $cuota) {
-            $cuotaTemp = (object)[];
-        }
-    } */
+            $historial = array();
+            foreach ($cuotas as $cuota) {
+                $cuotaTemp = (object)[];
+            }
+        } 
+    */
 
     // para la generacion de la boleta
     public function getInformacionPago(int $cuota_id)

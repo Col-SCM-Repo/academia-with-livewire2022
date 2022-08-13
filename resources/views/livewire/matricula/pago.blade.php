@@ -17,12 +17,19 @@
             </div>
             @if ($cuotas)
                 <div class="ibox-tools">
-                    <a class="btn btn-xs btn-success " style="color: #FFF">
-                        Ver historial pagos 
-                    </a>
-                    <button type="button" class="btn btn-xs btn-danger" wire:click="abrirModalPagos()" >
-                        Registrar pago
-                    </button>
+                    <div>
+                        <a class="btn btn-xs btn-success " style="color: #FFF">
+                            Ver historial pagos 
+                        </a>
+                        <button type="button" class="btn btn-xs btn-danger"  >
+                            Registrar pago
+                        </button>
+                    </div>
+                    <div>
+                        <small class="help-block m-b-none text-primary text-right">  
+                            Total pagado S./ {{ $cuotas['monto_deuda_pagado'] }} de S./ {{ $cuotas['monto_deuda_inicial'] }} ( S./ {{ $cuotas['monto_deuda_pendiente'] }} pendiente )  
+                        </small>
+                    </div>
                 </div>
                 
             @endif
@@ -46,6 +53,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+
                                 @if (count($cuotas['matricula'])>0)
                                     @foreach ($cuotas['matricula'] as $cuota)
                                         <tr>
@@ -59,8 +67,8 @@
                                             </td>
                                             <td scope="row"> {{ $cuota->monto_cuota }} </td>
                                             <td scope="row"> {{ $cuota->monto_pagado }} </td>
-                                            <td scope="row"> 
-                                                <button class="btn btn-xs btn-info" {{ $cuota->total_pagado? 'disabled':'' }} href="">Editar</button>
+                                                <td scope="row"> 
+                                                <button class="btn btn-xs btn-info" {{ $cuota->total_pagado? 'disabled':'' }} href="" wire:click="abrirModalPagos({{$cuota->id}}, false )" >Editar</button>
                                                 <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado && $cuota->monto_cuota != 0 )? '':'disabled' }} href="">Comprobante de pago</button>
                                             </td>
                                         </tr>
@@ -93,6 +101,9 @@
                             <tbody>
 
                                 @if (count($cuotas['ciclo'])>0)
+                                    @php
+                                        $esPrimeraCuota = true;
+                                    @endphp
                                     @foreach ($cuotas['ciclo'] as $cuota)
                                         <tr>
                                             <td scope="row"> {{ $cuota->orden }} </td>
@@ -106,9 +117,15 @@
                                             <td scope="row"> {{ $cuota->monto_cuota }} </td>
                                             <td scope="row"> {{ $cuota->monto_pagado }} </td>
                                             <td scope="row"> 
-                                                <button class="btn btn-xs btn-info" {{ $cuota->total_pagado? 'disabled':'' }} href="">Editar</button>
+                                                <button class="btn btn-xs btn-info" {{ ($esPrimeraCuota && ! $cuota->total_pagado )? '':'disabled' }} wire:click="abrirModalPagos({{$cuota->id}} )" >Editar</button>
                                                 <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }} href="">Comprobante de pago</button>
                                             </td>
+                                            
+                                            @php
+                                                if($esPrimeraCuota)
+                                                    if( ! $cuota->total_pagado )
+                                                        $esPrimeraCuota = false;
+                                            @endphp
                                         </tr>
                                     @endforeach
                                 @else
@@ -133,37 +150,38 @@
     
     <!-- begin: Modal pagos -->
     <x-modal-form idForm='form-modal-pago' titulo="Registrar pago" >
-        <form class="px-5 row" wire:submit.prevent="create">
-            <div class="row">
+        <form class="px-5 row" wire:submit.prevent="pagar">
                 <div class="col-sm-9">
-                    <div class="form-group row">
-                        <label class="col-sm-4 control-label text-right">Monto de cuota</label>
-                        <div class="col-sm-5">
-                            <input type="text" wire:model.defer="formularioAula.nombre" class="form-control" disabled >
+                    @if ( $fragmentarCuota )
+                        <div class="form-group row">
+                            <label class="col-sm-4 control-label text-right">Deuda pendiente</label>
+                            <div class="col-sm-8">
+                                <input type="text" wire:model.defer="formularioPago.deuda_pendiente" class="form-control" disabled >
+                            </div>
                         </div>
-                    </div>
+                    @endif
                     <div class="form-group row">
-                        <label class="col-sm-4 control-label text-right">Deuda total</label>
-                        <div class="col-sm-5">
-                            <input type="text" wire:model.defer="formularioAula.nombre" class="form-control" disabled >
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-4 control-label text-right">Monto a pagar</label>
-                        <div class="col-sm-5">
-                            <input type="text" wire:model.defer="formularioAula.vacantes" class="form-control text-uppercase"
-                                placeholder="Monto a pagar">
-                            <x-input-error variable='formularioAula.vacantes'> </x-input-error>
+                        <label class="col-sm-4 control-label text-right">Costo de cuota</label>
+                        <div class="col-sm-8" style="display: flex" x-data="{edition:false}">
+                            <input type="number"  wire:model.defer="formularioPago.costo_cuota" class="form-control" :disabled="!edition" >
+                            @if ( $fragmentarCuota )
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-success " x-on:click="edition=true" x-show="!edition" title="Editar cuota" >
+                                        <i class="fa fa-edit "></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary " x-on:click="edition=false" x-show="edition" title="Guardar cuota" >
+                                        <i class="fa fa-save "></i>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
-                    <button class="btn btn-sm btn-danger" type="submit" style="padding: .75rem 3rem">
-                        Pagar
-                    </button>
-                    <span wire:loading wire:target=" update "> Guardando ...</span>
+                <div class="col-sm-3" >
+                    <button class="btn btn-sm btn-danger" type="submit" style="padding: .75rem 3rem"> Pagar </button>
+                    <br> <br>
+                    <span wire:loading wire:target="update" > Guardando ...</span>
                 </div>
-            </div>
         </form>
     </x-modal-form>
     <!-- end: Modal pagos -->
