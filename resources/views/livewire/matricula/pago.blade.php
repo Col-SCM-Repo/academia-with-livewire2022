@@ -152,7 +152,7 @@
     <x-modal-form idForm='form-modal-pago' titulo="Registrar pago" >
         <form class="px-5 row" wire:submit.prevent="pagar">
                 <div class="col-sm-9">
-                    @if ( $fragmentarCuota )
+                    @if ( $autoFraccionamiento )
                         <div class="form-group row">
                             <label class="col-sm-4 control-label text-right">Deuda pendiente</label>
                             <div class="col-sm-8">
@@ -164,7 +164,7 @@
                         <label class="col-sm-4 control-label text-right">Costo de cuota</label>
                         <div class="col-sm-8" style="display: flex" x-data="{edition:false}">
                             <input type="number"  wire:model.defer="formularioPago.costo_cuota" class="form-control" :disabled="!edition" >
-                            @if ( $fragmentarCuota )
+                            @if ( $autoFraccionamiento )
                                 <div>
                                     <button type="button" class="btn btn-sm btn-success " x-on:click="edition=true" x-show="!edition" title="Editar cuota" >
                                         <i class="fa fa-edit "></i>

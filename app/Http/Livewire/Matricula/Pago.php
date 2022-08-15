@@ -11,7 +11,7 @@ use Livewire\Component;
 class Pago extends Component
 {
     public $matricula_id;
-    public $formularioPago, $fragmentarCuota;
+    public $formularioPago, $autoFraccionamiento;
     public $cuotas;
 
     private $_pagoRepository, $_cuotaRepository;
@@ -19,7 +19,7 @@ class Pago extends Component
     protected $rules = [
         'matricula_id' => 'required|numeric|min:0',
         'formularioPago.cuota_id' => 'required|numeric|min:1',
-        'formularioPago.deuda_pendiente' => 'required|numeric|min:1',
+        'formularioPago.deuda_pendiente' => '',
         'formularioPago.costo_cuota' => 'required|numeric|min:1',
         //'formularioPago.monto' => 'required|numeric|min:1',
     ];
@@ -47,14 +47,11 @@ class Pago extends Component
         return view('livewire.matricula.pago');
     }
 
-    public function abrirModalPagos($cuotaSeleccionada_id, $fragmentar = true)
+    public function abrirModalPagos($cuotaSeleccionada_id, $autoFraccionamiento = true)
     {
-        Log::debug($cuotaSeleccionada_id);
-        Log::debug($fragmentar ? 'true' : 'false');
-
-        $cuotaSeleccionada = (object) ($fragmentar ? $this->cuotas['ciclo'][$cuotaSeleccionada_id] : $this->cuotas['matricula'][$cuotaSeleccionada_id]);
+        $cuotaSeleccionada = (object) ($autoFraccionamiento ? $this->cuotas['ciclo'][$cuotaSeleccionada_id] : $this->cuotas['matricula'][$cuotaSeleccionada_id]);
         if ($cuotaSeleccionada) {
-            $this->fragmentarCuota = $fragmentar;
+            $this->autoFraccionamiento = $autoFraccionamiento;
             $this->formularioPago['cuota_id'] = $cuotaSeleccionada->id;
             $this->formularioPago['deuda_pendiente'] = $this->cuotas['monto_deuda_pendiente'];
             $this->formularioPago['costo_cuota'] = $cuotaSeleccionada->monto_cuota;
@@ -67,7 +64,13 @@ class Pago extends Component
     public function pagar()
     {
         $this->validate();
-        $pagoRegistrado = true;
+
+        $modelPago = $this->_pagoRepository->builderModelRepository();
+        $modelPago->cuota_id = $this->formularioPago['cuota_id'];
+        $modelPago->montoPagado = $this->formularioPago['costo_cuota'];
+        $modelPago->autoFraccionamiento = $this->autoFraccionamiento;
+        $pagoRegistrado = $this->_pagoRepository->registrarPago($modelPago);
+
         if ($pagoRegistrado) {
             sweetAlert($this, 'pago', EstadosEntidadEnum::CREATED);
 

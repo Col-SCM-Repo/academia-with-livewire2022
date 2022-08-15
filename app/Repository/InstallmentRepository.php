@@ -17,7 +17,7 @@ class InstallmentRepository extends Installment
                     id, enrollment_id, order, type, amount, status
 
         Nota:
-                Al crear deben haber minimo dos categorias de pagos (matricula, cuota)
+                    Al crear deben haber minimo dos categorias de pagos (matricula, cuota)
     */
 
     public function __construct()
@@ -134,7 +134,50 @@ class InstallmentRepository extends Installment
             'monto_deuda_inicial' => $monto_deuda_inicial,
             'monto_deuda_pagado' => $monto_pagado,
             'monto_deuda_pendiente' => $monto_deuda_inicial - $monto_pagado,
-            'total_pagado' => $totalPagado,
+            'total_pagado' => ($monto_deuda_inicial - $monto_pagado) == 0,
+        ];
+    }
+
+    public function getCuotasCiclo($matricula_id)
+    {
+        $cuotas = Installment::where('enrollment_id', $matricula_id)
+            ->where('type',  TiposCuotaEnum::CICLO)
+            ->where('status', EstadosEnum::ACTIVO)
+            ->where('deleted_at', null)
+            ->orderBy('order')
+            ->get();
+        if (count($cuotas) == 0) return null;
+
+        $cuotas_ciclo = array();
+        $monto_deuda_inicial = 0;   // Costo de la deuda inicial;
+        $monto_pagado = 0;          // Costo de la deuda inicial;
+
+        foreach ($cuotas as $cuotaIterador) {
+            $cuotaTemp = (object)[
+                'id' => $cuotaIterador->id,
+                'orden' => $cuotaIterador->order,
+                'monto_cuota' => $cuotaIterador->amount,
+                'pago_id' => null,
+                'monto_pagado' => null,
+                'esta_pagado' => false,
+            ];
+            $monto_deuda_inicial += $cuotaIterador->amount;
+
+            $pago = $cuotaIterador->payment;
+            if ($pago) {
+                $cuotaTemp->pago_id = $pago->id;
+                $cuotaTemp->monto_pagado = $pago->amount;
+                $cuotaTemp->esta_pagado = round((float) $pago->amount, 2) >= round((float) $cuotaTemp->monto_cuota, 2);
+                $monto_pagado += $cuotaTemp->monto_pagado;
+            }
+            $cuotas_ciclo[$cuotaIterador->id] = $cuotaTemp;
+        }
+        return [
+            'ciclo' => $cuotas_ciclo,
+            'monto_deuda_inicial' => $monto_deuda_inicial,
+            'monto_deuda_pagado' => $monto_pagado,
+            'monto_deuda_pendiente' => $monto_deuda_inicial - $monto_pagado,
+            'total_pagado' => ($monto_deuda_inicial - $monto_pagado) == 0,
         ];
     }
 
