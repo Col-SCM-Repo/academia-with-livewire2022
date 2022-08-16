@@ -40,14 +40,14 @@
                     <div class="col-lg-9 " style="display: flex; flex-wrap: wrap">
                         <div class="form-check">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnContado"
-                                value="cash" wire:model.defer='formularioMatricula.tipo_pago' x-on:change="alert( this.$wire.get('formularioMatricula.costo_matricula') )"  >
+                                value="cash" wire:model='formularioMatricula.tipo_pago'  >
                             <label class="form-check-label" for="rbtnContado">
                                 Contado
                             </label>
                         </div>
                         <div class="form-check" style="padding-left: 1rem">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnCredito"
-                                value="credit" wire:model.defer='formularioMatricula.tipo_pago' x-on:change="alert( this.$wire.get('formularioMatricula.costo_matricula') )"  >
+                                value="credit" wire:model='formularioMatricula.tipo_pago' >
                             <label class="form-check-label" for="rbtnCredito">
                                 Credito
                             </label>
@@ -68,10 +68,10 @@
                         <x-input-error variable='formularioMatricula.costo'> </x-input-error>
                     </div>
                 </div>
-                <div class="form-group pago-credito" style="display: none;" >
+                <div class="form-group" style="{{ (isset($formularioMatricula['tipo_pago']) && $formularioMatricula['tipo_pago'] == 'credit')? '' : 'display: none;'  }}" >
                     <label class="col-lg-3 control-label">Cuotas:</label>
                     <div class="col-lg-3">
-                        <input type="number" title="Costo por matricula" wire:model.defer="formularioMatricula.cuotas"
+                        <input type="number" title="Costo por matricula" wire:model="formularioMatricula.cuotas"
                             class="form-control" id="cuotas-pago">
                         <x-input-error variable='formularioMatricula.cuotas'> </x-input-error>
                     </div>
@@ -80,6 +80,24 @@
                         <input type="text" title="Costo por cada cuota" class="form-control" id="monto-cuota" disabled>
                     </div>
                 </div>
+                @if (isset($formularioMatricula['tipo_pago']) && $formularioMatricula['tipo_pago'] == 'credit')
+                    <div class="form-group">
+                        @php
+                            for ($i=0; $i < $formularioMatricula['cuotas  ']  ; $i++) { 
+                                # code...
+                            }
+
+                        @endphp
+
+
+                        <label class="col-lg-3 control-label">Monto cuota 1:</label>
+                        <div class="col-lg-3">
+                            <input type="number" title="Costo por matricula" wire:model="formularioMatricula.cuotas"
+                                class="form-control" id="cuotas-pago">
+                            <x-input-error variable='formularioMatricula.cuotas'> </x-input-error>
+                        </div>
+                    </div>
+                @endif
             </div>
             <div class="col-lg-5 form-horizontal">
                 <div class="form-group">
@@ -133,7 +151,7 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        /* document.addEventListener("DOMContentLoaded", () => {
                     Livewire.hook('message.processed', (msg, {fingerprint}) => {
                         if(fingerprint.name == 'matricula.matricula'){
                             // $(".pago-credito").fadeOut();
@@ -148,7 +166,7 @@
                             };
                         }
                     });
-                }); 
+                });  */
     </script>
 
     @push('scripts')
@@ -156,6 +174,7 @@
         $(document).ready(()=>{
             //$(".pago-credito").fadeOut();
 
+            /* 
             $("#rbtnContado").on('change', ({target})=>{
                 if(target.checked) {
                     $(".pago-credito").fadeOut()
@@ -163,7 +182,7 @@
                     // console.log( $wire.get( 'formularioMatricula.costo_matricula' ));
                     
                 }
-            });
+            }); 
 
             $("#rbtnCredito").on('change', ({target})=>{
                 if(target.checked) {
@@ -200,7 +219,7 @@
 
             $('#costo-ciclo').on('keyup', calcularMontoCuota);
             $('#cuotas-pago').on('keyup', calcularMontoCuota);
-
+            */
         });
 
 

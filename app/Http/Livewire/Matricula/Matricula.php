@@ -6,14 +6,19 @@ use App\Enums\EstadosEntidadEnum;
 use App\Enums\TiposParentescosApoderadoEnum;
 use App\Repository\ClassroomRepository;
 use App\Repository\EnrollmentRepository;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class Matricula extends Component
 {
     public $relative_id, $student_id, $matricula_id;
+
     public $formularioMatricula;
+
+    // variables de la vista
+    // numero cuotas 
+    // costo matricula
+
 
     public $lista_classrooms, $lista_carreras, $vacantes_total, $vacantes_disponible;
     private $_classroomRepository,  $_careersRepository, $_matriculaRepository;
@@ -22,13 +27,15 @@ class Matricula extends Component
         'formularioMatricula.tipo_matricula' => 'required|in:normal,beca,semi-beca',
         'formularioMatricula.classroom_id' => 'required|integer|min:1',
         'formularioMatricula.career_id' => 'required|integer|min:1',
-        'formularioMatricula.tipo_pago' => 'required|in:cash,credit',
-        'formularioMatricula.cuotas' => 'integer|min:0',
+        'formularioMatricula.tipo_pago' => 'required|in:cash,credit',       // agregar evento
+        'formularioMatricula.cuotas' => 'integer|min:0|max:3',                    // hacer dinamico
+        'formularioMatricula.costo_matricula' => 'required|numeric|min:0',
         'formularioMatricula.costo' => 'required|numeric|min:0',
         'formularioMatricula.observaciones' => 'string',
 
-        // otros
-        'formularioMatricula.costo_matricula' => 'required|numeric|min:0',
+        // falta agregar un array de objetos
+        'formularioMatricula.listaCuotas' => 'array',
+
         'relative_id' => 'required|numeric|min:1',
         'student_id' => 'required|numeric|min:1',
     ];
