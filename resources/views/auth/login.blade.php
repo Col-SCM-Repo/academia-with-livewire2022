@@ -11,6 +11,7 @@
         <link href="{{asset('inspinia_admin/css/plugins/ladda/ladda-themeless.min.css')}}" rel="stylesheet">
         <link href="{{asset('inspinia_admin/css/animate.css')}}" rel="stylesheet">
         <link href="{{asset('inspinia_admin/css/style.css')}}" rel="stylesheet">
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
 
     <body class="gray-bg">
@@ -37,6 +38,13 @@
                             </span>
                         @endif
                     </div>
+                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+                    @if (Session::has('g-recaptcha-reponse'))
+                        <p class="alert text-danger">
+                            * Debe completar el captcha
+                        </p>
+                    @endif
+                    <br/>
                     <button type="submit" class="ladda-button submit btn btn-primary block full-width m-b"  data-style="zoom-in">
                         Iniciar Sesión
                     </button>
