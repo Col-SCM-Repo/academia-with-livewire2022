@@ -9,8 +9,8 @@ $slot = ''
     <link href="{{ asset('inspinia_admin/css/plugins/steps/jquery.steps.css') }}" rel="stylesheet">
     <link href="{{ asset('inspinia_admin/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('inspinia_admin/css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
- 
-    
+
+
     <style>
         .wizard .content {
             min-height: 100px;
@@ -24,6 +24,12 @@ $slot = ''
         .wizard .content .body.current {
             position: relative;
         }
+
+        .typeahead   > li  {
+            list-style:none;
+            font-size:12px;
+        }
+
     </style>
 @endpush
 
@@ -36,10 +42,10 @@ $slot = ''
     <script src="{{ asset('inspinia_admin/js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
     <!-- Data table -->
     <script src=" {{ asset('inspinia_admin/js/plugins/dataTables/datatables.min.js') }} "></script>
-    
+
     <!-- Typehead -->
     <script src="{{ asset('inspinia_admin/js/plugins/typehead/bootstrap3-typeahead.min.js') }}"></script>
-    
+
     <script>
         var settings = {
             stepsOrientation: $.fn.steps.stepsOrientation.horizontal,
@@ -59,16 +65,16 @@ $slot = ''
             transitionEffect: $.fn.steps.transitionEffect.slideLeft,
             transitionEffectSpeed: 200,
 
-            onStepChanging: function (event, currentIndex, newIndex) { 
+            onStepChanging: function (event, currentIndex, newIndex) {
                 return true; },
             onStepChanged: function (event, currentIndex, priorIndex) {
 
-            }, 
+            },
             onCanceled: function (event) {
 
             },
             onFinishing: function (event, currentIndex) {
-                return true; }, 
+                return true; },
             onFinished: function (event, currentIndex) {
 
                 toastr.success('Se creo la matricula correctamente', 'Alerta')
@@ -99,8 +105,8 @@ $slot = ''
     </ol>
 </div>
 <div class="col-md-7 text-right" style="padding-top: 1rem">
-    <button class="btn btn-sm btn-success din" type="button" id="btnResetComponents"> 
-        Limpiar formulario 
+    <button class="btn btn-sm btn-success din" type="button" id="btnResetComponents">
+        Limpiar formulario
     </button>
 </div>
 
@@ -119,7 +125,7 @@ $slot = ''
                         <h1>Crear apoderado</h1>
                         <div>
                             @livewire('matricula.apoderado')
-                        </div> 
+                        </div>
                         <h1>Matricular</h1>
                         <div>
                             @livewire('matricula.matricula')
@@ -140,9 +146,9 @@ $slot = ''
         $(document).ready(()=>{
             $('#btnResetComponents').on('click', ()=>{
                 alert("reseteando componentes");
-                Livewire.emit('reset-forms', true); 
+                Livewire.emit('reset-forms', true);
             })
         })
-    </script>    
+    </script>
 @endpush
 

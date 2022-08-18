@@ -7,7 +7,6 @@ use App\Enums\EstadosEntidadEnum;
 use App\Repository\DistrictRepository;
 use App\Repository\SchoolRepository;
 use App\Repository\StudentRepository;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Alumno extends Component
@@ -23,15 +22,23 @@ class Alumno extends Component
 
     protected $listeners = [
         //    'reset-form-alumno' => 'initialState',
-        'pagina-cargada-getdata' => 'enviarDataAutocomplete',
+        'pagina-cargada-alumno' => 'enviarDataAutocomplete',
+        'change-props-alumno' => 'cambiarValor',
     ];
 
+    // Metodos listeners
     public function enviarDataAutocomplete()
     {
-        $this->emit('data-autocomplete', (object)[
+        $this->emit('data-autocomplete-alumno', (object)[
             "distritos" => $this->lista_distritos,
             "instituciones" => $this->lista_ie_procedencia,
         ]);
+    }
+
+    public function cambiarValor( $data )
+    {
+        // toastAlert($this, 'Recibido:: ['.$data['name'].']= '.$data['value']);
+        $this->formularioAlumno[$data['name']] = $data['value'];
     }
 
     protected $rules = [

@@ -38,7 +38,7 @@
                         <div class="col-lg-10">
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="date" autocomplete="of" wire:model.defer="formularioAlumno.f_nac"
+                                <input type="date" autocomplete="off" wire:model.defer="formularioAlumno.f_nac"
                                     class="form-control" placeholder="01/01/2000" id="f_nacimiento">
                             </div>
                             <x-input-error variable='formularioAlumno.f_nac'> </x-input-error>
@@ -51,11 +51,11 @@
                             <x-input-error variable='formularioAlumno.telefono'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Distrito</label>
+                    <div class="form-group" x-data="" ><label class="col-lg-2 control-label">Distrito</label>
                         <div class="col-lg-10 ui-widget">
-                            <input type="text" wire:model.defer="formularioAlumno.distrito"
+                            <input type="text" name="distrito" wire:model.defer="formularioAlumno.distrito"
                                 id="distrito" title="Distrito de procedencia. "
-                                class=" form-control" >
+                                class=" form-control" autocomplete="off"  >
                             <x-input-error variable='formularioAlumno.distrito'> </x-input-error>
                         </div>
                     </div>
@@ -95,18 +95,18 @@
                     <div class="form-group">
                         <label class="col-lg-2 control-label">I.E. Proc.</label>
                         <div class="col-lg-10">
-                            <input type="text" autocomplete="of" wire:model.defer="formularioAlumno.Ie_procedencia"
+                            <input type="text" name="Ie_procedencia" autocomplete="off " wire:model.defer="formularioAlumno.Ie_procedencia"
                                 title="instituciòn de procedencia" id="Ie_procedencia"
                                 class="form-control " >
                             <x-input-error variable='formularioAlumno.Ie_procedencia'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group">  
+                    <div class="form-group">
                         <label class="col-lg-2 control-label">Egreso</label>
                         <div class="col-lg-4">
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="text" autocomplete="of" wire:model.defer="formularioAlumno.anio_egreso"
+                                <input type="text" autocomplete="off " wire:model.defer="formularioAlumno.anio_egreso"
                                     class="form-control" placeholder="2022" title="Año de egreso" id="datepicker-year">
                             </div>
                         </div>
@@ -121,13 +121,13 @@
                         </div>
                         <br>
                         <div class="col-lg-6">
-                            @error('formularioAlumno.anio_egreso') 
-                                <small class="pr-1 text-danger" role="alert"> * El año de egreso es requerido </small> 
+                            @error('formularioAlumno.anio_egreso')
+                                <small class="pr-1 text-danger" role="alert"> * El año de egreso es requerido </small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
-                            @error('formularioAlumno.sexo') 
-                                <small class="pr-1 text-danger" role="alert"> * El campo sexo es requerido </small> 
+                            @error('formularioAlumno.sexo')
+                                <small class="pr-1 text-danger" role="alert"> * El campo sexo es requerido </small>
                             @enderror
                         </div>
                     </div>
@@ -136,65 +136,45 @@
             <div class="col-12 text-right  ">
                 <span wire:loading wire:target="buscar_interno"> Buscando alumno ...</span>
                 <span wire:loading wire:target="update, create"> Guardando ...</span>
-                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> 
-                    <i class="fa fa-save    "></i> {{ $idEstudiante? 'Actualizar': 'Guardar'}}  
+                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem">
+                    <i class="fa fa-save    "></i> {{ $idEstudiante? 'Actualizar': 'Guardar'}}
                 </button>
 
                 @if ($idEstudiante)
                 <button class="btn btn-sm btn-success" type="button" style="padding: .75rem 3rem"
-                    wire:click="initialState"> Limpiar formulario 
+                    wire:click="initialState"> Limpiar formulario
                 </button>
                 @endif
 
             </div>
         </form>
-        <script>
-
-            
-            /* 
-            document.addEventListener('ready', ()=>{
-                document.getElementsById("distrito").addEventListener('change',  e => {
-                    console.log(e.target.value);
-                    $set('formularioAlumno.distrito', e.target.value)
-                } )
-            }) 
-            */
-        </script>
-
     </div>
     @push('scripts')
     <script>
         $(document).ready(()=>{
-            Livewire.emit('pagina-cargada-getdata');
+            Livewire.emit('pagina-cargada-alumno');
 
-            Livewire.on( 'data-autocomplete', ({ distritos, instituciones  })=>{
-                
+            Livewire.on( 'data-autocomplete-alumno', ({ distritos, instituciones  })=>{
                 console.log(distritos);
                 console.log(instituciones);
-                
                 $( "#distrito" ).typeahead({
                 source: distritos
                 });
-                
+
                 $( "#Ie_procedencia" ).typeahead({
                 source: instituciones
-                }); 
-            }); 
-            
-            /* $("#distrito").on("change", e => {
-                console.log(e.target.value);
-                $set('formularioAlumno.distrito', e.target.value)
-            } ) */
-            
-/* 
-            var distrito = document.getElementById('distrito');
-            distrito.dispatchEvent(new Event('input'));
-            
-            var Ie_procedencia = document.getElementById('Ie_procedencia');
-            Ie_procedencia.dispatchEvent(new Event('input'));
-             */
+                });
 
-            /* $( document ).tooltip(); */
+                $( "#distrito" ).change( (e) => {
+                    // alert('distrito changed');
+                    Livewire.emit('change-props-alumno', { name: e.target.name, value: e.target.value   })
+                } );
+                $( "#Ie_procedencia" ).change( (e) => {
+                    // alert('Ie_procedencia changed');
+                    Livewire.emit('change-props-alumno', { name: e.target.name, value: e.target.value   })
+                } );
+                // console.log(this.$wire.lista_ie_procedencia );
+            });
         });
     </script>
     @endpush

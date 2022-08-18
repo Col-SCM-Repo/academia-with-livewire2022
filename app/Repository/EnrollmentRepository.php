@@ -10,20 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class EnrollmentRepository extends Enrollment
 {
-    protected $_cuotasRepository;
+    protected $_cuotasRepository, $_carrerasRepository;
 
     /*
         Cancelado::estados  (  activo ! 1 cancelado)
-
         Campos tabla enrollment:
-            id, code, type, student_id, classroom_id, relative_id, relative_relationship, user_id, 
+            id, code, type, student_id, classroom_id, relative_id, relative_relationship, user_id,
             career_id, payment_type, fees_quantity, period_cost, cancelled, observations
-
     */
-
     public function __construct()
     {
         $this->_cuotasRepository = new InstallmentRepository();
+        $this->_carrerasRepository = new CareerRepository();
     }
 
     public function builderModelRepository()
@@ -32,18 +30,18 @@ class EnrollmentRepository extends Enrollment
             //'id' => null,                  // id
             //'codigo' => null,              // code
             'tipo_matricula' => null,       // type
-            'estudiante_id' => null,        // student_id        
-            'aula_id' => null,              // classroom_id        
-            'apoderado_id' => null,         // relative_id        
-            'relacion_apoderado' => null,   // relative_relationship                    
-            //'usuario_id' => null,         // user_id    
-            'carrera_id' => null,           // career_id        
-            'tipo_pago' => null,            // payment_type        
-            'cantidad_cuotas' => null,      // fees_quantity            
-            'costo_matricula' => null,      // --------------------       
-            'costo_ciclo' => null,          // period_cost        
-            //estado' => null,              // status        
-            'observaciones' => null,        // observations        
+            'estudiante_id' => null,        // student_id
+            'aula_id' => null,              // classroom_id
+            'apoderado_id' => null,         // relative_id
+            'relacion_apoderado' => null,   // relative_relationship
+            //'usuario_id' => null,         // user_id
+            'carrera' => null,           // career_id
+            'tipo_pago' => null,            // payment_type
+            'cantidad_cuotas' => null,      // fees_quantity
+            'costo_matricula' => null,      // --------------------
+            'costo_ciclo' => null,          // period_cost
+            //estado' => null,              // status
+            'observaciones' => null,        // observations
         ];
     }
 
@@ -58,7 +56,11 @@ class EnrollmentRepository extends Enrollment
         $matricula->relative_id = $modelEnrollment->apoderado_id;
         $matricula->relative_relationship = $modelEnrollment->relacion_apoderado;
         $matricula->user_id = Auth::user()->id;
-        $matricula->career_id = $modelEnrollment->carrera_id;
+
+        // buscar a la carrera
+        $carrera = $this->_carrerasRepository->buscarCarrera($modelEnrollment->carrera) ;
+
+        $matricula->career_id = $carrera? $carrera->id : 666;
         $matricula->payment_type = $modelEnrollment->tipo_pago;
         $matricula->fees_quantity = ($modelEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $modelEnrollment->cantidad_cuotas : 0;
         $matricula->period_cost = $modelEnrollment->costo_ciclo;

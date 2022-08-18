@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Career;
+use DB;
 
 class CareerRepository extends Career
 {
@@ -33,7 +34,7 @@ class CareerRepository extends Career
 
     public function listarCarreras()
     {
-        return Career::all();
+        return DB::table('careers')->select('id', 'career as name')->get();
     }
 
     public function eliminarCarrera($nombreCarrera)

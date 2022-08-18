@@ -11,6 +11,11 @@ class OccupationRepository extends Occupation
         return Occupation::where('name', $nombreOcupacion)->first();
     }
 
+    public function listaOcupaciones()
+    {
+        return Occupation::all();
+    }
+
     public function registrarBuscarOcupacion($nombreOcupacion)
     {
         $Ocupacion = self::buscarOcupacion($nombreOcupacion);

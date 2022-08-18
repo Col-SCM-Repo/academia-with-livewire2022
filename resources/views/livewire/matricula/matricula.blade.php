@@ -11,7 +11,7 @@
             </div>
             <div class="ibox-tools">
                 <button class="btn btn-xs btn-success ">
-                    Descargar  
+                    Descargar
                 </button>
             </div>
         </span>
@@ -20,7 +20,7 @@
         <form x-data class="row" wire:submit.prevent="create" >
             <div class="col-lg-7 form-horizontal">
                 <div class="form-group">
-             
+
                     <label class="col-lg-3 control-label">Ciclo/Nivel/Aula:</label>
                     <div class="col-lg-9">
                         <select wire:model="formularioMatricula.classroom_id" class="form-control" >
@@ -82,20 +82,13 @@
                 </div>
                 @if (isset($formularioMatricula['tipo_pago']) && $formularioMatricula['tipo_pago'] == 'credit')
                     <div class="form-group">
-                        @php
-                            for ($i=0; $i < $formularioMatricula['cuotas  ']  ; $i++) { 
-                                # code...
-                            }
-
-                        @endphp
-
-
-                        <label class="col-lg-3 control-label">Monto cuota 1:</label>
-                        <div class="col-lg-3">
-                            <input type="number" title="Costo por matricula" wire:model="formularioMatricula.cuotas"
-                                class="form-control" id="cuotas-pago">
-                            <x-input-error variable='formularioMatricula.cuotas'> </x-input-error>
-                        </div>
+                        @if (isset($formularioMatricula['cuotas']))
+                            @php
+                                for ($i=0; $i < $formularioMatricula['cuotas'] ; $i++) {
+                                    echo "<p> Hopola mundo </p>";
+                                }
+                            @endphp
+                        @endif
                     </div>
                 @endif
             </div>
@@ -117,8 +110,8 @@
                     <label class="col-lg-3 control-label ">Programa:</label>
                     <div class="col-lg-9">
                         <input type="text" title="Nombres completos del alumno." class="form-control "
-                            wire:model.defer="formularioMatricula.career_id">
-                        <x-input-error variable='formularioMatricula.career_id'> </x-input-error>
+                            wire:model.defer="formularioMatricula.carrera" name="carrera" id="carrera_matricula">
+                        <x-input-error variable='formularioMatricula.carrera'> </x-input-error>
                     </div>
                 </div>
                 <div class="form-group">
@@ -150,79 +143,25 @@
         </form>
     </div>
 
-    <script>
-        /* document.addEventListener("DOMContentLoaded", () => {
-                    Livewire.hook('message.processed', (msg, {fingerprint}) => {
-                        if(fingerprint.name == 'matricula.matricula'){
-                            // $(".pago-credito").fadeOut();
+@push('scripts')
+<script>
+    $(document).ready(()=>{
+        Livewire.emit('pagina-cargada-matricula');
 
-                            if($("#rbtnContado").is(':checked'))  {
-                                $(".pago-credito").fadeOut();
-                                $("#costo-matricula").val('');
-                            };
-                            if($("#rbtnCredito").is(':checked'))  {
-                                $(".pago-credito").fadeIn();
-                                $("#costo-matricula").val(50);
-                            };
-                        }
-                    });
-                });  */
-    </script>
+        Livewire.on( 'data-autocomplete-matricula', ({ carreras })=>{
+            console.log(carreras);
 
-    @push('scripts')
-    <script>
-        $(document).ready(()=>{
-            //$(".pago-credito").fadeOut();
+            $( "#carrera_matricula" ).typeahead({
+                source: carreras
+            });
 
-            /* 
-            $("#rbtnContado").on('change', ({target})=>{
-                if(target.checked) {
-                    $(".pago-credito").fadeOut()
-                    $("#costo-matricula").val('');
-                    // console.log( $wire.get( 'formularioMatricula.costo_matricula' ));
-                    
-                }
-            }); 
+            $( "#carrera_matricula" ).change( (e) => {
+                Livewire.emit('change-props-matricula', { name: e.target.name, value: e.target.value   })
+            } );
 
-            $("#rbtnCredito").on('change', ({target})=>{
-                if(target.checked) {
-                    $(".pago-credito").fadeIn();
-                    $("#costo-matricula").val(50);
-                    // console.log( $wire.get( 'formularioMatricula.costo_matricula' ));
-                    
-                }
-            }); 
-
-            const calcularMontoCuota = (e)=>{
-                    console.log("666666666666");
-                const costo_ciclo = $('#costo-ciclo');
-                const cuotas_pago = $('#cuotas-pago');
-                const monto_cuota = $('#monto-cuota');
-
-                if( costo_ciclo && cuotas_pago && monto_cuota ){
-                    console.log("6666");
-                    let costo = null, cuotas= null;
-                    if(costo_ciclo.val() != null && costo_ciclo.val() != '' && costo_ciclo.val() >= 0 )
-                        costo = costo_ciclo.val();
-                    if(cuotas_pago.val() != null && cuotas_pago.val() != '' && cuotas_pago.val() > 0 )
-                        cuotas = cuotas_pago.val();
-
-                    if(costo && cuotas)
-                        monto_cuota.val( parseFloat(costo/cuotas).toFixed(2) )
-                    else
-                        monto_cuota.val( '' )
-                }
-            }
-
-            $('#costo-ciclo').on('change', calcularMontoCuota);
-            $('#cuotas-pago').on('change', calcularMontoCuota);
-
-            $('#costo-ciclo').on('keyup', calcularMontoCuota);
-            $('#cuotas-pago').on('keyup', calcularMontoCuota);
-            */
         });
+    });
+</script>
+@endpush
 
-
-    </script>
-    @endpush
 </div>

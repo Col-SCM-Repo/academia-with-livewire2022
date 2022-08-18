@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Matricula;
 
 use App\Enums\EstadosEntidadEnum;
 use App\Enums\TiposParentescosApoderadoEnum;
+use App\Repository\CareerRepository;
 use App\Repository\ClassroomRepository;
 use App\Repository\EnrollmentRepository;
 use Illuminate\Support\Facades\Session;
@@ -16,7 +17,7 @@ class Matricula extends Component
     public $formularioMatricula;
 
     // variables de la vista
-    // numero cuotas 
+    // numero cuotas
     // costo matricula
 
 
@@ -26,7 +27,7 @@ class Matricula extends Component
     protected $rules = [
         'formularioMatricula.tipo_matricula' => 'required|in:normal,beca,semi-beca',
         'formularioMatricula.classroom_id' => 'required|integer|min:1',
-        'formularioMatricula.career_id' => 'required|integer|min:1',
+        'formularioMatricula.carrera' => 'required|string | min:3',
         'formularioMatricula.tipo_pago' => 'required|in:cash,credit',       // agregar evento
         'formularioMatricula.cuotas' => 'integer|min:0|max:3',                    // hacer dinamico
         'formularioMatricula.costo_matricula' => 'required|numeric|min:0',
@@ -43,17 +44,35 @@ class Matricula extends Component
     protected $listeners = [
         'alumno_id' => 'alumnoEncontrado',
         'apòderado_id' => 'apoderadoEncontrado',
+
+        //  eventos para autocomplete
+        'pagina-cargada-matricula' => 'enviarDataAutocomplete',
+        'change-props-matricula' => 'cambiarValor',
     ];
+
+    // Metodos listeners
+    public function enviarDataAutocomplete()
+    {
+        $this->emit('data-autocomplete-matricula', (object)[
+            "carreras" => $this->lista_carreras,
+        ]);
+    }
+
+    public function cambiarValor( $data )
+    {
+        $this->formularioMatricula[$data['name']] = $data['value'];
+    }
 
     public function __construct()
     {
         $this->_classroomRepository = new ClassroomRepository();
-        //$this->_careersRepository = new CareerRepository();
+        $this->_careersRepository = new CareerRepository();
         $this->_matriculaRepository = new EnrollmentRepository();
     }
 
     public function mount()
     {
+        $this->lista_carreras =$this->_careersRepository->listarCarreras();
         self::initialState();
     }
 
@@ -71,6 +90,7 @@ class Matricula extends Component
             }
         }
     }
+
 
     public function render()
     {
@@ -99,7 +119,7 @@ class Matricula extends Component
         $modelMatricula->aula_id = $formularioMatriculaObj->classroom_id;
         $modelMatricula->apoderado_id = $this->relative_id;
         $modelMatricula->relacion_apoderado = TiposParentescosApoderadoEnum::PADRE;
-        $modelMatricula->carrera_id = $formularioMatriculaObj->career_id;
+        $modelMatricula->carrera = $formularioMatriculaObj->carrera;
         $modelMatricula->tipo_pago = $formularioMatriculaObj->tipo_pago;
         $modelMatricula->cantidad_cuotas = $formularioMatriculaObj->cuotas;
         $modelMatricula->costo_matricula = $formularioMatriculaObj->costo_matricula;

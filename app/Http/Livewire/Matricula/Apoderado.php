@@ -14,12 +14,29 @@ class Apoderado extends Component
     public $formularioApoderado;
 
     public $lista_distritos, $lista_ocupaciones;
-    private $distritosRepository, $ocupacionRepository,  $entityRepository, $apoderadoRepository;
+    private $_distritosRepository, $_ocupacionRepository,  $entityRepository, $apoderadoRepository;
     private $componenteExterno;
 
     protected $listeners = [
-        'ya-cargue' => 'getDatosAutocomplete'
+        //    'reset-form-alumno' => 'initialState',
+        'pagina-cargada-apoderado' => 'enviarDataAutocomplete',
+        'change-props-apoderado' => 'cambiarValor',
     ];
+
+    // Metodos listeners
+    public function enviarDataAutocomplete()
+    {
+        $this->emit('data-autocomplete-apoderado', (object)[
+            "distritos" => $this->lista_distritos,
+            "ocupaciones" => $this->lista_ocupaciones,
+        ]);
+    }
+
+    public function cambiarValor( $data )
+    {
+        // toastAlert($this, 'Recibido:: ['.$data['name'].']= '.$data['value']);
+        $this->formularioApoderado[$data['name']] = $data['value'];
+    }
 
     protected $rules = [
         'formularioApoderado.dni' => "required | integer | min:8",
@@ -38,13 +55,15 @@ class Apoderado extends Component
     public function __construct()
     {
         $this->apoderadoRepository = new RelativeRepository();
-        $this->distritosRepository = new DistrictRepository();
-        $this->ocupacionRepository = new OccupationRepository();
+        $this->_distritosRepository = new DistrictRepository();
+        $this->_ocupacionRepository = new OccupationRepository();
     }
 
     public function mount($ambito = 0) // 1 = externo  <> 0 = componente interno
     {
         self::initialState();
+        $this->lista_distritos =  $this->_distritosRepository->listaDistritos();
+        $this->lista_ocupaciones = $this->_ocupacionRepository->listaOcupaciones();
         $this->componenteExterno = $ambito == 1;
     }
 
