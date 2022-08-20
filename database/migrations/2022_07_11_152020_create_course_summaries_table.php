@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CourseSummaries extends Migration
+class CreateCourseSummariesTable extends Migration
 {
     // Detalle sobre las calificaciones del examen
     public function up()

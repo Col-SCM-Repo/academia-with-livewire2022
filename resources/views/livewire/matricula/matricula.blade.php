@@ -40,14 +40,16 @@
                     <div class="col-lg-9 " style="display: flex; flex-wrap: wrap">
                         <div class="form-check">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnContado"
-                                value="cash" wire:model='formularioMatricula.tipo_pago'  >
+                                value="cash" wire:model='formularioMatricula.tipo_pago'
+                                {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }} >
                             <label class="form-check-label" for="rbtnContado">
                                 Contado
                             </label>
                         </div>
                         <div class="form-check" style="padding-left: 1rem">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnCredito"
-                                value="credit" wire:model='formularioMatricula.tipo_pago' >
+                                value="credit" wire:model='formularioMatricula.tipo_pago'
+                                {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }} >
                             <label class="form-check-label" for="rbtnCredito">
                                 Credito
                             </label>
@@ -59,7 +61,8 @@
                     <label class="col-lg-3 control-label">Costo matricula:</label>
                     <div class="col-lg-3">
                         <input type="text" title="Costo de matricula"
-                            wire:model.defer="formularioMatricula.costo_matricula" class="form-control" id="costo-matricula"  >
+                            wire:model="formularioMatricula.costo_matricula" class="form-control" id="costo-matricula"
+                            {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }}  >
                         <x-input-error variable='formularioMatricula.costo_matricula'> </x-input-error>
                     </div>
                     <label class="col-lg-3 control-label" >Costo de ciclo:</label>
@@ -70,34 +73,46 @@
                 </div>
                 <div class="form-group" style="{{ (isset($formularioMatricula['tipo_pago']) && $formularioMatricula['tipo_pago'] == 'credit')? '' : 'display: none;'  }}" >
                     <label class="col-lg-3 control-label">Cuotas:</label>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <input type="number" title="Costo por matricula" wire:model="formularioMatricula.cuotas"
-                            class="form-control" id="cuotas-pago">
+                            class="form-control" id="cuotas-pago"
+                            {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }} >
                         <x-input-error variable='formularioMatricula.cuotas'> </x-input-error>
                     </div>
-                    <label class="col-lg-3 control-label">Monto por cuota:</label>
-                    <div class="col-lg-3">
-                        <input type="text" title="Costo por cada cuota" class="form-control" id="monto-cuota" disabled>
-                    </div>
                 </div>
-                @if (isset($formularioMatricula['tipo_pago']) && $formularioMatricula['tipo_pago'] == 'credit')
-                    <div class="form-group">
-                        @if (isset($formularioMatricula['cuotas']))
-                            @php
-                                for ($i=0; $i < $formularioMatricula['cuotas'] ; $i++) {
-                                    echo "<p> Hopola mundo </p>";
-                                }
-                            @endphp
-                        @endif
+
+
+
+
+                @if (isset($formularioMatricula['lista_cuotas']) && is_array($formularioMatricula['lista_cuotas'])
+                && count($formularioMatricula['lista_cuotas']) > 0 &&  $formularioMatricula['tipo_pago'] == 'credit')
+                    <div class="row">
+                        <div class="col-lg-offset-3  col-lg-9">
+                            @foreach ($formularioMatricula['lista_cuotas'] as $index=> $cuota_detalle)
+                                <div class="form-group row">
+                                    <div class="col-lg-4">
+                                        <label class="text-right form-control">Cuota {{ $index+1 }} </label>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="number" class="form-control" {{ $index == (count($formularioMatricula['lista_cuotas'])-1)? 'disabled' : '' }} wire:model = 'formularioMatricula.lista_cuotas.{{$index}}.costo' >
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="date" class="form-control" wire:model = 'formularioMatricula.lista_cuotas.{{$index}}.fecha' >
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 @endif
+
             </div>
             <div class="col-lg-5 form-horizontal">
                 <div class="form-group">
                     <label class="col-lg-3 control-label ">Tipo</label>
                     <div class="col-lg-9">
-                        <select class="form-control" wire:model.defer="formularioMatricula.tipo_matricula"
-                            title="Tipo de matricula">
+                        <select class="form-control" wire:model="formularioMatricula.tipo_matricula"
+                            title="Tipo de matricula"
+                            {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }} >
                             <option value=""> Seleccionar tipo </option>
                             <option value="normal">Normal</option>
                             <option value="beca">Beca</option>
@@ -110,7 +125,8 @@
                     <label class="col-lg-3 control-label ">Programa:</label>
                     <div class="col-lg-9">
                         <input type="text" title="Nombres completos del alumno." class="form-control "
-                            wire:model.defer="formularioMatricula.carrera" name="carrera" id="carrera_matricula">
+                            wire:model.defer="formularioMatricula.carrera" name="carrera" id="carrera_matricula"
+                            {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }} >
                         <x-input-error variable='formularioMatricula.carrera'> </x-input-error>
                     </div>
                 </div>
@@ -118,7 +134,9 @@
                     <label class="col-lg-3 control-label"> Observaciones:</label>
                     <div class="col-lg-9">
                         <textarea rows="4" title="Observaciones de la matricula." class="form-control "
-                            wire:model.defer="formularioMatricula.observaciones"></textarea>
+                            wire:model="formularioMatricula.observaciones"
+                            {{ isset($formularioMatricula['classroom_id']) && is_numeric($formularioMatricula['classroom_id'])? '':'disabled' }}
+                            ></textarea>
                         <x-input-error variable='formularioMatricula.observaciones'> </x-input-error>
                     </div>
                 </div>
@@ -126,10 +144,14 @@
             <div class="col-12 text-right">
                 <div class="alert " role="alert">
                     @error($relative_id)
-                        <p class="text-danger">Debe registrar al <span class="alert-link">apoderado</span></p>
+                        <div class="alert alert-danger" role="alert">
+                        Debe registrar al <span class="alert-link">apoderado</span>
+                        </div>
                     @enderror
                     @error($student_id)
-                        <p class="text-danger">Debe registrar al <span class="alert-link">alumno</span></p>
+                        <div class="alert alert-danger" role="alert">
+                        Debe registrar al <span class="alert-link">alumno</span>
+                        </div>
                     @enderror
                 </div>
             </div>
@@ -150,15 +172,12 @@
 
         Livewire.on( 'data-autocomplete-matricula', ({ carreras })=>{
             console.log(carreras);
-
             $( "#carrera_matricula" ).typeahead({
                 source: carreras
             });
-
             $( "#carrera_matricula" ).change( (e) => {
                 Livewire.emit('change-props-matricula', { name: e.target.name, value: e.target.value   })
             } );
-
         });
     });
 </script>

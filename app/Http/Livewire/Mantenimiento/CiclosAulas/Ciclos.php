@@ -50,10 +50,10 @@ class Ciclos extends Component
         return view('livewire.mantenimiento.ciclos-aulas.ciclos');
     }
 
-    // Crud ciclo 
+    // Crud ciclo
     public function create()
     {
-        toastAlert($this, "Entra validacion");
+        //toastAlert($this, "Entra validacion");
         $this->validate();
         if ($this->_cicloRepository->registrarPeriodo(convertArrayUpperCase($this->formularioCiclo))) {
             sweetAlert($this, 'ciclo', EstadosEntidadEnum::CREATED);

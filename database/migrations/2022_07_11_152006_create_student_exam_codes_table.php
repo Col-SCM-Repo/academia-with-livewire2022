@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class StudentExamCodes extends Migration
+class CreateStudentExamCodesTable extends Migration
 {
     public function up()
     {
