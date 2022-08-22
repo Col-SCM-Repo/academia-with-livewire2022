@@ -96,7 +96,7 @@ class Alumno extends Component
                 self::initialState();
             } else {
                 // siguiente paso  o habilitar boton
-                $this->emit('alumno_id', $estudianteCreado->id);
+                $this->emitTo('matricula.matricula', 'student-found', (object)[ 'name' => 'student_id', 'value' => $estudianteCreado->id]);
             }
         } else
             toastAlert($this, 'Ocurrio un error al registrar alumno');
@@ -140,7 +140,7 @@ class Alumno extends Component
                 'sexo' => $informacionAlumno->sexo,
             ];
             $this->idEstudiante = $informacionAlumno->idEstudiante;
-            $this->emit('alumno_id', $informacionAlumno->idEstudiante);
+            $this->emitTo('matricula.matricula', 'student-found', (object)[ 'name' => 'student_id', 'value' => $informacionAlumno->idEstudiante]);
             $this->validate();
         } else {
             toastAlert($this, 'El alumno no pudo ser encontrado', EstadosAlertasEnum::WARNING);

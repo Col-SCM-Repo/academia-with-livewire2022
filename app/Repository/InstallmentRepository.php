@@ -13,7 +13,7 @@ class InstallmentRepository extends Installment
     protected $paymentRepository;
 
     /*
-        Columnas: 
+        Columnas:
                     id, enrollment_id, order, type, amount, status
 
         Nota:
@@ -40,7 +40,6 @@ class InstallmentRepository extends Installment
     public function generarCoutasPago(object $modelInstallment)
     {
         $cuotas = [];
-        Log::debug((array) $modelInstallment);
         switch ($modelInstallment->tipo_pago) {
             case FormasPagoEnum::CONTADO:
             case strtoupper(FormasPagoEnum::CONTADO):
@@ -49,11 +48,9 @@ class InstallmentRepository extends Installment
                 break;
             case FormasPagoEnum::CREDITO:
             case strtoupper(FormasPagoEnum::CREDITO):
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => $modelInstallment->costo_matricula];
-                $costo_cuota = round($modelInstallment->costo_ciclo / $modelInstallment->cuotas, 2);
-                for ($i = 0; $i < $modelInstallment->cuotas; $i++) {
-                    $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => ($i + 2), 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::CICLO, 'amount' => $costo_cuota];
-                }
+                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => $modelInstallment->costo_matricula , 'deadline' =>  null];
+                for ($i = 0; $i < count($modelInstallment->detalle_cuotas); $i++)
+                    $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => ($i + 2), 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::CICLO, 'amount' => $modelInstallment->detalle_cuotas[$i]['costo'], 'deadline' => $modelInstallment->detalle_cuotas[$i]['fecha']  ];
                 break;
             default:
                 return null;
@@ -207,7 +204,7 @@ class InstallmentRepository extends Installment
             foreach ($cuotas as $cuota) {
                 $cuotaTemp = (object)[];
             }
-        } 
+        }
     */
 
     // para la generacion de la boleta

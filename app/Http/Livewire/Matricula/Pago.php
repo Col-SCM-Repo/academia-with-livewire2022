@@ -25,7 +25,7 @@ class Pago extends Component
     ];
 
     protected $listeners = [
-        'matricula_id' => 'vincularMatricula'
+        'enrollment-found' => 'setData'
     ];
 
     public function __construct()
@@ -47,24 +47,10 @@ class Pago extends Component
         return view('livewire.matricula.pago');
     }
 
-    public function abrirModalPagos($cuotaSeleccionada_id, $autoFraccionamiento = true)
-    {
-        $cuotaSeleccionada = (object) ($autoFraccionamiento ? $this->cuotas['ciclo'][$cuotaSeleccionada_id] : $this->cuotas['matricula'][$cuotaSeleccionada_id]);
-        if ($cuotaSeleccionada) {
-            $this->autoFraccionamiento = $autoFraccionamiento;
-            $this->formularioPago['cuota_id'] = $cuotaSeleccionada->id;
-            $this->formularioPago['deuda_pendiente'] = $this->cuotas['monto_deuda_pendiente'];
-            $this->formularioPago['costo_cuota'] = $cuotaSeleccionada->monto_cuota;
-            openModal($this, '#form-modal-pago');
-        } else
-            toastAlert($this, 'Error, no se pudo cargar la cuota en el formulario');
-    }
-
-
+    /***********************************************************  CRUD *************************************************************/
     public function pagar()
     {
         $this->validate();
-
         $modelPago = $this->_pagoRepository->builderModelRepository();
         $modelPago->cuota_id = $this->formularioPago['cuota_id'];
         $modelPago->montoPagado = $this->formularioPago['costo_cuota'];
@@ -80,10 +66,27 @@ class Pago extends Component
             toastAlert($this, 'Error al registrar pago');
     }
 
-    // otros en segundo plano 
-    public function vincularMatricula($matricula_id)
+    /***********************************************************  Funciones listeners *************************************************************/
+    public function abrirModalPagos($cuotaSeleccionada_id, $autoFraccionamiento = true)
+    {
+        $cuotaSeleccionada = (object) ($autoFraccionamiento ? $this->cuotas['ciclo'][$cuotaSeleccionada_id] : $this->cuotas['matricula'][$cuotaSeleccionada_id]);
+        if ($cuotaSeleccionada) {
+            $this->autoFraccionamiento = $autoFraccionamiento;
+            $this->formularioPago['cuota_id'] = $cuotaSeleccionada->id;
+            $this->formularioPago['deuda_pendiente'] = $this->cuotas['monto_deuda_pendiente'];
+            $this->formularioPago['costo_cuota'] = $cuotaSeleccionada->monto_cuota;
+            openModal($this, '#form-modal-pago');
+        } else
+            toastAlert($this, 'Error, no se pudo cargar la cuota en el formulario');
+    }
+
+    public function setData($nuevaData)
     {
         self::initialState();
-        $this->matricula_id = $matricula_id;
+        $this->formularioPago[$nuevaData['name']] = $nuevaData['value'];
     }
+
+    /***********************************************************  Funciones internas *************************************************************/
+
+
 }

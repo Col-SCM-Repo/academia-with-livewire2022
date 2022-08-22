@@ -95,9 +95,19 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <input type="number" class="form-control" {{ $index == (count($formularioMatricula['lista_cuotas'])-1)? 'disabled' : '' }} wire:model = 'formularioMatricula.lista_cuotas.{{$index}}.costo' >
+                                        <div>
+                                            @error('formularioMatricula.lista_cuotas.'.$index.'.costo')
+                                                <small class="pr-1 text-danger" role="alert"> * Costo requerido</small>
+                                            @enderror
+                                        </div>
                                     </div>
                                     <div class="col-lg-5">
                                         <input type="date" class="form-control" wire:model = 'formularioMatricula.lista_cuotas.{{$index}}.fecha' >
+                                        <div>
+                                            @error('formularioMatricula.lista_cuotas.'.$index.'.fecha')
+                                                <small class="pr-1 text-danger" role="alert"> * Fecha requerida</small>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -143,14 +153,14 @@
             </div>
             <div class="col-12 text-right">
                 <div class="alert " role="alert">
-                    @error($relative_id)
+                    @error('formularioMatricula.relative_id')
                         <div class="alert alert-danger" role="alert">
-                        Debe registrar al <span class="alert-link">apoderado</span>
+                            Debe registrar al <span class="alert-link">apoderado</span>
                         </div>
                     @enderror
-                    @error($student_id)
+                    @error('formularioMatricula.student_id')
                         <div class="alert alert-danger" role="alert">
-                        Debe registrar al <span class="alert-link">alumno</span>
+                            Debe registrar al <span class="alert-link">alumno</span>
                         </div>
                     @enderror
                 </div>
@@ -176,7 +186,7 @@
                 source: carreras
             });
             $( "#carrera_matricula" ).change( (e) => {
-                Livewire.emit('change-props-matricula', { name: e.target.name, value: e.target.value   })
+                Livewire.emit('change-prop-enrollment', { name: e.target.name, value: e.target.value })
             } );
         });
     });

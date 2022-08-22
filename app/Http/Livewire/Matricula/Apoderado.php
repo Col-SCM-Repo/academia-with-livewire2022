@@ -14,7 +14,7 @@ class Apoderado extends Component
     public $formularioApoderado;
 
     public $lista_distritos, $lista_ocupaciones;
-    private $_distritosRepository, $_ocupacionRepository,  $entityRepository, $apoderadoRepository;
+    private $_distritosRepository, $_ocupacionRepository, $apoderadoRepository;
     private $componenteExterno;
 
     protected $listeners = [
@@ -83,7 +83,7 @@ class Apoderado extends Component
         $apoderadoCreado = $this->apoderadoRepository->registrarApoderado(convertArrayUpperCase($this->formularioApoderado));
         if ($apoderadoCreado) {
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
-            $this->emit('apòderado_id', $apoderadoCreado->id);
+            $this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $apoderadoCreado->id]);
         } else
             toastAlert($this, 'Primero verifique haber realizado la busqueda.');
     }
@@ -118,7 +118,7 @@ class Apoderado extends Component
                 'estado_marital' => $informacionApoderado->estado_marital,
             ];
             $this->idRelacionApoderado  = $informacionApoderado->idRelacionApoderado;
-            $this->emit('apòderado_id', $informacionApoderado->idRelacionApoderado);
+            $this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $informacionApoderado->idRelacionApoderado]);
             $this->validate();
         } else {
             toastAlert($this, 'No se encontrò al apoderado.');

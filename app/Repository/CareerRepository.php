@@ -16,7 +16,7 @@ class CareerRepository extends Career
 
     public function buscarCarrera($nombreCarrera)
     {
-        return Career::where('carrer', $nombreCarrera)->first();
+        return Career::where('career', $nombreCarrera)->first();
     }
 
     public function registrarCarrera($nombreCarrera, $nemonico, $nombreGrupo = 'O')

@@ -35,9 +35,10 @@ class EnrollmentRepository extends Enrollment
             'apoderado_id' => null,         // relative_id
             'relacion_apoderado' => null,   // relative_relationship
             //'usuario_id' => null,         // user_id
-            'carrera' => null,           // career_id
+            'carrera' => null,              // nombre carrera
             'tipo_pago' => null,            // payment_type
             'cantidad_cuotas' => null,      // fees_quantity
+            'cuotas_detalle' => null,      // fees_quantity
             'costo_matricula' => null,      // --------------------
             'costo_ciclo' => null,          // period_cost
             //estado' => null,              // status
@@ -47,6 +48,8 @@ class EnrollmentRepository extends Enrollment
 
     public function registrarMatricula($modelEnrollment)
     {
+        // dd($modelEnrollment);
+
         if (self::alumnoEstaMatriculado($modelEnrollment->aula_id, $modelEnrollment->estudiante_id)) return null;
 
         $matricula = new Enrollment();
@@ -60,7 +63,7 @@ class EnrollmentRepository extends Enrollment
         // buscar a la carrera
         $carrera = $this->_carrerasRepository->buscarCarrera($modelEnrollment->carrera) ;
 
-        $matricula->career_id = $carrera? $carrera->id : 666;
+        $matricula->career_id = $carrera? $carrera->id : 666;   // Cambiarla por buscar o crear
         $matricula->payment_type = $modelEnrollment->tipo_pago;
         $matricula->fees_quantity = ($modelEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $modelEnrollment->cantidad_cuotas : 0;
         $matricula->period_cost = $modelEnrollment->costo_ciclo;
@@ -78,6 +81,7 @@ class EnrollmentRepository extends Enrollment
         $modelInstallment->costo_matricula = $modelEnrollment->costo_matricula;
         $modelInstallment->costo_ciclo = $modelEnrollment->costo_ciclo;
         $modelInstallment->cuotas = $matricula->fees_quantity;
+        $modelInstallment->detalle_cuotas = $matricula->fees_quantity >0 ? $modelEnrollment->cuotas_detalle : array() ;
 
         return $this->_cuotasRepository->generarCoutasPago($modelInstallment) ? $matricula : null;
     }

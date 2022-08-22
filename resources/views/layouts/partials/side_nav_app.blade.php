@@ -4,8 +4,7 @@
             <li class="nav-header">
                 <div class="dropdown profile-element">
                     <div class="text-center">
-                        <img alt="image" class="img-circle" width="100px;"
-                            src="https://scontent.flim10-1.fna.fbcdn.net/v/t1.18169-9/26238769_333394743844244_6939617783275579729_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=GmdspAAer_QAX8QAl6L&_nc_ht=scontent.flim10-1.fna&oh=00_AT_S2z4t074KsUI3FOP9R7iZp-w6_S_y1dq4I1Kwx02H3g&oe=62F2504D" />
+                        <img alt="image" class="img-circle" width="100px;" src="{{ asset('images/academiaCabreraLogo.png') }}" />
                     </div>
                     <br>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">

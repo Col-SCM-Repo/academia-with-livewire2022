@@ -9,7 +9,7 @@ function convertArrayUpperCase(array $array, bool $wantObject = true)
 {
     $temp = array();
     foreach ($array as $key => $value) {
-        $temp[$key] = strtoupper($value);
+        $temp[$key] = is_string($value) ? strtoupper($value) : $value;
     }
     return $wantObject ? (object) $temp : $temp;
 }
@@ -100,7 +100,7 @@ function toastAlertAvanzado(Component $context, string $nombreEntidad, string $a
 
 function generate_random_password()
 {
-    //Se define una cadena de caractares. 
+    //Se define una cadena de caractares.
     $cadena = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
 
     $longitudCadena = strlen($cadena);

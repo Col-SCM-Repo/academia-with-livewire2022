@@ -11,62 +11,40 @@ use App\Repository\EnrollmentRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class Matricula extends Component
 {
-    public $relative_id, $student_id, $matricula_id;
-
+    public $matricula_id;
     public $formularioMatricula;
-
-    // variables de la vista
-    // numero cuotas
-    // costo matricula
-
 
     public $lista_classrooms, $lista_carreras, $vacantes_total, $vacantes_disponible;
     private $_classroomRepository,  $_careersRepository, $_matriculaRepository;
 
     protected $rules = [
-        'formularioMatricula.tipo_matricula' => 'required|in:normal,beca,semi-beca',
+        'formularioMatricula.tipo_matricula' => 'required|string|in:normal,beca,semi-beca',
         'formularioMatricula.classroom_id' => 'required|integer|min:1',
         'formularioMatricula.carrera' => 'required|string | min:3',
-        'formularioMatricula.tipo_pago' => 'required|in:cash,credit',               // agregar evento
-        'formularioMatricula.cuotas' => 'integer|min:0|max:3',                      // hacer dinamico
+        'formularioMatricula.tipo_pago' => 'required|string|in:cash,credit',    // agregar evento
+        'formularioMatricula.cuotas' => 'required|integer|min:0|max:3',         // hacer dinamico
+        'formularioMatricula.listaCuotas' => 'required | array',
         'formularioMatricula.lista_cuotas.*.costo' => 'numeric | min:0',
         'formularioMatricula.lista_cuotas.*.fecha' => 'date',
-        'formularioMatricula.costo_matricula' => 'required|numeric|min:0',
-        'formularioMatricula.costo' => 'required|numeric|min:0',
-        'formularioMatricula.observaciones' => 'string',
+        'formularioMatricula.costo_matricula' => 'required | numeric | min:0',
+        'formularioMatricula.costo' => 'required | numeric | min:0',
+        'formularioMatricula.observaciones' => ' required | string ',
 
-        // falta agregar un array de objetos
-        'formularioMatricula.listaCuotas' => 'array',
-
-        'relative_id' => 'required|numeric|min:1',
-        'student_id' => 'required|numeric|min:1',
+        'formularioMatricula.relative_id' => 'required|numeric|min:1 ',
+        'formularioMatricula.student_id' => 'required|numeric|min:1 ',
     ];
 
     protected $listeners = [
-        'alumno_id' => 'alumnoEncontrado',
-        'apòderado_id' => 'apoderadoEncontrado',
+        'student-found' => 'setData',
+        'relative-found' => 'setData',
+        'change-prop-enrollment' => 'setData',
 
-        //  eventos para autocomplete
         'pagina-cargada-matricula' => 'enviarDataAutocomplete',
-        'change-props-matricula' => 'cambiarValor',
     ];
 
-    // Metodos listeners
-    public function enviarDataAutocomplete()
-    {
-        $this->emit('data-autocomplete-matricula', (object)[
-            "carreras" => $this->lista_carreras,
-        ]);
-    }
-
-    public function cambiarValor( $data )
-    {
-        $this->formularioMatricula[$data['name']] = $data['value'];
-    }
 
     public function __construct()
     {
@@ -75,13 +53,29 @@ class Matricula extends Component
         $this->_matriculaRepository = new EnrollmentRepository();
     }
 
+    public function initialState()
+    {
+        $this->reset(['formularioMatricula', 'matricula_id']);
+        $this->formularioMatricula['cuotas'] = 0;
+        $this->formularioMatricula['listaCuotas'] = array();
+        $this->formularioMatricula['relative_id'] = null;
+        $this->formularioMatricula['student_id'] = null;
+    }
+
     public function mount()
     {
-        $this->lista_carreras =$this->_careersRepository->listarCarreras();
         self::initialState();
+        $this->lista_carreras =$this->_careersRepository->listarCarreras();
 
-        $this->relative_id=1;
-        $this->student_id=1;
+        //  temporal
+        $this->formularioMatricula['relative_id']=1;
+        $this->formularioMatricula['student_id']=1;
+    }
+
+    public function render()
+    {
+        $this->lista_classrooms = Session::has('periodo') ? $this->_classroomRepository->getListaClases(Session::get('periodo')->id) : [];
+        return view('livewire.matricula.matricula');
     }
 
     public function updated($name, $value)
@@ -133,23 +127,7 @@ class Matricula extends Component
         }
     }
 
-
-
-    public function render()
-    {
-        if (Session::has('periodo'))
-            $this->lista_classrooms = $this->_classroomRepository->getListaClases(Session::get('periodo')->id);
-        else
-            $this->lista_classrooms = [];
-        return view('livewire.matricula.matricula');
-    }
-
-    public function initialState()
-    {
-        $this->reset(['relative_id', 'student_id', 'formularioMatricula', 'matricula_id']);
-        $this->formularioMatricula['cuotas'] = 0;
-    }
-
+    /***********************************************************  CRUD *************************************************************/
     public function create()
     {
         $this->validate();
@@ -161,10 +139,11 @@ class Matricula extends Component
         $modelMatricula->estudiante_id = $this->student_id;
         $modelMatricula->aula_id = $formularioMatriculaObj->classroom_id;
         $modelMatricula->apoderado_id = $this->relative_id;
-        $modelMatricula->relacion_apoderado = TiposParentescosApoderadoEnum::PADRE;
+        $modelMatricula->relacion_apoderado = TiposParentescosApoderadoEnum::PADRE; // Cambiar
         $modelMatricula->carrera = $formularioMatriculaObj->carrera;
         $modelMatricula->tipo_pago = $formularioMatriculaObj->tipo_pago;
         $modelMatricula->cantidad_cuotas = $formularioMatriculaObj->cuotas;
+        $modelMatricula->cuotas_detalle = $formularioMatriculaObj->lista_cuotas;
         $modelMatricula->costo_matricula = $formularioMatriculaObj->costo_matricula;
         $modelMatricula->costo_ciclo = $formularioMatriculaObj->costo;
         $modelMatricula->observaciones = $formularioMatriculaObj->observaciones;
@@ -172,7 +151,7 @@ class Matricula extends Component
         $matriculaCreada = $this->_matriculaRepository->registrarMatricula($modelMatricula);
         if ($matriculaCreada) {
             $this->matricula_id = $matriculaCreada->id;
-            $this->emitTo('matricula.pago', 'matricula_id', $matriculaCreada->id);
+            $this->emitTo('matricula.pago', 'enrollment-found', (object)[ 'name' => 'enrollment_id', 'value'=> $matriculaCreada->id  ]);
             sweetAlert($this, 'matricula', EstadosEntidadEnum::CREATED);
         } else
             toastAlert($this, 'Error al registar matricula');
@@ -180,24 +159,26 @@ class Matricula extends Component
 
     public function update()
     {
-        $this->validateOnly('formularioMatricula');
-        $this->validateOnly('relative_id');
-        $this->validateOnly('student_id');
+        $this->validate('formularioMatricula');
 
         sweetAlert($this, 'matricula', EstadosEntidadEnum::UPDATED);
     }
 
-    // Funciones adicionales en segundo plano
-    public function apoderadoEncontrado($idApoderado)
+
+
+    /***********************************************************  Funciones listeners *************************************************************/
+    public function enviarDataAutocomplete()
     {
-        $this->relative_id = $idApoderado;
+        $this->emit('data-autocomplete-matricula', (object)[ "carreras" => $this->lista_carreras ]);
     }
 
-    public function alumnoEncontrado($idAlumno)
+    public function setData( $nuevaData )
     {
-        $this->student_id = $idAlumno;
+        // dd( $nuevaData,$this->formularioMatricula  );
+        $this->formularioMatricula[$nuevaData['name']] = $nuevaData['value'];
     }
 
+    /***********************************************************  Funciones internas *************************************************************/
     private function generarCuotasAutomatico ( bool $automatico = true ){
         if(!(isset($this->formularioMatricula['costo']) && is_numeric($this->formularioMatricula['costo']) && $this->formularioMatricula['costo']>0))
             return null;
@@ -236,6 +217,5 @@ class Matricula extends Component
 }
 
 /********************************************************************************************************************************************************************
- ************************************************************* AGREGAR COLUMNAS DE FECHA AL NIVEL Y AULA ************************************************************
- /********************************************************************************************************************************************************************
- */
+/************************************************************* AGREGAR COLUMNAS DE FECHA AL NIVEL Y AULA ************************************************************
+/********************************************************************************************************************************************************************
