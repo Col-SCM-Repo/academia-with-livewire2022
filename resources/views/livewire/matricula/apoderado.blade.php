@@ -57,6 +57,22 @@
                             <x-input-error variable='formularioApoderado.direccion'> </x-input-error>
                         </div>
                     </div>
+                    <div class="form-group"><label class="col-lg-2 control-label">Parentesco</label>
+                        <div class="col-lg-10">
+                            <select class="form-control" wire:model.defer="formularioApoderado.parentesco">
+                                <option value="">Seleccione</option>
+                                <option value="father">Padre</option>
+                                <option value="mother">Madre</option>
+                                <option value="brother">Hermano</option>
+                                <option value="sister">Hermana</option>
+                                <option value="uncle">Tio(a)</option>
+                                <option value="grandparent">Abuelo(a)</option>
+                                <option value="cousin">Primo</option>
+                                <option value="other">Otro</option>
+                            </select>
+                            <x-input-error variable='formularioApoderado.parentesco'> </x-input-error>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">

@@ -14,6 +14,13 @@ function convertArrayUpperCase(array $array, bool $wantObject = true)
     return $wantObject ? (object) $temp : $temp;
 }
 
+function formatInputStr( string $inputStr ){
+    if(is_string($inputStr)){
+        return strtoupper(trim($inputStr));
+    }
+    return $inputStr;
+}
+
 function  openModal(Component $context, string $query, bool $open = true)
 {
     $context->emit('change-modal', (object)[

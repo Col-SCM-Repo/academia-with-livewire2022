@@ -14,29 +14,15 @@ class Apoderado extends Component
     public $formularioApoderado;
 
     public $lista_distritos, $lista_ocupaciones;
-    private $_distritosRepository, $_ocupacionRepository, $apoderadoRepository;
+    private $_distritosRepository, $_ocupacionRepository, $_apoderadoRepository;
     private $componenteExterno;
 
     protected $listeners = [
         //    'reset-form-alumno' => 'initialState',
         'pagina-cargada-apoderado' => 'enviarDataAutocomplete',
-        'change-props-apoderado' => 'cambiarValor',
+        'change-props-apoderado' => 'setData',
+        'student-found' => 'setData',
     ];
-
-    // Metodos listeners
-    public function enviarDataAutocomplete()
-    {
-        $this->emit('data-autocomplete-apoderado', (object)[
-            "distritos" => $this->lista_distritos,
-            "ocupaciones" => $this->lista_ocupaciones,
-        ]);
-    }
-
-    public function cambiarValor( $data )
-    {
-        // toastAlert($this, 'Recibido:: ['.$data['name'].']= '.$data['value']);
-        $this->formularioApoderado[$data['name']] = $data['value'];
-    }
 
     protected $rules = [
         'formularioApoderado.dni' => "required | integer | min:8",
@@ -44,17 +30,20 @@ class Apoderado extends Component
         'formularioApoderado.telefono' => "required | string | min: 4",
         'formularioApoderado.distrito' => "required | string ",
         'formularioApoderado.direccion' => "required | string | min: 4",
+        'formularioApoderado.parentesco' => "required | in:father,mother,brother,sister,uncle,grandparent,cousin,other",
         'formularioApoderado.nombres' => "required | string | min: 4",
         'formularioApoderado.ap_paterno' => "required | string | min: 4",
         'formularioApoderado.ap_materno' => "required | string | min: 4",
         'formularioApoderado.ocupacion' => "required | string | min: 4",
+        //'formularioApoderado.grado_de_instruccion' => "required | string | min: 4",
         'formularioApoderado.sexo' => "required | string | min:4 | max:8",
         'formularioApoderado.estado_marital' => "required | string | min:4",
+        'formularioApoderado.student_id' => "required | int | min:0",
     ];
 
     public function __construct()
     {
-        $this->apoderadoRepository = new RelativeRepository();
+        $this->_apoderadoRepository = new RelativeRepository();
         $this->_distritosRepository = new DistrictRepository();
         $this->_ocupacionRepository = new OccupationRepository();
     }
@@ -77,13 +66,40 @@ class Apoderado extends Component
         $this->reset(['formularioApoderado', 'idRelacionApoderado']);
     }
 
+    /***********************************************************  CRUD *************************************************************/
     public function create()
     {
         $this->validate();
-        $apoderadoCreado = $this->apoderadoRepository->registrarApoderado(convertArrayUpperCase($this->formularioApoderado));
-        if ($apoderadoCreado) {
+        //$apoderadoCreado = $this->_apoderadoRepository->registrarApoderado(convertArrayUpperCase($this->formularioApoderado));
+
+        $moApoderado = $this->_apoderadoRepository->builderModelRepository();
+        $moApoderado->apellido_paterno = formatInputStr( $this->formularioApoderado['ap_paterno'] );
+        $moApoderado->apellido_materno = formatInputStr( $this->formularioApoderado['ap_materno'] );
+        $moApoderado->nombres = formatInputStr( $this->formularioApoderado['nombres'] );
+        $moApoderado->direccion = formatInputStr( $this->formularioApoderado['direccion'] );
+        $moApoderado->distrito = formatInputStr( $this->formularioApoderado['distrito'] );
+        $moApoderado->telefono = formatInputStr( $this->formularioApoderado['telefono'] );
+        //$moApoderado->celular = formatInputStr( $this->formularioApoderado['XXXXX'] );
+        //$moApoderado->email = formatInputStr( $this->formularioApoderado['XXXXX'] );
+        $moApoderado->fecha_nacimiento = formatInputStr( $this->formularioApoderado['f_nac'] );
+        $moApoderado->sexo = formatInputStr( $this->formularioApoderado['sexo'] );
+        $moApoderado->dni = formatInputStr( $this->formularioApoderado['dni'] );
+        $moApoderado->estado_marital = formatInputStr( $this->formularioApoderado['estado_marital'] );
+        //$moApoderado->grado_de_instruccion = formatInputStr( $this->formularioApoderado['grado_de_instruccion']);
+        $moApoderado->estudiante_id = $this->formularioApoderado['student_id'] ;
+        $moApoderado->parentesco = $this->formularioApoderado['parentesco'];
+        $moApoderado->ocupacion = formatInputStr( $this->formularioApoderado['ocupacion'] );
+
+        $apoderado = $this->_apoderadoRepository->registrar($moApoderado);
+        //dd($moApoderado);
+        // parentesco  grado_de_instruccion
+
+        if ($apoderado) {
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
-            $this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $apoderadoCreado->id]);
+            $this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $apoderado->id]);
+
+/*             if($this->componenteExterno)[] // tener en cuenta el comportamiento del componente */
+
         } else
             toastAlert($this, 'Primero verifique haber realizado la busqueda.');
     }
@@ -92,16 +108,19 @@ class Apoderado extends Component
     {
         $this->validate();
         $data = convertArrayUpperCase($this->formularioApoderado);
-        if ($this->apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
+        if ($this->_apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::UPDATED);
         } else
             toastAlert($this, 'No se encontrò al apoderado.');
     }
 
+    /***********************************************************  Funciones listeners *************************************************************/
     public function buscar_interno()
     {
         $this->validateOnly('formularioApoderado.dni');
-        $informacionApoderado = $this->apoderadoRepository->getInformacionApoderado($this->formularioApoderado['dni']);
+        $dni = $this->formularioApoderado['dni'];
+        $informacionApoderado = $this->_apoderadoRepository->getInformacionApoderado($dni);
+        $this->initialState();
 
         if ($informacionApoderado) {
             $this->formularioApoderado = [
@@ -114,15 +133,32 @@ class Apoderado extends Component
                 'ap_paterno' => $informacionApoderado->apPaterno,
                 'ap_materno' => $informacionApoderado->apMaterno,
                 'ocupacion' => $informacionApoderado->ocupacion,
+                'parentesco ' => $informacionApoderado->parentesco,
                 'sexo' => $informacionApoderado->sexo,
-                'estado_marital' => $informacionApoderado->estado_marital,
+                'estado_marital' => $informacionApoderado->estado_marital
             ];
             $this->idRelacionApoderado  = $informacionApoderado->idRelacionApoderado;
-            $this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $informacionApoderado->idRelacionApoderado]);
+            //$this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $informacionApoderado->idRelacionApoderado]);
             $this->validate();
         } else {
             toastAlert($this, 'No se encontrò al apoderado.');
-            $this->initialState();
+            $this->formularioApoderado['dni'] = $dni;
         }
     }
+
+    public function enviarDataAutocomplete()
+    {
+        $this->emit('data-autocomplete-apoderado', (object)[
+            "distritos" => $this->lista_distritos,
+            "ocupaciones" => $this->lista_ocupaciones,
+        ]);
+    }
+
+    public function setData( $data )
+    {
+        $this->formularioApoderado[$data['name']] = $data['value'];
+    }
+
+    /***********************************************************  Funciones internas *************************************************************/
+
 }

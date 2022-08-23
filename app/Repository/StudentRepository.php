@@ -99,7 +99,7 @@ class StudentRepository extends Student
         $this->entidadRepository->actualizar( $estudiante->entity_id, $moEntidad);
 
         $estudiante->school_id = $this->escuelaRepository->registrarBuscarEscuela($moStudent->nombre_escuela)->id;
-        $estudiante->graduation_year = $moStudent->anio_egreso;
+        $estudiante->graduation_year = $moStudent->anio_graduacion;
         $estudiante->save();
         return $estudiante->save();
     }
@@ -111,7 +111,7 @@ class StudentRepository extends Student
 
     public function getInformacionEstudiante( string $dni)
     {
-        $entidadEstudiante = self::buscarEstudiante( $dni);
+        $entidadEstudiante = self::buscarEstudiantePorDNI( $dni);
 
         if (!$entidadEstudiante) return null;
         if (!$entidadEstudiante->student) return null;

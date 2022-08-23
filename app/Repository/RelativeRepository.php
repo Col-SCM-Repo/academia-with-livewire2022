@@ -3,61 +3,114 @@
 namespace App\Repository;
 
 use App\Models\Relative;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
-// Relative es lo mismo que decir apoderado
+// Relative es lo mismo que apoderados
 class RelativeRepository extends Relative
 {
-    private $entidadRepositorio, $ocupacionRepository;
+    private $_entidadRepository, $ocupacionRepository;
 
     public function __construct()
     {
-        $this->entidadRepositorio = new EntityRepository();
+        $this->_entidadRepository = new EntityRepository();
         $this->ocupacionRepository = new OccupationRepository();
     }
 
-    public function buscarApoderado($dni)
+    public function builderModelRepository()
     {
-        $entidad = $this->entidadRepositorio->buscarEntidad($dni);
+        return (object) [
+            // Propiedades de la entidad
+            "apellido_paterno" => null,         //  father_lastname
+            "apellido_materno" => null,         //  mother_lastname
+            "nombres" => null,                  //  name
+            "direccion" => null,                //  address
+            "distrito" => null,                 //  district_id
+            "telefono" => null,                 //  telephone
+            "celular" => null,                  //  mobile_phone
+            "email" => null,                    //  email
+            "fecha_nacimiento" => null,         //  birth_date
+            "sexo" => null,                     //  gender
+            "pais_id" => 173,                   //  country_id
+            "tipo_documento" => "dni",          //  document_type
+            "dni" => null,                      //  document_number
+            "estado_marital" => null,           //  marital_status
+            "grado_de_instruccion" => null,     //  instruction_degree
+
+            // Propiedades de apoderado
+            "estudiante_id" => null,            // student_id
+            "parentesco" => null,               //  relative_relationship
+            "ocupacion" => null,                //  occupation_id
+        ];
+    }
+
+    public function buscarApoderadoPorDNI($dni)
+    {
+        $entidad = $this->_entidadRepository->buscarEntidadPorDNI($dni);
         if (!$entidad) return null;
         return $entidad->relative;
     }
 
-    public function registrarApoderado($objApoderado)
+    public function registrar( object $moApoderado)
     {
-        $apoderado = self::buscarApoderado($objApoderado->dni);
-        if (!$apoderado) {
-            $entidad = $this->entidadRepositorio->buscarEntidad($objApoderado->dni);
-            if (!$entidad)
-                $entidad = $this->entidadRepositorio->registrarEntidad($objApoderado);
-
-            $ocupacion = $this->ocupacionRepository->registrarBuscarOcupacion($objApoderado->ocupacion);
-
-            $Apoderado = new Relative();
-            $Apoderado->entity_id = $entidad->id;
-            $Apoderado->occupation_id = $ocupacion->id;
-            $Apoderado->save();
-            return $Apoderado;
+        if (!self::buscarApoderadoPorDNI($moApoderado->dni)) {
+            $entidad = $this->_entidadRepository->buscarEntidadPorDNI($moApoderado->dni);
+            if (!$entidad){
+                $modelEntidad = $this->_entidadRepository->builderModelRepository();
+                $modelEntidad->apellido_paterno = $moApoderado->apellido_paterno;
+                $modelEntidad->apellido_materno = $moApoderado->apellido_materno;
+                $modelEntidad->nombres = $moApoderado->nombres;
+                $modelEntidad->direccion = $moApoderado->direccion;
+                $modelEntidad->distrito = $moApoderado->distrito;
+                $modelEntidad->telefono = $moApoderado->telefono;
+                $modelEntidad->celular = $moApoderado->celular;
+                $modelEntidad->email = $moApoderado->email;
+                $modelEntidad->fecha_nacimiento = $moApoderado->fecha_nacimiento;
+                $modelEntidad->sexo = $moApoderado->sexo;
+                $modelEntidad->dni = $moApoderado->dni;
+                $modelEntidad->estado_marital = $moApoderado->estado_marital;
+                $modelEntidad->grado_de_instruccion = $moApoderado->grado_de_instruccion;
+                $entidad = $this->_entidadRepository->registrar($modelEntidad);
+            }
+            $apoderado = new Relative();
+            $apoderado->student_id	 = $moApoderado->estudiante_id;
+            $apoderado->entity_id = $entidad->id;
+            $apoderado->occupation_id = $this->ocupacionRepository->registrarBuscarOcupacion($moApoderado->ocupacion)->id;
+            $apoderado->relative_relationship = $moApoderado->parentesco;
+            $apoderado->save();
+            return $apoderado;
         }
-        return null;
+        throw new BadRequestException('Error, el apoderado ya se encuentra registrado');
     }
 
-    public function actualizarApoderado($idRelacionApoderado, $objApoderado)
+    public function actualizar( int $idRelacionApoderado, object $moApoderado)
     {
         $apoderado = Relative::find($idRelacionApoderado);
+        if (!$apoderado) throw new NotFoundResourceException("No se encontrò el apoderado a actualizar");
 
-        if (!$apoderado) throw new NotFoundResourceException("No se encontro el apoderado");
+        $modelEntidad = $this->_entidadRepository->builderModelRepository();
+        $modelEntidad->apellido_paterno = $moApoderado->apellido_paterno;
+        $modelEntidad->apellido_materno = $moApoderado->apellido_materno;
+        $modelEntidad->nombres = $moApoderado->nombres;
+        $modelEntidad->direccion = $moApoderado->direccion;
+        $modelEntidad->distrito = $moApoderado->distrito;
+        $modelEntidad->telefono = $moApoderado->telefono;
+        $modelEntidad->celular = $moApoderado->celular;
+        $modelEntidad->email = $moApoderado->email;
+        $modelEntidad->fecha_nacimiento = $moApoderado->fecha_nacimiento;
+        $modelEntidad->sexo = $moApoderado->sexo;
+        $modelEntidad->dni = $moApoderado->dni;
+        $modelEntidad->estado_marital = $moApoderado->estado_marital;
+        $modelEntidad->grado_de_instruccion = $moApoderado->grado_de_instruccion;
+        $this->_entidadRepository->actualizar( $apoderado->entity_id, $modelEntidad);
 
-        $ocupacion = $this->ocupacionRepository->registrarBuscarOcupacion($objApoderado->ocupacion);
-        $apoderado->occupation_id = $ocupacion->id;
-
-        $this->entidadRepositorio->actualizarEntidad($apoderado->entity_id, $objApoderado);
-
+        $apoderado->occupation_id = $this->ocupacionRepository->registrarBuscarOcupacion($moApoderado->ocupacion)->id;
+        $apoderado->relative_relationship = $moApoderado->parentesco;
         $apoderado->save();
         return $apoderado;
     }
 
-    public function eliminarApoderado($dni)
+    public function eliminar($dni)
     {
         $Apoderado = self::buscarApoderado($dni);
         if ($Apoderado) {
@@ -67,9 +120,9 @@ class RelativeRepository extends Relative
         return false;
     }
 
-    public function getInformacionApoderado($dni)
+    public function getInformacionApoderado( string $dni)
     {
-        $entidad = $this->entidadRepositorio->buscarEntidad($dni);
+        $entidad = $this->_entidadRepository->buscarEntidadPorDNI($dni);
         $apoderado = $entidad ? $entidad->relative : null;
 
         if ($apoderado) {
@@ -88,12 +141,13 @@ class RelativeRepository extends Relative
                 "estado_marital" => $entidad->marital_status,
                 "photo_path" => $entidad->photo_path,
                 "ocupacion" => $apoderado->occupation->name,
+                "parentesco" => $apoderado->relative_relationship,
             ];
         }
         return null;
     }
 
-    public function getListaApoderados()
+    /* public function getListaApoderados()
     {
         $listaApoderados = array();
         foreach (Relative::all()  as $relacionApoderado)
@@ -109,7 +163,8 @@ class RelativeRepository extends Relative
                 "sexo" => $relacionApoderado->entity->gender,
                 "dni" => $relacionApoderado->entity->document_number,
                 "ocupacion" => $relacionApoderado->entity->occupation->name,
+                "parentesco" => $relacionApoderado->relative_relationship,
             ];
         return $listaApoderados;
-    }
+    } */
 }

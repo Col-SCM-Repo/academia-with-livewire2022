@@ -52,8 +52,8 @@ class EntityRepository extends Entity
         $entidad = self::buscarEntidadPorDNI($modelEntity->dni);
         if (!$entidad) {
             $entidad = new Entity();
-            $entidad->father_lastname = $modelEntity->ap_paterno;
-            $entidad->mother_lastname = $modelEntity->ap_materno;
+            $entidad->father_lastname = $modelEntity->apellido_paterno;
+            $entidad->mother_lastname = $modelEntity->apellido_materno;
             $entidad->name = $modelEntity->nombres;
             $entidad->address = $modelEntity->direccion;
             $entidad->district_id = $this->distritoRepository->registraroBuscarDistrito($modelEntity->distrito)->id;
@@ -66,7 +66,7 @@ class EntityRepository extends Entity
             $entidad->document_type = $modelEntity->tipo_documento;
             $entidad->document_number = $modelEntity->dni;
             $entidad->marital_status = $modelEntity->estado_marital;
-            $entidad->instruction_degree = $modelEntity->grado_instruccion;
+            $entidad->instruction_degree = $modelEntity->grado_de_instruccion;
             $entidad->save();
         }
         return $entidad;
@@ -75,10 +75,10 @@ class EntityRepository extends Entity
     public function actualizar(int $idEntidad, object $modelEntity)
     {
         $entidad = Entity::find($idEntidad);
-        if (!$entidad)  throw new NotFoundResourceException('Error, no se encontrò persona a actualizar');
+        if (!$entidad)  throw new NotFoundResourceException('Error, no se encontrò persona (entidad) a actualizar');
 
-        $entidad->father_lastname = $modelEntity->ap_paterno ? $modelEntity->ap_paterno :$entidad->father_lastname ;
-        $entidad->mother_lastname = $modelEntity->ap_materno ? $modelEntity->ap_materno :$entidad->mother_lastname ;
+        $entidad->father_lastname = $modelEntity->apellido_paterno ? $modelEntity->apellido_paterno :$entidad->father_lastname ;
+        $entidad->mother_lastname = $modelEntity->apellido_materno ? $modelEntity->apellido_materno :$entidad->mother_lastname ;
         $entidad->name = $modelEntity->nombres ? $modelEntity->nombres :$entidad->name ;
         $entidad->address = $modelEntity->direccion ? $modelEntity->direccion :$entidad->address ;
         $entidad->district_id = $modelEntity->distrito? $this->distritoRepository->registraroBuscarDistrito($modelEntity->distrito)->id : $entidad->district_id;
@@ -91,7 +91,7 @@ class EntityRepository extends Entity
         $entidad->document_type = $modelEntity->tipo_documento ? $modelEntity->tipo_documento :$entidad->document_type ;
         $entidad->document_number = $modelEntity->dni ? $modelEntity->dni :$entidad->document_number ;
         $entidad->marital_status = $modelEntity->estado_marital ? $modelEntity->estado_marital :$entidad->marital_status ;
-        $entidad->instruction_degree = $modelEntity->grado_instruccion ? $modelEntity->grado_instruccion :$entidad->instruction_degree ;
+        $entidad->instruction_degree = $modelEntity->grado_de_instruccion ? $modelEntity->grado_de_instruccion :$entidad->instruction_degree ;
         $entidad->save();
         return $entidad;
     }
