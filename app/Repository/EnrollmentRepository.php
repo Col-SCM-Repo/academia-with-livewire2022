@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Enums\EstadosEnum;
 use App\Enums\FormasPagoEnum;
 use App\Models\Enrollment;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
@@ -67,7 +68,15 @@ class EnrollmentRepository extends Enrollment
         $mIntallment->cuotas = $matricula->fees_quantity;
         $mIntallment->detalle_cuotas = $matricula->fees_quantity >0 ? $mEnrollment->cuotas_detalle : array() ;
 
-        return $this->_cuotasRepository->generarCoutasPago($mIntallment) ? $matricula : null;
+        $cuotasGeneradas = null;
+        try {
+            $cuotasGeneradas = $this->_cuotasRepository->generarCoutasPago($mIntallment);
+        } catch (Exception $e) {
+            self::eliminar( $matricula->id );
+            throw new BadRequestException($e->getMessage());
+        }
+
+        return  $cuotasGeneradas ? $matricula : null;
     }
 
     public function actualizar( int $matricula_id, object $mEnrollment)

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class InstallmentRepository extends Installment
 {
-    protected $_enrollmentRepository;
+    //protected $_enrollmentRepository;
 
     /*  Columnas:
             id enrollment_id order type amount status deadline
@@ -18,7 +18,7 @@ class InstallmentRepository extends Installment
 
     public function __construct()
     {
-        $this->_enrollmentRepository = new EnrollmentRepository();
+        //$this->_enrollmentRepository = new EnrollmentRepository();
     }
 
     public function builderModelRepository()
@@ -50,7 +50,6 @@ class InstallmentRepository extends Installment
                     $cuotas[] = ['enrollment_id' => $moInstallment->matricula_id, 'order' => ($i + 2), 'type' => TiposCuotaEnum::CICLO, 'amount' => $moInstallment->detalle_cuotas[$i]['costo'], 'deadline' => $moInstallment->detalle_cuotas[$i]['fecha']];
                 break;
             default:
-                $this->_enrollmentRepository->eliminar($moInstallment->matricula_id, true);
                 throw new BadRequestException("Error, la forma de pago no es valida");
         }
         return Installment::insert($cuotas);
