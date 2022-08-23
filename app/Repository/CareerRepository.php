@@ -19,14 +19,14 @@ class CareerRepository extends Career
         return Career::where('career', $nombreCarrera)->first();
     }
 
-    public function registrarCarrera($nombreCarrera, $nemonico, $nombreGrupo = 'O')
+    public function buscarRegistrarCarrera($nombreCarrera, $nemonico = null, $nombreGrupo = 'O')
     {
         $carrera = self::buscarCarrera($nombreCarrera);
         if (!$carrera) {
             $grupo = $this->_grupoRepository->buscarGrupo($nombreGrupo);
             $carrera->group_id = $grupo->id;
             $carrera->career = $nombreCarrera;
-            $carrera->nmonico = $nemonico;
+            $carrera->nmonico = $nemonico ? $nemonico : substr($nombreCarrera, 0, 2) ;
             $carrera->save();
         }
         return $carrera;

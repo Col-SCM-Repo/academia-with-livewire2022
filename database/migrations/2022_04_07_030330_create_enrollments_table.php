@@ -15,8 +15,6 @@ class CreateEnrollmentsTable extends Migration
 			$table->enum('type', array('normal', 'beca', 'semi-beca'));
 			$table->bigInteger('student_id')->unsigned()->index('FK_enrollments_students');
 			$table->bigInteger('classroom_id')->unsigned()->index('FK_enrollments_classrooms');
-			$table->bigInteger('relative_id')->unsigned()->index('FK_enrollments_relatives');
-			$table->enum('relative_relationship', array('father', 'mother', 'brother', 'sister', 'uncle', 'grandparent', 'cousin', 'other'));
 			$table->bigInteger('user_id')->unsigned()->index('FK_enrollments_users');
 			$table->bigInteger('career_id')->unsigned()->index('FK_enrollments_carreer');
 			$table->enum('payment_type', array('cash', 'credit'));

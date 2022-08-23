@@ -6,74 +6,59 @@ use App\Enums\EstadosEnum;
 use App\Enums\TiposCuotaEnum;
 use App\Enums\FormasPagoEnum;
 use App\Models\Installment;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class InstallmentRepository extends Installment
 {
-    protected $paymentRepository;
+    protected $_enrollmentRepository;
 
-    /*
-        Columnas:
-                    id, enrollment_id, order, type, amount, status
-
-        Nota:
-                    Al crear deben haber minimo dos categorias de pagos (matricula, cuota)
+    /*  Columnas:
+            id enrollment_id order type amount status deadline
     */
 
     public function __construct()
     {
+        $this->_enrollmentRepository = new EnrollmentRepository();
     }
 
     public function builderModelRepository()
     {
-        return $modelRepository = (object) [
-            'matricula_id' => null,
-            'tipo_pago' => null,
-            'costo_matricula' => null,
-            'costo_ciclo' => null,
-            'cuotas' => null,
+        return (object) [
+            'matricula_id' => null,         // enrollment_id
+            'tipo_pago' => null,            //
+            'costo_matricula' => null,      //
+            'costo_ciclo' => null,          //
+            'cuotas' => null,               //
 
-            'status' => null,
+            // 'status' => null,            // status
         ];
     }
 
-    public function generarCoutasPago(object $modelInstallment)
+    public function generarCoutasPago(object $moInstallment)
     {
         $cuotas = [];
-        switch ($modelInstallment->tipo_pago) {
+        switch ($moInstallment->tipo_pago) {
             case FormasPagoEnum::CONTADO:
             case strtoupper(FormasPagoEnum::CONTADO):
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => 0.00];
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 2, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::CICLO, 'amount' => $modelInstallment->costo_ciclo];
+                $cuotas[] = ['enrollment_id' => $moInstallment->matricula_id, 'order' => 1, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => 0.00 , 'deadline' =>  date('Y-m-d')];
+                $cuotas[] = ['enrollment_id' => $moInstallment->matricula_id, 'order' => 2, 'type' => TiposCuotaEnum::CICLO, 'amount' => $moInstallment->costo_ciclo , 'deadline' =>  date('Y-m-d')];
                 break;
             case FormasPagoEnum::CREDITO:
             case strtoupper(FormasPagoEnum::CREDITO):
-                $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => 1, 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => $modelInstallment->costo_matricula , 'deadline' =>  null];
-                for ($i = 0; $i < count($modelInstallment->detalle_cuotas); $i++)
-                    $cuotas[] = ['enrollment_id' => $modelInstallment->matricula_id, 'order' => ($i + 2), 'status' => EstadosEnum::ACTIVO, 'type' => TiposCuotaEnum::CICLO, 'amount' => $modelInstallment->detalle_cuotas[$i]['costo'], 'deadline' => $modelInstallment->detalle_cuotas[$i]['fecha']  ];
+                $cuotas[] = ['enrollment_id' => $moInstallment->matricula_id, 'order' => 1, 'type' => TiposCuotaEnum::MATRICULA, 'amount' => $moInstallment->costo_matricula , 'deadline' =>  date('Y-m-d')];
+                for ($i = 0; $i < count($moInstallment->detalle_cuotas); $i++)
+                    $cuotas[] = ['enrollment_id' => $moInstallment->matricula_id, 'order' => ($i + 2), 'type' => TiposCuotaEnum::CICLO, 'amount' => $moInstallment->detalle_cuotas[$i]['costo'], 'deadline' => $moInstallment->detalle_cuotas[$i]['fecha']];
                 break;
             default:
-                return null;
+                $this->_enrollmentRepository->eliminar($moInstallment->matricula_id, true);
+                throw new BadRequestException("Error, la forma de pago no es valida");
         }
-        Installment::insert($cuotas);
-        return true;
+        return Installment::insert($cuotas);
     }
 
-    /* public function actualizarCoutasPago($matricula_id)
+    public function actualizarCoutasPago(int $matricula_id)
     {
-        $cuotas = self::where('enrollment_id', $matricula_id)
-            ->where('status', EstadosEnum::ACTIVO)
-            ->get();
-
-        if (count($cuotas) == 0) return null;
-
-        $montoDevuelto = 0;
-
-        foreach ($cuotas as $cuota) {
-            $cuota->status = EstadosEnum::INACTIVO;
-            $cuota->save();
-        }
-    } */
+    }
 
     public function getInformacionPagosYCuotas($matricula_id)
     {
@@ -85,7 +70,6 @@ class InstallmentRepository extends Installment
 
         $cuotas_matricula = array();
         $cuotas_ciclo = array();
-        $totalPagado = true;
         $monto_deuda_inicial = 0;   // Costo de la deuda inicial;
         $monto_pagado = 0;          // Costo de la deuda inicial;
 

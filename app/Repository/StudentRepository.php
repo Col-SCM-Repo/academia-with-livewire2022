@@ -5,11 +5,14 @@ namespace App\Repository;
 use App\Models\Student;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\ErrorHandler\Debug;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class StudentRepository extends Student
 {
     private $entidadRepository, $escuelaRepository;
+
+    /*      id	entity_id	school_id	graduation_year	photo_file */
 
     public function __construct()
     {
@@ -17,19 +20,98 @@ class StudentRepository extends Student
         $this->escuelaRepository = new SchoolRepository();
     }
 
-    public function buscarEstudiante($identificadorEstudiante, $isDNI = true)
+    public function builderModelRepository()
     {
-        $entidadAlumno =  null;
-        if ($isDNI)
-            $entidadAlumno = $this->entidadRepository->buscarEntidad($identificadorEstudiante);
-        else
-            $entidadAlumno = $this->entidadRepository::find($identificadorEstudiante);
-        return  $entidadAlumno;
+        return (object) [
+            // Propiedades de la entidad
+            "apellido_paterno" => null,         //  father_lastname
+            "apellido_materno" => null,         //  mother_lastname
+            "nombres" => null,                  //  name
+            "direccion" => null,                //  address
+            "distrito" => null,                 //  district_id
+            "telefono" => null,                 //  telephone
+            "celular" => null,                  //  mobile_phone
+            "email" => null,                    //  email
+            "fecha_nacimiento" => null,         //  birth_date
+            "sexo" => null,                     //  gender
+            "pais_id" => 173,                   //  country_id
+            "tipo_documento" => "dni",          //  document_type
+            "dni" => null,                      //  document_number
+            "estado_marital" => null,           //  marital_status
+            "grado_de_instruccion" => null,     //  instruction_degree
+
+            // Propiedades de estudiante
+            "nombre_escuela" => null,           //
+            "anio_graduacion" => null,          //  graduation_year
+            "nombre_archivo_foto" => null,      //  photo_file
+        ];
     }
 
-    public function getInformacionEstudiante($dni)
+    public function registrar($moStudent)
     {
-        $entidadEstudiante = self::buscarEstudiante($dni);
+        $moEntidad = $this->entidadRepository->builderModelRepository();
+        $moEntidad->apellido_paterno = $moStudent->apellido_paterno;
+        $moEntidad->apellido_materno = $moStudent->apellido_materno;
+        $moEntidad->nombres = $moStudent->nombres;
+        $moEntidad->direccion = $moStudent->direccion;
+        $moEntidad->distrito = $moStudent->distrito;
+        $moEntidad->telefono = $moStudent->telefono;
+        $moEntidad->celular = $moStudent->celular;
+        $moEntidad->email = $moStudent->email;
+        $moEntidad->fecha_nacimiento = $moStudent->fecha_nacimiento;
+        $moEntidad->sexo = $moStudent->sexo;
+        $moEntidad->dni = $moStudent->dni;
+        $moEntidad->estado_marital = $moStudent->estado_marital;
+        $moEntidad->grado_de_instruccion = $moStudent->grado_de_instruccion;
+        $entidad = $this->entidadRepository->registrar($moEntidad);
+
+        $estudiante = Student::where('entity_id', $entidad->id)->first();
+        if ($estudiante) throw new BadRequestException('El alumno con dni '.$moEntidad->dni.' ya se encuentra registrado. ');
+
+        $estudiante = new Student();
+        $estudiante->entity_id = $entidad->id;
+        $estudiante->school_id = $this->escuelaRepository->registrarBuscarEscuela($moStudent->nombre_escuela)->id;
+        $estudiante->graduation_year = $moStudent->anio_graduacion;
+        //$estudiante->photo_file = $moStudent->nombre_archivo_foto;
+        $estudiante->save();
+        return $estudiante;
+    }
+
+    public function actualizar( int $idEstudiante, object $moStudent)
+    {
+        $estudiante = Student::find($idEstudiante);
+        if (!$estudiante) throw new NotFoundResourceException('Error, no se encontro al estudiante');
+
+        $moEntidad = $this->entidadRepository->builderModelRepository();
+        $moEntidad->apellido_paterno = $moStudent->apellido_paterno;
+        $moEntidad->apellido_materno = $moStudent->apellido_materno;
+        $moEntidad->nombres = $moStudent->nombres;
+        $moEntidad->direccion = $moStudent->direccion;
+        $moEntidad->distrito = $moStudent->distrito;
+        $moEntidad->telefono = $moStudent->telefono;
+        $moEntidad->celular = $moStudent->celular;
+        $moEntidad->email = $moStudent->email;
+        $moEntidad->fecha_nacimiento = $moStudent->fecha_nacimiento;
+        $moEntidad->sexo = $moStudent->sexo;
+        $moEntidad->dni = $moStudent->dni;
+        $moEntidad->estado_marital = $moStudent->estado_marital;
+        $moEntidad->grado_de_instruccion = $moStudent->grado_de_instruccion;
+        $this->entidadRepository->actualizar( $estudiante->entity_id, $moEntidad);
+
+        $estudiante->school_id = $this->escuelaRepository->registrarBuscarEscuela($moStudent->nombre_escuela)->id;
+        $estudiante->graduation_year = $moStudent->anio_egreso;
+        $estudiante->save();
+        return $estudiante->save();
+    }
+
+    public function buscarEstudiantePorDNI( string $dni)
+    {
+        return $this->entidadRepository->buscarEntidadPorDNI($dni);
+    }
+
+    public function getInformacionEstudiante( string $dni)
+    {
+        $entidadEstudiante = self::buscarEstudiante( $dni);
 
         if (!$entidadEstudiante) return null;
         if (!$entidadEstudiante->student) return null;
@@ -52,43 +134,9 @@ class StudentRepository extends Student
         ];
     }
 
-    public function registrarEstudiante($objEstudiante)
-    {
-        $entidad = $this->entidadRepository->registrarEntidad($objEstudiante);
-        $estudiante = Student::where('entity_id', $entidad->id)->first();
-
-        if (!$estudiante) {
-            $escuela = $this->escuelaRepository->registrarBuscarEscuela($objEstudiante->Ie_procedencia);
-
-            $estudiante = new Student();
-            $estudiante->entity_id = $entidad->id;
-            $estudiante->school_id = $escuela->id;
-            $estudiante->graduation_year = $objEstudiante->anio_egreso;
-            $estudiante->save();
-            $estudiante->creado = true;
-        } else
-            $estudiante->creado = false;
-        return $estudiante;
-    }
-
-    public function actualizarEstudiante($idEstudiante, $objEstudiante)
-    {
-        $estudiante = Student::find($idEstudiante);
-        if (!$estudiante) throw new NotFoundResourceException('Error, no se encontro al estudiante');
-
-        $escuela = $this->escuelaRepository->registrarBuscarEscuela($objEstudiante->Ie_procedencia);
-
-        $estudiante->school_id = $escuela->id;
-        $estudiante->graduation_year = $objEstudiante->anio_egreso;
-
-        $this->entidadRepository->actualizarEntidad($estudiante->entity_id, $objEstudiante);
-        $estudiante->save();
-        return true;
-    }
-
     public function eliminarEstudiante($idEstudiante)
     {
-        $estudiante = self::buscarEstudiante($idEstudiante, false);
+        $estudiante = self::find($idEstudiante);
         if ($estudiante) {
             $estudiante->delete();
             return true;

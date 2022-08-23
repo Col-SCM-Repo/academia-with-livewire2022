@@ -16,6 +16,7 @@ class AddForeignKeysToRelativesTable extends Migration
 	{
 		Schema::table('relatives', function (Blueprint $table) {
 			$table->foreign('entity_id', 'FK_relatives_entities')->references('id')->on('entities')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+			$table->foreign('student_id', 'FK_relatives_student')->references('id')->on('students')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 			$table->foreign('occupation_id', 'FK_relatives_occupation')->references('id')->on('occupations')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 	}
@@ -30,6 +31,7 @@ class AddForeignKeysToRelativesTable extends Migration
 	{
 		Schema::table('relatives', function (Blueprint $table) {
 			$table->dropForeign('FK_relatives_entities');
+			$table->dropForeign('FK_relatives_student');
 			$table->dropForeign('FK_relatives_occupation');
 		});
 	}

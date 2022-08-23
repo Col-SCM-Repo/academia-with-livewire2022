@@ -5,8 +5,8 @@ namespace App\Repository;
 use App\Enums\EstadosEnum;
 use App\Enums\FormasPagoEnum;
 use App\Models\Enrollment;
-use App\Models\Installment;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class EnrollmentRepository extends Enrollment
 {
@@ -14,9 +14,7 @@ class EnrollmentRepository extends Enrollment
 
     /*
         Cancelado::estados  (  activo ! 1 cancelado)
-        Campos tabla enrollment:
-            id, code, type, student_id, classroom_id, relative_id, relative_relationship, user_id,
-            career_id, payment_type, fees_quantity, period_cost, cancelled, observations
+        *** code  type  student_id  classroom_id  user_id  career_id  payment_type  fees_quantity  period_cost  status  observations ***
     */
     public function __construct()
     {
@@ -27,86 +25,78 @@ class EnrollmentRepository extends Enrollment
     public function builderModelRepository()
     {
         return (object) [
-            //'id' => null,                  // id
-            //'codigo' => null,              // code
             'tipo_matricula' => null,       // type
             'estudiante_id' => null,        // student_id
             'aula_id' => null,              // classroom_id
-            'apoderado_id' => null,         // relative_id
-            'relacion_apoderado' => null,   // relative_relationship
-            //'usuario_id' => null,         // user_id
             'carrera' => null,              // nombre carrera
             'tipo_pago' => null,            // payment_type
-            'cantidad_cuotas' => null,      // fees_quantity
-            'cuotas_detalle' => null,      // fees_quantity
-            'costo_matricula' => null,      // --------------------
-            'costo_ciclo' => null,          // period_cost
-            //estado' => null,              // status
             'observaciones' => null,        // observations
+
+            'costo_matricula' => null,      //
+            'costo_ciclo' => null,          // period_cost
+            'cantidad_cuotas' => null,      // fees_quantity
+            'cuotas_detalle' => null,       // fees_quantity
         ];
     }
 
-    public function registrarMatricula($modelEnrollment)
+    public function registrar( object $mEnrollment)
     {
-        // dd($modelEnrollment);
-
-        if (self::alumnoEstaMatriculado($modelEnrollment->aula_id, $modelEnrollment->estudiante_id)) return null;
+        if (self::alumnoEstaMatriculado($mEnrollment->aula_id, $mEnrollment->estudiante_id))
+            throw new BadRequestException('El alumno ya se encuentra matriculado');
 
         $matricula = new Enrollment();
-        $matricula->type = $modelEnrollment->tipo_matricula;
-        $matricula->student_id = $modelEnrollment->estudiante_id;
-        $matricula->classroom_id = $modelEnrollment->aula_id;
-        $matricula->relative_id = $modelEnrollment->apoderado_id;
-        $matricula->relative_relationship = $modelEnrollment->relacion_apoderado;
+        $matricula->type = $mEnrollment->tipo_matricula;
+        $matricula->student_id = $mEnrollment->estudiante_id;
+        $matricula->classroom_id = $mEnrollment->aula_id;
         $matricula->user_id = Auth::user()->id;
-
-        // buscar a la carrera
-        $carrera = $this->_carrerasRepository->buscarCarrera($modelEnrollment->carrera) ;
-
-        $matricula->career_id = $carrera? $carrera->id : 666;   // Cambiarla por buscar o crear
-        $matricula->payment_type = $modelEnrollment->tipo_pago;
-        $matricula->fees_quantity = ($modelEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $modelEnrollment->cantidad_cuotas : 0;
-        $matricula->period_cost = $modelEnrollment->costo_ciclo;
-        $matricula->status = EstadosEnum::ACTIVO;
-        $matricula->observations = $modelEnrollment->observaciones;
+        $matricula->career_id = $this->_carrerasRepository->buscarRegistrarCarrera($mEnrollment->carrera)->id;
+        $matricula->payment_type = $mEnrollment->tipo_pago;
+        $matricula->fees_quantity = ($mEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $mEnrollment->cantidad_cuotas : 0;
+        $matricula->period_cost = $mEnrollment->costo_ciclo;
+        $matricula->observations = $mEnrollment->observaciones;
         $matricula->save();
-
         $matricula->code = str_pad($matricula->id, 6, "0", STR_PAD_LEFT);
         $matricula->save();
 
-        // generar cuotas de pago
-        $modelInstallment = $this->_cuotasRepository->builderModelRepository();
-        $modelInstallment->matricula_id = $matricula->id;
-        $modelInstallment->tipo_pago = $modelEnrollment->tipo_pago;
-        $modelInstallment->costo_matricula = $modelEnrollment->costo_matricula;
-        $modelInstallment->costo_ciclo = $modelEnrollment->costo_ciclo;
-        $modelInstallment->cuotas = $matricula->fees_quantity;
-        $modelInstallment->detalle_cuotas = $matricula->fees_quantity >0 ? $modelEnrollment->cuotas_detalle : array() ;
+        // Cuotas de pago (Installments)
+        $mIntallment = $this->_cuotasRepository->builderModelRepository();
+        $mIntallment->matricula_id = $matricula->id;
+        $mIntallment->tipo_pago = $mEnrollment->tipo_pago;
+        $mIntallment->costo_matricula = $mEnrollment->costo_matricula;
+        $mIntallment->costo_ciclo = $mEnrollment->costo_ciclo;
+        $mIntallment->cuotas = $matricula->fees_quantity;
+        $mIntallment->detalle_cuotas = $matricula->fees_quantity >0 ? $mEnrollment->cuotas_detalle : array() ;
 
-        return $this->_cuotasRepository->generarCoutasPago($modelInstallment) ? $matricula : null;
+        return $this->_cuotasRepository->generarCoutasPago($mIntallment) ? $matricula : null;
     }
 
-    public function actualizarMatricula($matricula_id, $modelEnrollment)
+    public function actualizar( int $matricula_id, object $mEnrollment)
     {
     }
 
-    public function eliminarMatricula($matricula_id, $modelEnrollment)
+    public function eliminar( int $matricula_id, bool $automatico = false)
+    {
+        $matricula = Enrollment::find($matricula_id);
+        if($matricula){
+            if($automatico){
+                $matricula->observations = "Autoeliminacion" ;
+                $matricula->save();
+            }
+            $matricula->delete();
+            return true;
+        }
+        return false;
+    }
+
+    public function matriculados(int $aula_id)
     {
     }
 
-    public function listaMatriculados($aula_id)
+    public function buscar(string $dni_estudiante)
     {
     }
 
-    public function historialMatriculas($aula_id)
-    {
-    }
-
-    public function buscarMatricula(string $dni_estudiante)
-    {
-    }
-
-    public function informacionDeMatricula(int $estudiante_id, string $dni_estudiante)
+    public function informacionDeMatricula(int $estudiante_id)
     {
     }
 

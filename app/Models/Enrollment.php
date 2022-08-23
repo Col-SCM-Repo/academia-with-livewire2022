@@ -19,8 +19,6 @@ class Enrollment extends Model
         'type',
         'student_id',
         'classroom_id',
-        'relative_id',
-        'relative_relationship',
         'user_id',
         'career_id',
         'paymennt_type',
@@ -52,11 +50,6 @@ class Enrollment extends Model
     public function career()
     {
         return $this->belongsTo(Career::class);
-    }
-
-    public function relative()
-    {
-        return $this->belongsTo(Relative::class);
     }
 
     public function classroom()

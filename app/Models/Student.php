@@ -24,6 +24,11 @@ class Student extends Model
         return $this->belongsTo(Entity::class, 'entity_id', 'id');
     }
 
+    public function relative()
+    {
+        return $this->hasMany(Relative::class, 'student_id', 'id');
+    }
+
     public function school()
     {
         return $this->belongsTo(School::class, 'school_id', 'id');
