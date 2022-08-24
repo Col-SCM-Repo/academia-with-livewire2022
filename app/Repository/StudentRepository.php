@@ -3,8 +3,6 @@
 namespace App\Repository;
 
 use App\Models\Student;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 

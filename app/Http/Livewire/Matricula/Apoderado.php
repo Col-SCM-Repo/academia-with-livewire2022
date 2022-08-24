@@ -6,12 +6,12 @@ use App\Enums\EstadosEntidadEnum;
 use App\Repository\DistrictRepository;
 use App\Repository\OccupationRepository;
 use App\Repository\RelativeRepository;
+use Exception;
 use Livewire\Component;
 
 class Apoderado extends Component
 {
-    public $idRelacionApoderado;
-    public $formularioApoderado;
+    public $idRelacionApoderado, $formularioApoderado;
 
     public $lista_distritos, $lista_ocupaciones;
     private $_distritosRepository, $_ocupacionRepository, $_apoderadoRepository;
@@ -25,7 +25,7 @@ class Apoderado extends Component
     ];
 
     protected $rules = [
-        'formularioApoderado.dni' => "required | integer | min:8",
+        'formularioApoderado.dni' => "required | string | min:8",
         'formularioApoderado.f_nac' => "required | date_format:Y-m-d",
         'formularioApoderado.telefono' => "required | string | min: 4",
         'formularioApoderado.distrito' => "required | string ",
@@ -38,7 +38,9 @@ class Apoderado extends Component
         //'formularioApoderado.grado_de_instruccion' => "required | string | min: 4",
         'formularioApoderado.sexo' => "required | string | min:4 | max:8",
         'formularioApoderado.estado_marital' => "required | string | min:4",
-        'formularioApoderado.student_id' => "required | int | min:0",
+        'formularioApoderado.student_id' => "required | integer | min:0",
+
+        'idRelacionApoderado' => 'required | integer | min:0'
     ];
 
     public function __construct()
@@ -64,12 +66,25 @@ class Apoderado extends Component
     public function initialState()
     {
         $this->reset(['formularioApoderado', 'idRelacionApoderado']);
+        $this->formularioApoderado['dni'] = null;
+        $this->formularioApoderado['f_nac'] = null;
+        $this->formularioApoderado['telefono'] = null;
+        $this->formularioApoderado['distrito'] = null;
+        $this->formularioApoderado['direccion'] = null;
+        $this->formularioApoderado['parentesco'] = null;
+        $this->formularioApoderado['nombres'] = null;
+        $this->formularioApoderado['ap_paterno'] = null;
+        $this->formularioApoderado['ap_materno'] = null;
+        $this->formularioApoderado['ocupacion'] = null;
+        $this->formularioApoderado['sexo'] = null;
+        $this->formularioApoderado['estado_marital'] = null;
+        $this->formularioApoderado['student_id'] = null;
     }
 
     /***********************************************************  CRUD *************************************************************/
     public function create()
     {
-        $this->validate();
+        $this->validateOnly('formularioApoderado');
         //$apoderadoCreado = $this->_apoderadoRepository->registrarApoderado(convertArrayUpperCase($this->formularioApoderado));
 
         $moApoderado = $this->_apoderadoRepository->builderModelRepository();
@@ -90,38 +105,45 @@ class Apoderado extends Component
         $moApoderado->parentesco = $this->formularioApoderado['parentesco'];
         $moApoderado->ocupacion = formatInputStr( $this->formularioApoderado['ocupacion'] );
 
-        $apoderado = $this->_apoderadoRepository->registrar($moApoderado);
-        //dd($moApoderado);
-        // parentesco  grado_de_instruccion
-
-        if ($apoderado) {
+        try {
+            $this->_apoderadoRepository->registrar($moApoderado);
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
-            $this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $apoderado->id]);
-
-/*             if($this->componenteExterno)[] // tener en cuenta el comportamiento del componente */
-
-        } else
-            toastAlert($this, 'Primero verifique haber realizado la busqueda.');
+        } catch (Exception $err) {
+            toastAlert( $this, $err->getMessage());
+        }
     }
 
     public function update()
     {
         $this->validate();
+        dd($this->formularioApoderado);
         $data = convertArrayUpperCase($this->formularioApoderado);
+
         if ($this->_apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::UPDATED);
         } else
             toastAlert($this, 'No se encontrò al apoderado.');
     }
 
+    /* public function updated($name, $value)
+    {
+        dd($name, $value);
+    } */
+
     /***********************************************************  Funciones listeners *************************************************************/
     public function buscar_interno()
     {
         $this->validateOnly('formularioApoderado.dni');
-        $dni = $this->formularioApoderado['dni'];
-        $informacionApoderado = $this->_apoderadoRepository->getInformacionApoderado($dni);
-        $this->initialState();
+        $this->validateOnly('formularioApoderado.student_id');
 
+        $dni = $this->formularioApoderado['dni'];
+        $student_id = $this->formularioApoderado['student_id'];
+
+        $informacionApoderado = $this->_apoderadoRepository->getInformacionApoderado($dni);
+        dd($informacionApoderado);
+
+
+        $this->initialState();
         if ($informacionApoderado) {
             $this->formularioApoderado = [
                 'dni' => $informacionApoderado->dni,
@@ -133,7 +155,7 @@ class Apoderado extends Component
                 'ap_paterno' => $informacionApoderado->apPaterno,
                 'ap_materno' => $informacionApoderado->apMaterno,
                 'ocupacion' => $informacionApoderado->ocupacion,
-                'parentesco ' => $informacionApoderado->parentesco,
+                'parentesco' => $informacionApoderado->parentesco,
                 'sexo' => $informacionApoderado->sexo,
                 'estado_marital' => $informacionApoderado->estado_marital
             ];

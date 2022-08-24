@@ -18,7 +18,7 @@
                         <label class="col-lg-2 control-label">DNI</label>
                         <div class="col-lg-10">
                             <div class="input-group ">
-                                <input type="text" wire:model.defer="formularioApoderado.dni" placeholder="Numero de DNI o carnet de extranjeria " class="form-control text-uppercase">
+                                <input type="text" wire:model="formularioApoderado.dni" placeholder="Numero de DNI o carnet de extranjeria " class="form-control text-uppercase">
                                 <span class="input-group-btn">
                                     <button type="button" wire:click = "buscar_interno" class="btn btn-outline btn-primary" title="Buscar en la base de datos interna del colegio">
                                         <i class="fa fa-search" aria-hidden="true"></i>
@@ -138,6 +138,12 @@
                     </div>
                 </div>
             </div>
+
+            @error('formularioApoderado.student_id')
+            <div class="alert text-danger" role="alert">
+                * Para continuar, debe <strong>registrar un estudiante</strong>
+            </div>
+            @enderror
             <div class="col-12 text-center  "  >
                 <span wire:loading wire:target="buscar_interno"  >  Buscando apoderado ...</span>
                 <span wire:loading wire:target="update, create"  > Guardando ...</span>

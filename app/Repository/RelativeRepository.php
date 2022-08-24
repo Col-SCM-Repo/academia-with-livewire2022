@@ -120,29 +120,47 @@ class RelativeRepository extends Relative
         return false;
     }
 
-    public function getInformacionApoderado( string $dni)
+    public function getInformacionApoderado( string $dni, int $student_id = -1)
     {
         $entidad = $this->_entidadRepository->buscarEntidadPorDNI($dni);
-        $apoderado = $entidad ? $entidad->relative : null;
-
-        if ($apoderado) {
-            return (object)[
-                "idRelacionApoderado" => $apoderado->id,
-                "idEntity" => $entidad->id,
-                "apPaterno" => $entidad->father_lastname,
-                "apMaterno" => $entidad->mother_lastname,
-                "nombre" => $entidad->name,
-                "direccion" => $entidad->address,
-                "distrito" => $entidad->district->name,
-                "telefono" => $entidad->telephone,
-                "fechaNacimiento" => $entidad->birth_date,
-                "sexo" => $entidad->gender,
-                "dni" => $entidad->document_number,
-                "estado_marital" => $entidad->marital_status,
-                "photo_path" => $entidad->photo_path,
-                "ocupacion" => $apoderado->occupation->name,
-                "parentesco" => $apoderado->relative_relationship,
-            ];
+        if ($entidad) {
+            $apoderado = Relative::where('student_id', $student_id)->where('entity_id', $entidad->id)->first();
+            if ($apoderado)
+                return (object)[
+                    "idRelacionApoderado" => $apoderado->id,
+                    "idEntity" => $entidad->id,
+                    "apPaterno" => $entidad->father_lastname,
+                    "apMaterno" => $entidad->mother_lastname,
+                    "nombre" => $entidad->name,
+                    "direccion" => $entidad->address,
+                    "distrito" => $entidad->district->name,
+                    "telefono" => $entidad->telephone,
+                    "fechaNacimiento" => $entidad->birth_date,
+                    "sexo" => $entidad->gender,
+                    "dni" => $entidad->document_number,
+                    "estado_marital" => $entidad->marital_status,
+                    "photo_path" => $entidad->photo_path,
+                    "ocupacion" => $apoderado->occupation->name,
+                    "parentesco" => $apoderado->relative_relationship,
+                ];
+            else
+                return (object)[
+                    "idRelacionApoderado" => null,
+                    "idEntity" => $entidad->id,
+                    "apPaterno" => $entidad->father_lastname,
+                    "apMaterno" => $entidad->mother_lastname,
+                    "nombre" => $entidad->name,
+                    "direccion" => $entidad->address,
+                    "distrito" => $entidad->district->name,
+                    "telefono" => $entidad->telephone,
+                    "fechaNacimiento" => $entidad->birth_date,
+                    "sexo" => $entidad->gender,
+                    "dni" => $entidad->document_number,
+                    "estado_marital" => $entidad->marital_status,
+                    "photo_path" => $entidad->photo_path,
+                    "ocupacion" => null,
+                    "parentesco" => null,
+                ];
         }
         return null;
     }
