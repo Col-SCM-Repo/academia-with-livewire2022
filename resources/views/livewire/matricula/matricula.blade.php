@@ -67,7 +67,7 @@
                     </div>
                     <label class="col-lg-3 control-label" >Costo de ciclo:</label>
                     <div class="col-lg-3">
-                        <input type="text" title="Costo del ciclo"  class="form-control" id="costo-ciclo" value="{{ isset($formularioMatricula['costo']) ? $formularioMatricula['costo']:'' }}" disabled>
+                        <input type="text" title="Costo del ciclo"  class="form-control" id="costo-ciclo" wire:model.defer="formularioMatricula.costo" disabled>
                         <x-input-error variable='formularioMatricula.costo'> </x-input-error>
                     </div>
                 </div>
@@ -81,7 +81,42 @@
                     </div>
                 </div>
 
-
+                @error('formularioMatricula.tipo_matricula')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.classroom_id')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.carrera')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.tipo_pago')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.cuotas')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.lista_Cuotas')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.lista_cuotas')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.lista_cuotas')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.costo_matricula')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.costo')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.observaciones')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
+                @error('formularioMatricula.student_id')
+                    <div class="text-danger"> {{ $message }}  </div>
+                @enderror
 
 
                 @if (isset($formularioMatricula['lista_cuotas']) && is_array($formularioMatricula['lista_cuotas'])
@@ -153,13 +188,8 @@
             </div>
             <div class="col-12 text-right">
                 <div class="alert " role="alert">
-                    @error('formularioMatricula.relative_id')
-                        <div class="alert alert-danger" role="alert">
-                            Debe registrar al <span class="alert-link">apoderado</span>
-                        </div>
-                    @enderror
                     @error('formularioMatricula.student_id')
-                        <div class="alert alert-danger" role="alert">
+                        <div class="text-danger" role="alert">
                             Debe registrar al <span class="alert-link">alumno</span>
                         </div>
                     @enderror

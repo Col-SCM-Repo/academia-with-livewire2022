@@ -8,6 +8,7 @@ use App\Enums\TiposParentescosApoderadoEnum;
 use App\Repository\CareerRepository;
 use App\Repository\ClassroomRepository;
 use App\Repository\EnrollmentRepository;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
@@ -26,20 +27,19 @@ class Matricula extends Component
         'formularioMatricula.carrera' => 'required|string | min:3',
         'formularioMatricula.tipo_pago' => 'required|string|in:cash,credit',    // agregar evento
         'formularioMatricula.cuotas' => 'required|integer|min:0|max:3',         // hacer dinamico
-        'formularioMatricula.listaCuotas' => 'required | array',
+        'formularioMatricula.lista_Cuotas' => ' array',
         'formularioMatricula.lista_cuotas.*.costo' => 'numeric | min:0',
         'formularioMatricula.lista_cuotas.*.fecha' => 'date',
         'formularioMatricula.costo_matricula' => 'required | numeric | min:0',
         'formularioMatricula.costo' => 'required | numeric | min:0',
         'formularioMatricula.observaciones' => ' required | string ',
 
-        'formularioMatricula.relative_id' => 'required|numeric|min:1 ',
+        //'formularioMatricula.relative_id' => 'required|numeric|min:1 ',
         'formularioMatricula.student_id' => 'required|numeric|min:1 ',
     ];
 
     protected $listeners = [
         'student-found' => 'setData',
-        'relative-found' => 'setData',
         'change-prop-enrollment' => 'setData',
 
         'pagina-cargada-matricula' => 'enviarDataAutocomplete',
@@ -57,8 +57,8 @@ class Matricula extends Component
     {
         $this->reset(['formularioMatricula', 'matricula_id']);
         $this->formularioMatricula['cuotas'] = 0;
-        $this->formularioMatricula['listaCuotas'] = array();
-        $this->formularioMatricula['relative_id'] = null;
+        $this->formularioMatricula['lista_cuotas'] = array();
+        //$this->formularioMatricula['relative_id'] = null;
         $this->formularioMatricula['student_id'] = null;
     }
 
@@ -68,8 +68,8 @@ class Matricula extends Component
         $this->lista_carreras =$this->_careersRepository->listarCarreras();
 
         //  temporal
-        $this->formularioMatricula['relative_id']=1;
-        $this->formularioMatricula['student_id']=1;
+        // $this->formularioMatricula['relative_id']=1;
+        // $this->formularioMatricula['student_id']=1;
     }
 
     public function render()
@@ -119,7 +119,11 @@ class Matricula extends Component
                 case 'formularioMatricula.lista_cuotas.0.costo':
                 case 'formularioMatricula.lista_cuotas.1.costo':
                     $this->validateOnly('formularioMatricula.lista_cuotas.*.costo');
-                    self::recalcularMontos();
+                    try {
+                        self::recalcularMontos();
+                    } catch (Exception $err) {
+                        toastAlert($this, $err->getMessage());
+                    }
                     break;
 
             default:
@@ -131,23 +135,24 @@ class Matricula extends Component
     public function create()
     {
         $this->validate();
+        //dd($this->formularioMatricula);
 
-        $formularioMatriculaObj = convertArrayUpperCase($this->formularioMatricula);
-
+        // $formularioMatriculaObj = convertArrayUpperCase($this->formularioMatricula);
         $modelMatricula = $this->_matriculaRepository->builderModelRepository();
-        $modelMatricula->tipo_matricula = $formularioMatriculaObj->tipo_matricula;
-        $modelMatricula->estudiante_id = $this->student_id;
-        $modelMatricula->aula_id = $formularioMatriculaObj->classroom_id;
-        $modelMatricula->apoderado_id = $this->relative_id;
+        $modelMatricula->tipo_matricula = formatInputStr($this->formularioMatricula['tipo_matricula']);
+        $modelMatricula->estudiante_id =$this->formularioMatricula['student_id'];
+        $modelMatricula->aula_id = $this->formularioMatricula['classroom_id'];
+        //$modelMatricula->apoderado_id = $this->relative_id;
         $modelMatricula->relacion_apoderado = TiposParentescosApoderadoEnum::PADRE; // Cambiar
-        $modelMatricula->carrera = $formularioMatriculaObj->carrera;
-        $modelMatricula->tipo_pago = $formularioMatriculaObj->tipo_pago;
-        $modelMatricula->cantidad_cuotas = $formularioMatriculaObj->cuotas;
-        $modelMatricula->cuotas_detalle = $formularioMatriculaObj->lista_cuotas;
-        $modelMatricula->costo_matricula = $formularioMatriculaObj->costo_matricula;
-        $modelMatricula->costo_ciclo = $formularioMatriculaObj->costo;
-        $modelMatricula->observaciones = $formularioMatriculaObj->observaciones;
+        $modelMatricula->carrera =  formatInputStr($this->formularioMatricula['carrera']) ;
+        $modelMatricula->tipo_pago = formatInputStr($this->formularioMatricula['tipo_pago']);
+        $modelMatricula->cantidad_cuotas = formatInputStr($this->formularioMatricula['cuotas']);
+        $modelMatricula->cuotas_detalle = $this->formularioMatricula['lista_cuotas'];
+        $modelMatricula->costo_matricula = formatInputStr($this->formularioMatricula['costo_matricula']);
+        $modelMatricula->costo_ciclo = $this->formularioMatricula['costo'];
+        $modelMatricula->observaciones = $this->formularioMatricula['observaciones'];
 
+        dd($modelMatricula);
         $matriculaCreada = $this->_matriculaRepository->registrarMatricula($modelMatricula);
         if ($matriculaCreada) {
             $this->matricula_id = $matriculaCreada->id;
