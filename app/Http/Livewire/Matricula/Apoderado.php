@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Matricula;
 
+use App\Enums\EstadosAlertasEnum;
 use App\Enums\EstadosEntidadEnum;
 use App\Repository\DistrictRepository;
 use App\Repository\OccupationRepository;
@@ -106,7 +107,8 @@ class Apoderado extends Component
         $moApoderado->ocupacion = formatInputStr( $this->formularioApoderado['ocupacion'] );
 
         try {
-            $this->_apoderadoRepository->registrar($moApoderado);
+            $apoderado = $this->_apoderadoRepository->registrar($moApoderado);
+            $this->idRelacionApoderado  = $apoderado->id;
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
         } catch (Exception $err) {
             toastAlert( $this, $err->getMessage());
@@ -116,13 +118,32 @@ class Apoderado extends Component
     public function update()
     {
         $this->validate();
-        dd($this->formularioApoderado);
-        $data = convertArrayUpperCase($this->formularioApoderado);
 
-        if ($this->_apoderadoRepository->actualizarApoderado($this->idRelacionApoderado, $data)) {
+        $moApoderado = $this->_apoderadoRepository->builderModelRepository();
+        $moApoderado->apellido_paterno = formatInputStr( $this->formularioApoderado['ap_paterno'] );
+        $moApoderado->apellido_materno = formatInputStr( $this->formularioApoderado['ap_materno'] );
+        $moApoderado->nombres = formatInputStr( $this->formularioApoderado['nombres'] );
+        $moApoderado->direccion = formatInputStr( $this->formularioApoderado['direccion'] );
+        $moApoderado->distrito = formatInputStr( $this->formularioApoderado['distrito'] );
+        $moApoderado->telefono = formatInputStr( $this->formularioApoderado['telefono'] );
+        //$moApoderado->celular = formatInputStr( $this->formularioApoderado['XXXXX'] );
+        //$moApoderado->email = formatInputStr( $this->formularioApoderado['XXXXX'] );
+        $moApoderado->fecha_nacimiento = formatInputStr( $this->formularioApoderado['f_nac'] );
+        $moApoderado->sexo = formatInputStr( $this->formularioApoderado['sexo'] );
+        $moApoderado->dni = formatInputStr( $this->formularioApoderado['dni'] );
+        $moApoderado->estado_marital = formatInputStr( $this->formularioApoderado['estado_marital'] );
+        //$moApoderado->grado_de_instruccion = formatInputStr( $this->formularioApoderado['grado_de_instruccion']);
+        $moApoderado->estudiante_id = $this->formularioApoderado['student_id'] ;
+        $moApoderado->parentesco = $this->formularioApoderado['parentesco'];
+        $moApoderado->ocupacion = formatInputStr( $this->formularioApoderado['ocupacion'] );
+
+        try {
+            $this->_apoderadoRepository->actualizar($this->idRelacionApoderado, $moApoderado);
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::UPDATED);
-        } else
-            toastAlert($this, 'No se encontrò al apoderado.');
+        } catch (Exception $err) {
+            toastAlert( $this, $err->getMessage());
+        }
+        // CORREGIR BLOQUEAR DNI AL BUSCAR APODERADO
     }
 
     /* public function updated($name, $value)
@@ -139,11 +160,9 @@ class Apoderado extends Component
         $dni = $this->formularioApoderado['dni'];
         $student_id = $this->formularioApoderado['student_id'];
 
-        $informacionApoderado = $this->_apoderadoRepository->getInformacionApoderado($dni);
-        dd($informacionApoderado);
+        $informacionApoderado = $this->_apoderadoRepository->getInformacionApoderado($dni,$student_id);
+        // dd($informacionApoderado);
 
-
-        $this->initialState();
         if ($informacionApoderado) {
             $this->formularioApoderado = [
                 'dni' => $informacionApoderado->dni,
@@ -157,14 +176,17 @@ class Apoderado extends Component
                 'ocupacion' => $informacionApoderado->ocupacion,
                 'parentesco' => $informacionApoderado->parentesco,
                 'sexo' => $informacionApoderado->sexo,
-                'estado_marital' => $informacionApoderado->estado_marital
+                'estado_marital' => $informacionApoderado->estado_marital,
+                'student_id'=> $student_id
             ];
             $this->idRelacionApoderado  = $informacionApoderado->idRelacionApoderado;
             //$this->emitTo('matricula.matricula', 'relative-found', (object)[ 'name' => 'relative_id', 'value' => $informacionApoderado->idRelacionApoderado]);
             $this->validate();
         } else {
-            toastAlert($this, 'No se encontrò al apoderado.');
+            $this->initialState();
+            toastAlert($this, 'No se encontrò al apoderado.', EstadosAlertasEnum::WARNING);
             $this->formularioApoderado['dni'] = $dni;
+            $this->formularioApoderado['student_id'] = $student_id;
         }
     }
 
