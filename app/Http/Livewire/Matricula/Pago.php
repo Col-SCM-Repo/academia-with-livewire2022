@@ -24,7 +24,8 @@ class Pago extends Component
     ];
 
     protected $listeners = [
-        'enrollment-found' => 'setData'
+        'enrollment-found' => 'setData',
+        'anular-pago' => 'anularPago',
     ];
 
     public function __construct()
@@ -83,11 +84,17 @@ class Pago extends Component
         }
     }
 
-    public function anularPago()
+    public function anularPago( int $array_index )
     {
-        $this->validate();
+        // dd( $array_index, $this->historial );
+        try {
+            $pago = $this->historial['pagos'][$array_index];
+            $this->_pagoRepository->anularPago($pago['id']);
+            sweetAlert($this, 'pago', EstadosEntidadEnum::DELETED);
 
-
+        } catch (Exception $err) {
+            toastAlert($this, $err->getMessage());
+        }
     }
 
     /***********************************************************  Funciones listeners *************************************************************/
@@ -126,8 +133,8 @@ class Pago extends Component
                 case 'ciclo':
                     $this->reset('historial');
                     $this->historial = $this->cuotas[$tipoCuota][$cuota_id];
-                    dd($this->historial);
-                    openModal($this,'#');
+                    // dd($this->historial);
+                    openModal($this,'#form-modal-historial');
                     break;
                 default:
                     toastAlert($this, 'No se puede identificar la cuota', EstadosAlertasEnum::WARNING);

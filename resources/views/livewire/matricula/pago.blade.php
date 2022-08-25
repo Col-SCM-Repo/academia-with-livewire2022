@@ -72,8 +72,8 @@
                                             <td scope="row"> {{ $cuota->monto_pagado }} </td>
                                             <td scope="row"> {{ $cuota->fecha_limite }} </td>
                                             <td scope="row">
-                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }}  wire:click='abrirModalHistorial("matricula", {{ $cuota->id }})'>
-                                                    <i class="fa fa-history" aria-hidden="true"></i>
+                                                <button class="btn btn-xs btn-success " {{ ($cuota->total_pagado)? '':'disabled' }}  wire:click='abrirModalHistorial("matricula", {{ $cuota->id }})'>
+                                                    <i class="fa fa-book" aria-hidden="true"></i>
                                                     Historial
                                                 </button>
                                             </td>
@@ -130,8 +130,8 @@
                                             <td scope="row"> {{ $cuota->monto_pagado }} </td>
                                             <td scope="row"> {{ $cuota->fecha_limite }} </td>
                                             <td scope="row">
-                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }} wire:click='abrirModalHistorial("ciclo", {{ $cuota->id }})'>
-                                                    <i class="fa fa-history" aria-hidden="true"></i>
+                                                <button class="btn btn-xs btn-success " {{ ($cuota->pagos && count($cuota->pagos)>0)? '':'disabled' }} wire:click='abrirModalHistorial("ciclo", {{ $cuota->id }})'>
+                                                    <i class="fa fa-book" aria-hidden="true"></i>
                                                     Historial
                                                 </button>
                                             </td>
@@ -191,9 +191,114 @@
     </x-modal-form>
     <!-- end: Modal pagos -->
 
+    <!-- begin: Modal pagos -->
+    <x-modal-form-lg idForm='form-modal-historial' titulo="Historial de pagos" >
+        <div class="px-5" style="padding: 0 2rem  !important;">
+            <div class="">
+                <div class="form-group row">
+                    <table class="table table-sm table-hover table-striped ">
+                        <thead>
+                            <tr>
+                                <th scope="col" > # </th>
+                                <th scope="col" > Monto </th>
+                                <th scope="col" > Usuario </th>
+                                <th scope="col" > Fecha </th>
+                                <th scope="col" > Tipo </th>
+                                <th scope="col" > Acciones </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($historial && $historial['pagos'] && count($historial['pagos'])>0)
+                                @foreach ($historial['pagos'] as $index=>$pago)
+                                    <tr>
+                                        <th scope="row"> {{ $index+1 }} </th>
+                                        <td> {{ $pago['monto'] }} </td>
+                                        <td> {{ $pago['usuario'] }} </td>
+                                        <td> {{ $pago['fecha_pago'] }} </td>
+                                        <td> {{ $pago['es_devolucion'] ? 'NOTA' : 'TICKET' }} </td>
+                                        <td>
+                                            <button class="btn btn-xs btn-success" title="Ver boleta">
+                                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Boleta
+                                            </button>
+                                            @if (! $pago['es_devolucion'])
+                                                <button class="btn btn-xs btn-danger btn-pago-anular" title="Anular pago" data-target="{{ $index }}">
+                                                    {{-- <i class="fa fa-history" aria-hidden="true"></i>  --}}
+                                                    Anular
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td scope="row" colspan="5" class="text-center"> No se encontro pagos</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </x-modal-form-lg>
+    <!-- end: Modal pagos -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            Livewire.hook('message.processed', (msg, {fingerprint}) => {
+                console.log(fingerprint);
+                    if(fingerprint.name == 'matricula.pago'){
+                        [...document.getElementsByClassName('btn-pago-anular')].forEach((el)=>{
+                            el.addEventListener('click', ({target})=>{
+                                if( target.dataset.target ){
+                                    swal({
+                                        title: "Estas Seguro?",
+                                        text: "Se anulara el pago",
+                                        icon: "warning",
+                                        buttons: true,
+                                        buttons: ["Cancelar", "Eliminar"],
+                                        dangerMode: true,
+                                    })
+                                    .then((willDelete) => {
+                                        if (willDelete) {
+                                            Livewire.emit('anular-pago', target.dataset.target)
+                                        }
+                                    });
+                                }
+                            })
+                        })
+                    }
+            })
+        })
+/*
+        NOTA:
+            * HISTORIAL ES NECESARIO VSUALIZAR CUANDO YA HAY CUOTAS
+*/
+
+    </script>
+
     @push('scripts')
     <script>
-
+        $(()=>{
+            [...document.getElementsByClassName('btn-pago-anular')].forEach((el)=>{
+                        el.addEventListener('click', ({target})=>{
+                            if( target.dataset.target ){
+                                swal({
+                                    title: "Estas Seguro?",
+                                    text: "Se anulara el pago",
+                                    icon: "warning",
+                                    buttons: true,
+                                    buttons: ["Cancelar", "Eliminar"],
+                                    dangerMode: true,
+                                })
+                                .then((willDelete) => {
+                                    if (willDelete) {
+                                        Livewire.emit('anular-pago', target.dataset.target)
+                                    }
+                                });
+                            }
+                        })
+                    })
+        });
     </script>
     @endpush
 </div>

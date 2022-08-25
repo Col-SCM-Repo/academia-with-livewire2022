@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Enums\EstadosEnum;
 use App\Enums\TiposConceptoPagoEnun;
 use App\Enums\TiposPagoFacturaEnum;
 use App\Models\Payment;
@@ -98,15 +97,26 @@ class PaymentRepository extends Payment
             throw new Exception('Error, el monto abonado no puede ser mayor a la deuda pendiente de S./'.$informacionDeuda['monto_deuda_pendiente'].'');
     }
 
+    public function anularPago( int $pago_id ){
+        $pago = Payment::find($pago_id);
+        // dd($pago, $pago_id);
+        if($pago){
+            return self::almacenarPago(null, $pago->amount, false, $pago_id );
+        }
+        else
+            throw new NotFoundResourceException('Error, no se encuentra el pago a eliminar id:'.$pago_id);
 
-    private function almacenarPago( int $cuota_id, $monto, bool $entero=true )
+    }
+
+    private function almacenarPago( $cuota_id, $monto, bool $entero=true, $pago_id = null)
     {
         $pago = new Payment();
         $pago->installment_id = $cuota_id;
         $pago->amount = $monto;
-        $pago->type = TiposPagoFacturaEnum::TICKET;
+        $pago->type = $pago_id ? TiposPagoFacturaEnum::DEVOLUCION : TiposPagoFacturaEnum::TICKET;
         $pago->concept_type = $entero? TiposConceptoPagoEnun::ENTERO : TiposConceptoPagoEnun::PARCIAL;
         $pago->user_id = Auth::user()->id;
+        $pago->payment_id = $pago_id;
         $pago->save();
 
         // $pago->serie = null;

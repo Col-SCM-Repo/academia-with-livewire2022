@@ -99,16 +99,20 @@ class InstallmentRepository extends Installment
                         'usuario' => $pago->user->nombreCompleto(),
                         'serie' => $pago->serie,
                         'numeracion' => $pago->numeration,
+                        'fecha_pago' => date ( 'Y-m-d h:i:s A', strtotime($pago->created_at)),
                         'es_devolucion' => null,
                         'fecha_devolucion' => null,
                     ];
-                    if($pago->payment_id == null ){
+
+                    $notaPago = $pago->note;
+                    if(!$notaPago){
                         $pagoTemp->es_devolucion=false;
+                        $pagoTemp->fecha_devolucion=null;
                         $montoAbonado+=$pago->amount;
                     }
                     else{
                         $pagoTemp->es_devolucion=true;
-                        $pagoTemp->fecha_devolucion=null;       // pendiente de agregar fecha .... en funcion a la nota de credito
+                        $pagoTemp->fecha_devolucion= date ( 'Y-m-d h:i:s A', strtotime($notaPago->created_at));       // pendiente de agregar fecha .... en funcion a la nota de credito
                     }
                     $pagos[] = $pagoTemp;
                 }
@@ -168,7 +172,8 @@ class InstallmentRepository extends Installment
                 $pagos = array();
                 $montoAbonado =0;
                 foreach ($pagosAbonados as $pago) {
-                    if($pago->payment_id == null ){
+                    $notaPago = $pago->note;
+                    if(!$notaPago ){
                         $pagos[$pago->id] = (object) [
                             'id' => $pago->id,
                             'cuota_id' => $pago->installment_id,

@@ -30,14 +30,19 @@ class Payment extends Model
         return $this->belongsTo(Installment::class);
     }
 
-    public function payment()
+    /* public function payment()
     {
         return $this->belongsTo(Payment::class);
-    }
+    } */
 
-    public function notes()
+    /* public function notes()
     {
         return $this->hasMany(Payment::class);
+    } */
+
+    public function note()
+    {
+        return $this->hasOne(Payment::class, 'payment_id', 'id');
     }
 
     public function user()
