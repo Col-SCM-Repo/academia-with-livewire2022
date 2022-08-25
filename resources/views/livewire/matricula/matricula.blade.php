@@ -4,9 +4,9 @@
             <div style="flex-grow: 1">
                 <h5 > Nueva matricula </h5>
                 @if ( $matricula_id )
-                    <span class="label label-warning-light"> Sin registrar </span>
-                @else
                     <span class="label label-primary"> Registrado </span>
+                @else
+                    <span class="label label-warning-light"> Sin registrar </span>
                 @endif
             </div>
             <div class="ibox-tools">

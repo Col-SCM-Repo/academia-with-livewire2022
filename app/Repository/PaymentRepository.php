@@ -6,6 +6,7 @@ use App\Enums\EstadosEnum;
 use App\Enums\TiposConceptoPagoEnun;
 use App\Enums\TiposPagoFacturaEnum;
 use App\Models\Payment;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -14,8 +15,8 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 class PaymentRepository extends Payment
 {
     /*
-        COLUMNAS: 
-                    id	installment_id	amount	type	concept_type	
+        COLUMNAS:
+                    id	installment_id	amount	type	concept_type
                     user_id	payment_id	serie	numeration
     */
 
@@ -29,16 +30,97 @@ class PaymentRepository extends Payment
     public function builderModelRepository()
     {
         return (object) [
-            'id' => null,
-            'cuota_id' => null,
-            'montoPagado' => null,        // Monto pagado
-            'autoFraccionamiento' => true
+            //'id' => null,
+            'cuota_id' => null,                 // installment_id
+            'matricula_id' => null,                 //
+            'montoPagado' => null,              // amount
+            //'tipo' => null,                     // type
+            //'concepto' => null,                 // concept_type
+            'pago_id' => null                   // payment_id
+            // 'autoFraccionamiento' => true
             // 'payment_id' => null,
-            // 'serie' => null,
-            // 'numeration' => null,    // numeracion ya no se va a utilizar 
+            // 'serie' => null,                 // ...evaluar
+            // 'numeration' => null,            // ...evaluar
         ];
     }
 
+    public function pagarMatricula( object $modelBuilder ){
+        $cuota = $this->_cuotasRepository::find($modelBuilder->cuota_id);
+        if (!$cuota) throw new NotFoundResourceException('No se encontro la cuota especificada');
+        if($cuota->abonado() >= $cuota->amount) throw new NotFoundResourceException('La cuota ya esta pagada');
+
+        if(round($modelBuilder->montoPagado, 2) == round($cuota->amount, 2))
+            return [self::almacenarPago($cuota->id, $modelBuilder->montoPagado)];
+
+        throw new Exception('Error, el pago de la matricula no se puede fraccionar');
+    }
+
+    public function pagarCiclo( object $modelBuilder ){
+        $informacionDeuda = $this->_cuotasRepository->getCuotasCiclo($modelBuilder->matricula_id);
+        if(!$informacionDeuda) throw new NotFoundResourceException('Error, no se encontro informacion sobre la deuda');
+
+        if( $informacionDeuda['monto_deuda_pendiente'] >= $modelBuilder->montoPagado  ){
+            $pagos = array();
+            $saldo=round($modelBuilder->montoPagado,2);
+            foreach ( $informacionDeuda['cuotas_ciclo']  as $cuotaIterador ) {
+                if( $saldo < 0){
+                    Log::debug("[PaymentRepository::pagarCiclo] [CRITICO] El saldo [$saldo] es negativo  ".$cuotaIterador->id.' fecha '.date('Y-m-d H:i:s'));
+                    throw new Exception('Ocurrio un error critico al registrar pagos.'.$cuotaIterador->id);
+                };
+                if($saldo==0) break;
+                if(!$cuotaIterador->total_pagado){
+                    if( ! $cuotaIterador->pagos ){
+                        if( $saldo>= $cuotaIterador->monto_cuota ){
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $cuotaIterador->monto_cuota );
+                            $saldo -= $cuotaIterador->monto_cuota;
+                        }
+                        else{
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $saldo, false);
+                            $saldo = 0;
+                        }
+                    }
+                    else{
+                        $montoPendienteCuota = round($cuotaIterador->monto_cuota,2) - round($cuotaIterador->monto_pagado, 2);
+                        if( $saldo>= $montoPendienteCuota ){
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $montoPendienteCuota, false);
+                            $saldo -= $montoPendienteCuota;
+                        }
+                        else{
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $saldo, false);
+                            $saldo = 0;
+                        }
+                    }
+                }
+            }
+            return $pagos;
+        }
+        else
+            throw new Exception('Error, el monto abonado no puede ser mayor a la deuda pendiente de S./'.$informacionDeuda['monto_deuda_pendiente'].'');
+    }
+
+
+    private function almacenarPago( int $cuota_id, $monto, bool $entero=true )
+    {
+        $pago = new Payment();
+        $pago->installment_id = $cuota_id;
+        $pago->amount = $monto;
+        $pago->type = TiposPagoFacturaEnum::TICKET;
+        $pago->concept_type = $entero? TiposConceptoPagoEnun::ENTERO : TiposConceptoPagoEnun::PARCIAL;
+        $pago->user_id = Auth::user()->id;
+        $pago->save();
+
+        // $pago->serie = null;
+        $pago->numeration = str_pad($pago->id, 6, "0", STR_PAD_LEFT);
+        $pago->save();
+        return $pago;
+    }
+
+
+
+
+
+
+/*
     public function registrarPago(object $modelBuilder)
     {
         $cuota = $this->_cuotasRepository::find($modelBuilder->cuota_id);
@@ -140,5 +222,5 @@ class PaymentRepository extends Payment
 
     public function to_pay_installment($objPago)
     {
-    }
+    } */
 }

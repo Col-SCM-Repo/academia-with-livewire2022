@@ -71,12 +71,12 @@ class EnrollmentRepository extends Enrollment
         $cuotasGeneradas = null;
         try {
             $cuotasGeneradas = $this->_cuotasRepository->generarCoutasPago($mIntallment);
+            if(! $cuotasGeneradas) throw new Exception('Ocurrio un error al generar las cuotas de pago');
+            return $matricula;
         } catch (Exception $e) {
             self::eliminar( $matricula->id );
             throw new BadRequestException($e->getMessage());
         }
-
-        return  $cuotasGeneradas ? $matricula : null;
     }
 
     public function actualizar( int $matricula_id, object $mEnrollment)

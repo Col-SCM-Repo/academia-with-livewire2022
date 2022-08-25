@@ -26,21 +26,34 @@ class Installment extends Model
     {
         return $this->hasMany(Payment::class)->where('type', '=', 'ticket');
     } */
-    public function payment()
+    public function payments()
     {
-        return $this->hasOne(Payment::class, 'installment_id', 'id')
-            ->where('type', '=', TiposPagoFacturaEnum::TICKET);
+        return $this->hasMany(Payment::class, 'installment_id', 'id')
+                ->where('type', '=', TiposPagoFacturaEnum::TICKET);
     }
 
+    public function abonado()
+    {
+        $abonadoAcumulador = 0;
+        foreach ($this->payments as $pago) {
+            if($pago->payment_id == null){
+                $abonadoAcumulador+= $pago->amount;
+            }
+        }
+        return  $abonadoAcumulador;
+    }
+
+    /*
     public function allPayments()
     {
-        return $this->hasOne(Payment::class, 'installment_id', 'id');
+        return $this->hasMany(Payment::class, 'installment_id', 'id');
     }
 
     public function note_payments()
     {
         return $this->hasMany(Payment::class)->where('type', '=', 'note');
     }
+    */
 
     public function enrollment()
     {

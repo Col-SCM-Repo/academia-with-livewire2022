@@ -9,7 +9,7 @@
                         @else
                             <span class="label label-warning-light"> Con deuda </span>
                         @endif
-                        
+
                     @else
                         <span class="label label-danger"> Sin registrar </span>
                     @endif
@@ -19,19 +19,16 @@
                 <div class="ibox-tools">
                     <div>
                         <a class="btn btn-xs btn-success " style="color: #FFF">
-                            Ver historial pagos 
+                            Ver historial pagos
                         </a>
-                        <button type="button" class="btn btn-xs btn-danger"  >
-                            Registrar pago
-                        </button>
                     </div>
                     <div>
-                        <small class="help-block m-b-none text-primary text-right">  
-                            Total pagado S./ {{ $cuotas['monto_deuda_pagado'] }} de S./ {{ $cuotas['monto_deuda_inicial'] }} ( S./ {{ $cuotas['monto_deuda_pendiente'] }} pendiente )  
+                        <small class="help-block m-b-none text-primary text-right">
+                            Total pagado S./ {{ $cuotas['monto_deuda_pagado'] }} de S./ {{ $cuotas['monto_deuda_inicial'] }} ( S./ {{ $cuotas['monto_deuda_pendiente'] }} pendiente )
                         </small>
                     </div>
                 </div>
-                
+
             @endif
         </span>
     </div>
@@ -40,16 +37,22 @@
         <div class="px-3">
             @if ($cuotas)
                 <div class="row">
-                    <label class="col-md-2 col-sm-3" for=""> Cuota matricula </label>
+                    <label class="col-md-2 col-sm-3" for="">
+                        <p>Matricula</p>
+                        <button type="button" class="btn btn-xs btn-danger" wire:click='abrirModalPagos("matricula")'  >
+                            Pagar
+                        </button>
+                    </label>
                     <div class="col-md-10">
                         <table class="table table-sm table-responsive table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col" style="width: 1rem">#</t>
-                                    <th scope="col" style="width: 20%">Estado</t>
-                                    <th scope="col" style="width: 20%">Monto cuota</t>
-                                    <th scope="col" style="width: 20%">Monto pagado</t>
-                                    <th scope="col">Acciones</t>
+                                    <th scope="col" style="width: 1rem">#</th>
+                                    <th scope="col" style="width: 20%">Estado</th>
+                                    <th scope="col" style="width: 20%">Cuota</th>
+                                    <th scope="col" style="width: 20%">Pagado</th>
+                                    <th scope="col" style="width: 20%">Fecha limite</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,18 +61,21 @@
                                     @foreach ($cuotas['matricula'] as $cuota)
                                         <tr>
                                             <td scope="row"> {{ $cuota->orden }} </td>
-                                            <td scope="row"> 
+                                            <td scope="row">
                                                 @if ($cuota->total_pagado)
                                                     <span class=" text-success"> PAGADO </span>
                                                 @else
                                                     <span class=" text-danger"> CON DEUDA </span>
-                                                @endif 
+                                                @endif
                                             </td>
                                             <td scope="row"> {{ $cuota->monto_cuota }} </td>
                                             <td scope="row"> {{ $cuota->monto_pagado }} </td>
-                                                <td scope="row"> 
-                                                <button class="btn btn-xs btn-info" {{ $cuota->total_pagado? 'disabled':'' }} href="" wire:click="abrirModalPagos({{$cuota->id}}, false )" >Editar</button>
-                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado && $cuota->monto_cuota != 0 )? '':'disabled' }} href="">Comprobante de pago</button>
+                                            <td scope="row"> {{ $cuota->fecha_limite }} </td>
+                                            <td scope="row">
+                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }}  wire:click='abrirModalHistorial("matricula", {{ $cuota->id }})'>
+                                                    <i class="fa fa-history" aria-hidden="true"></i>
+                                                    Historial
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -84,18 +90,24 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <div class="row">
-                    <label class="col-md-2 col-sm-3" for=""> Cuotas ciclo </label>
+                    <label class="col-md-2 col-sm-3" for="">
+                        <p>Ciclo</p>
+                        <button type="button" class="btn btn-xs btn-danger" wire:click='abrirModalPagos' >
+                            Abonar
+                        </button>
+                    </label>
                     <div class="col-md-10">
                         <table class="table table-sm table-responsive table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col" style="width: 1rem">#</t>
-                                    <th scope="col" style="width: 20%">Estado</t>
-                                    <th scope="col" style="width: 20%">Monto cuota</t>
-                                    <th scope="col" style="width: 20%">Monto pagado</t>
-                                    <th scope="col">Acciones</t>
+                                    <th scope="col" style="width: 1rem">#</th>
+                                    <th scope="col" style="width: 20%">Estado</th>
+                                    <th scope="col" style="width: 20%">Cuota</th>
+                                    <th scope="col" style="width: 20%">Pagado</th>
+                                    <th scope="col" style="width: 20%">Fecha limite</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,20 +119,23 @@
                                     @foreach ($cuotas['ciclo'] as $cuota)
                                         <tr>
                                             <td scope="row"> {{ $cuota->orden }} </td>
-                                            <td scope="row"> 
+                                            <td scope="row">
                                                 @if ($cuota->total_pagado)
                                                     <span class=" text-success"> PAGADO </span>
                                                 @else
                                                     <span class=" text-danger"> CON DEUDA </span>
-                                                @endif 
+                                                @endif
                                             </td>
                                             <td scope="row"> {{ $cuota->monto_cuota }} </td>
                                             <td scope="row"> {{ $cuota->monto_pagado }} </td>
-                                            <td scope="row"> 
-                                                <button class="btn btn-xs btn-info" {{ ($esPrimeraCuota && ! $cuota->total_pagado )? '':'disabled' }} wire:click="abrirModalPagos({{$cuota->id}} )" >Editar</button>
-                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }} href="">Comprobante de pago</button>
+                                            <td scope="row"> {{ $cuota->fecha_limite }} </td>
+                                            <td scope="row">
+                                                <button class="btn btn-xs btn-info" {{ ($cuota->total_pagado)? '':'disabled' }} wire:click='abrirModalHistorial("ciclo", {{ $cuota->id }})'>
+                                                    <i class="fa fa-history" aria-hidden="true"></i>
+                                                    Historial
+                                                </button>
                                             </td>
-                                            
+
                                             @php
                                                 if($esPrimeraCuota)
                                                     if( ! $cuota->total_pagado )
@@ -147,33 +162,23 @@
 
 
     </div>
-    
+
     <!-- begin: Modal pagos -->
     <x-modal-form idForm='form-modal-pago' titulo="Registrar pago" >
         <form class="px-5 row" wire:submit.prevent="pagar">
                 <div class="col-sm-9">
-                    @if ( $autoFraccionamiento )
-                        <div class="form-group row">
-                            <label class="col-sm-4 control-label text-right">Deuda pendiente</label>
-                            <div class="col-sm-8">
-                                <input type="text" wire:model.defer="formularioPago.deuda_pendiente" class="form-control" disabled >
-                            </div>
-                        </div>
-                    @endif
                     <div class="form-group row">
-                        <label class="col-sm-4 control-label text-right">Costo de cuota</label>
-                        <div class="col-sm-8" style="display: flex" x-data="{edition:false}">
-                            <input type="number"  wire:model.defer="formularioPago.costo_cuota" class="form-control" :disabled="!edition" >
-                            @if ( $autoFraccionamiento )
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-success " x-on:click="edition=true" x-show="!edition" title="Editar cuota" >
-                                        <i class="fa fa-edit "></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-primary " x-on:click="edition=false" x-show="edition" title="Guardar cuota" >
-                                        <i class="fa fa-save "></i>
-                                    </button>
-                                </div>
-                            @endif
+                        <label class="col-sm-4 control-label text-right">Deuda de cuota</label>
+                        <div class="col-sm-8">
+                            <input type="text" wire:model.defer="formularioPago.monto_pendiente_cuota" class="form-control" disabled >
+                            <x-input-error variable='formularioPago.monto_pendiente_cuota'> </x-input-error>
+                        </div>
+                    </div>
+                    <div class="form-group row"  style="{{ $formularioPago['cuota_id']!=null? 'display:none':'' }}">
+                        <label class="col-sm-4 control-label text-right">Monto a abonar</label>
+                        <div class="col-sm-8">
+                            <input type="number"  wire:model.defer="formularioPago.monto_pagar" class="form-control" >
+                            <x-input-error variable='formularioPago.monto_pagar'> </x-input-error>
                         </div>
                     </div>
                 </div>

@@ -152,14 +152,14 @@ class Matricula extends Component
         $modelMatricula->costo_ciclo = $this->formularioMatricula['costo'];
         $modelMatricula->observaciones = $this->formularioMatricula['observaciones'];
 
-        dd($modelMatricula);
-        $matriculaCreada = $this->_matriculaRepository->registrarMatricula($modelMatricula);
-        if ($matriculaCreada) {
+        try {
+            $matriculaCreada = $this->_matriculaRepository->registrar($modelMatricula);
             $this->matricula_id = $matriculaCreada->id;
-            $this->emitTo('matricula.pago', 'enrollment-found', (object)[ 'name' => 'enrollment_id', 'value'=> $matriculaCreada->id  ]);
+            $this->emitTo('matricula.pago', 'enrollment-found', (object)[ 'name' => 'matricula_id', 'value'=> $matriculaCreada->id  ]);
             sweetAlert($this, 'matricula', EstadosEntidadEnum::CREATED);
-        } else
-            toastAlert($this, 'Error al registar matricula');
+        } catch (Exception $err) {
+            toastAlert($this, $err->getMessage());
+        }
     }
 
     public function update()
