@@ -36,7 +36,7 @@ class Installment extends Model
     {
         $abonadoAcumulador = 0;
         foreach ($this->payments as $pago) {
-            if($pago->payment_id == null){
+            if(!$pago->note){
                 $abonadoAcumulador+= $pago->amount;
             }
         }

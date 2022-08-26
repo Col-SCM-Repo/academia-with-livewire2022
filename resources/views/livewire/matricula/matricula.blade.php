@@ -81,44 +81,6 @@
                     </div>
                 </div>
 
-                @error('formularioMatricula.tipo_matricula')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.classroom_id')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.carrera')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.tipo_pago')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.cuotas')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.lista_Cuotas')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.lista_cuotas')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.lista_cuotas')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.costo_matricula')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.costo')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.observaciones')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-                @error('formularioMatricula.student_id')
-                    <div class="text-danger"> {{ $message }}  </div>
-                @enderror
-
-
                 @if (isset($formularioMatricula['lista_cuotas']) && is_array($formularioMatricula['lista_cuotas'])
                 && count($formularioMatricula['lista_cuotas']) > 0 &&  $formularioMatricula['tipo_pago'] == 'credit')
                     <div class="row">

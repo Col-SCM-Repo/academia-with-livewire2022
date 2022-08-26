@@ -32,7 +32,7 @@ class Matricula extends Component
         'formularioMatricula.lista_cuotas.*.fecha' => 'date',
         'formularioMatricula.costo_matricula' => 'required | numeric | min:0',
         'formularioMatricula.costo' => 'required | numeric | min:0',
-        'formularioMatricula.observaciones' => ' required | string ',
+        'formularioMatricula.observaciones' => ' nullable | string ',
 
         //'formularioMatricula.relative_id' => 'required|numeric|min:1 ',
         'formularioMatricula.student_id' => 'required|numeric|min:1 ',

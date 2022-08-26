@@ -50,9 +50,9 @@
                         class="fa arrow"></span>
                 </a>
                 <ul class="nav nav-second-level">
-                    <li><a href="">Option 1</a></li>
-                    <li><a href="">Option 2</a></li>
-                    <li><a href="">Option 3</a></li>
+                    <li><a href="{{ route('evaluaciones.configuracion') }}">Configuracion de examenes</a></li>
+                    <li><a href="{{ route('evaluaciones.revision') }}">Carga y revision de examenes</a></li>
+                    <li><a href="{{ route('evaluaciones.reporte') }}">Reporte de resultados</a></li>
                 </ul>
             </li>
             <li>

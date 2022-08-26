@@ -13,9 +13,11 @@ class CreateExamsTable extends Migration
             $table->integer('period_id')->unsigned()->index('FK_exams_period');
             $table->bigInteger('level_id')->unsigned()->nullable()->index('FK_exams_level');
             $table->bigInteger('group_id')->unsigned()->index('FK_exams_group');
-            $table->string('group_code')->nullable();             // 2 digitos
-            $table->string('nombre_examen');
-            $table->dateTime('fecha_examen')->nullable();
+            $table->string('group_code')->nullable();             // 2 primeros digitos
+            $table->string('name');
+            $table->integer('number_questions')->unsigned();
+			$table->enum('evaluation_type', array( 'simulacrum','monthly','weekly','daily', 'quick', 'other'));
+            $table->dateTime('exam_date')->nullable();
             $table->bigInteger('user_id')->unsigned()->nullable()->index('FK_exams_user');
             $table->timestamps();
 			$table->softDeletes();

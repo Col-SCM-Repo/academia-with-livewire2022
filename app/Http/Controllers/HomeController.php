@@ -15,8 +15,24 @@ class HomeController extends Controller
         return view('index');
     }
 
+    /********************** Modulo evaluaciones **********************/
+    public function configuracion()     //evaluaciones/configuracion-examenes
+    {
+        return view('modulos.evaluaciones.configuracion');
+    }
+
+    public function revision()          //evaluaciones/carga-revision
+    {
+        return "evaluaciones - revision";
+    }
+
+    public function reporte()           //evaluaciones/resultados-reporte
+    {
+        return "evaluaciones - reporte";
+    }
+
     /********************** Modulo mantenimiento **********************/
-    public function ciclosAulas() // mantenimiento/ciclos-y-aulas 
+    public function ciclosAulas() // mantenimiento/ciclos-y-aulas
     {
         return view('modulos.ciclosyAulas.main');
     }

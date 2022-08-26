@@ -210,6 +210,7 @@
                         <tbody>
                             @if ($historial && $historial['pagos'] && count($historial['pagos'])>0)
                                 @foreach ($historial['pagos'] as $index=>$pago)
+                                @php    $pago = (array)$pago;   @endphp
                                     <tr>
                                         <th scope="row"> {{ $index+1 }} </th>
                                         <td> {{ $pago['monto'] }} </td>

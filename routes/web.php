@@ -38,10 +38,15 @@ Route::middleware(['auth'])->prefix('matricula')->group(function () {
 Route::middleware(['auth'])->prefix('mantenimiento')->group(function () {
     Route::get('/ciclos-y-aulas', [HomeController::class, 'ciclosAulas'])->name('mantenimiento.ciclos-y-aulas');
 });
-/* 
+/*
 mantenimiento.ciclos-aulas.index */
 
 
+Route::middleware(['auth'])->prefix('evaluaciones')->group(function () {
+    Route::get('/configuracion-examenes', [HomeController::class, 'configuracion'])->name('evaluaciones.configuracion');
+    Route::get('/carga-revision', [HomeController::class, 'revision'])->name('evaluaciones.revision');
+    Route::get('/resultados-reporte', [HomeController::class, 'reporte'])->name('evaluaciones.reporte');
+});
 
 
 Route::middleware(['auth'])->prefix('mantenimiento')->group(function () {

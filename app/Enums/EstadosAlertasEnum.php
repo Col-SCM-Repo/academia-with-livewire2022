@@ -9,7 +9,7 @@ abstract class EstadosAlertasEnum
     const ERROR  = 'error';
 }
 
-/* 
+/*
 enum EstadosAlertas
 {
     case SUCCESS  = 'success';

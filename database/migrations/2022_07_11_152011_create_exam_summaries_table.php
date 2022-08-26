@@ -16,9 +16,9 @@ class CreateExamSummariesTable extends Migration
 			$table->bigInteger('exam_id')->unsigned()->nullable()->index('FK_examSummaries_exam');
 			$table->bigInteger('student_id')->unsigned()->nullable()->index('FK_examSummaries_student');
 			$table->enum('student_type', array('free', 'student'))->default('student');
-            $table->double('puntaje_acumulado')->unsigned()->default(0);
-            $table->double('puntaje_restado')->unsigned()->default(0);
-            $table->double('puntaje_final')->unsigned()->default(0);
+            $table->double('score_correct')->unsigned()->default(0);
+            $table->double('score_wrong')->unsigned()->default(0);
+            $table->double('final_score')->unsigned()->default(0);
 
             $table->text('observation')->nullable();
             $table->bigInteger('user_id')->unsigned()->nullable();

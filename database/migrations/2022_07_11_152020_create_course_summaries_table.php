@@ -18,7 +18,8 @@ class CreateCourseSummariesTable extends Migration
             $table->integer('wrong_answers')->unsigned()->default(0);
             $table->integer('blank_answers')->unsigned()->default(0);
 
-            $table->double('course_score')->unsigned()->default(0);
+            $table->text('student_responses')->nullable();
+            $table->double('course_score')->unsigned()->default(0);     // puntaje de curso
             $table->timestamps();
         });
     }

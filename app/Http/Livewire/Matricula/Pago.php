@@ -13,6 +13,10 @@ use Livewire\Component;
 class Pago extends Component
 {
     public $matricula_id, $formularioPago;
+
+    //
+    public $historial_tipo_cuota, $historial_cuota_id;
+
     public $cuotas, $historial;
     private $_pagoRepository, $_cuotaRepository;
 
@@ -51,6 +55,14 @@ class Pago extends Component
     {
         $this->matricula_id = 1;
         $this->cuotas = $this->matricula_id? $this->_cuotaRepository->getInformacionPagosYCuotas($this->matricula_id) : null ;
+        if($this->historial_tipo_cuota &&  $this->historial_cuota_id){
+            $this->historial = (array) $this->cuotas[$this->historial_tipo_cuota][$this->historial_cuota_id];
+            /* foreach ($this->historial['pagos'] as $key => $pago)
+                $this->historial['pagos'][$key] = (array)$pago; */
+
+            // dd($this->historial);
+        }
+
         // Log::debug((array) $this->cuotas);
         return view('livewire.matricula.pago');
     }
@@ -131,6 +143,8 @@ class Pago extends Component
             switch ($tipoCuota) {
                 case 'matricula':
                 case 'ciclo':
+                    $this->historial_tipo_cuota = $tipoCuota;
+                    $this->historial_cuota_id = $cuota_id;
                     $this->reset('historial');
                     $this->historial = $this->cuotas[$tipoCuota][$cuota_id];
                     // dd($this->historial);

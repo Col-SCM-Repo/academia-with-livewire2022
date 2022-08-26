@@ -2,20 +2,12 @@
 
 namespace App\Http\Livewire\Common;
 
-use App\Models\District;
+use Livewire\Component;
 
-class DistrictAutocomplete extends Autocomplete
+class DistrictAutocomplete extends Component
 {
-    protected $listeners = ['valueSelected'];
-
-    public function valueSelected(District $distrito)
+    public function render()
     {
-        $this->emitUp('districtSelected', $distrito);
-    }
-
-    public function query()
-    {
-        return District::where('name', 'like', '%' . $this->search . '%')
-            ->orderBy('name');
+        return view('livewire.common.autocomplete');
     }
 }

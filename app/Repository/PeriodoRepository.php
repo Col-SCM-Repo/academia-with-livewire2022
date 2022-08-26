@@ -71,7 +71,7 @@ class PeriodoRepository extends Period
     public function listaPeriodos(int $estado = null)
     {
         if ($estado)
-            return Period::where('active', $estado)->get();
+            return Period::where('active', $estado)->orderBy('year', 'DESC')->get();
         else
             return Period::orderBy('year', 'DESC')->get();
     }
@@ -96,22 +96,22 @@ class PeriodoRepository extends Period
         }
         return false;
     }
-    /* 
+    /*
     public function getPeriodoEnrollment($id)
     {
         return Period::with(['levels.enrollments', 'levels.classrooms.enrollments', 'levels.level_type'])->whereId($id)->firstOrFail();
     }
 
-    // Devuelve informacion de todos los periodos activos 
+    // Devuelve informacion de todos los periodos activos
     public function getPeriodosAndLevels()
     {
         return Period::with('classrooms.level.level_type')->where('active', 1)->get();
     }
 
-    // recibe el ID una clase y muestra informacion de los alumnos y sus apoderados 
+    // recibe el ID una clase y muestra informacion de los alumnos y sus apoderados
     public function getStudentsAndParents($id)
     {
         return Classroom::with('level.level_type', 'enrollments.student.entity', 'enrollments.relative.entity')->whereId($id)->firstOrFail();
-    } 
+    }
 */
 }
