@@ -19,6 +19,7 @@ class CreateExamsTable extends Migration
 			$table->enum('evaluation_type', array( 'simulacrum','monthly','weekly','daily', 'quick', 'other'));
             $table->dateTime('exam_date')->nullable();
             $table->bigInteger('user_id')->unsigned()->nullable()->index('FK_exams_user');
+            $table->string('path')->nullable();
             $table->timestamps();
 			$table->softDeletes();
         });

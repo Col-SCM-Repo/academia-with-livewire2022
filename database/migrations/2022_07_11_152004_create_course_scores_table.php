@@ -15,6 +15,7 @@ class CreateCourseScoresTable extends Migration
             $table->double('score_correct')->unsigned();            // Puntaje de las preguntas buenas
             $table->double('score_wrong')->unsigned()->default(1);  // Puntaje de las preguntas malas
             $table->integer('number_questions')->unsigned();        // Numero de preguntas
+            $table->integer('order')->unsigned();        // Numero de preguntas
             $table->timestamps();
         });
     }

@@ -15,8 +15,8 @@ class CreateExamQuestionsTable extends Migration
 			$table->bigInteger('course_id')->unsigned()->nullable()->index('FK_examQuestions_course');
 
 			$table->integer('question_number')->unsigned();
-			$table->double('score')->unsigned();
-			$table->enum('correct_answer', array( 'A', 'B', 'C','D', 'E'));
+			$table->double('score')->unsigned()->nullable();
+			$table->enum('correct_answer', array( 'A', 'B', 'C','D', 'E'))->nullable();
 
             $table->timestamps();
         });
