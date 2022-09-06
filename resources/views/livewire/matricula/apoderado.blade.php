@@ -10,36 +10,40 @@
         </span>
     </div>
     <div class="ibox-content">
-        <table class="table table-sm table-hover">
-            <thead>
-                <tr>
-                    <th scope="col" >Codigo</th>
-                    <th scope="col" >DNI</th>
-                    <th scope="col" >Apellidos y nombres</th>
-                    <th scope="col" >Parentesco</th>
-                    <th scope="col" >Acciones</th>
-                </tr>
-            </thead>
-            <tbody style="cursor: pointer;">
-                @if (count($listaApoderadosEstudiante)>0)
-                    @foreach ($listaApoderadosEstudiante as $apoderado)
-                        <tr>
-                            <td scope="row">0001</td>
-                            <td>1111123</td>
-                            <td>Juan Manuel Jose perez bejar</td>
-                            <td>Padre</td>
-                            <td>
-                                <button class="btn btn-xs btn-success" title="Editar apoderado" wire:click="editarApoderado(1)"> <i class="fa fa-pencil" aria-hidden="true"></i> </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                @else
+        @if ($idEstudiante)
+            <table class="table table-sm table-hover">
+                <thead>
                     <tr>
-                        <td class=" text-center " colspan="5"> <span>Sin registros</span> </td>
+                        <th scope="col" >Codigo</th>
+                        <th scope="col" >DNI</th>
+                        <th scope="col" >Apellidos y nombres</th>
+                        <th scope="col" >Parentesco</th>
+                        <th scope="col" >Acciones</th>
                     </tr>
-                @endif
-            </tbody>
-        </table>
+                </thead>
+                <tbody style="cursor: pointer;">
+                        @if (count($listaApoderadosEstudiante)>0)
+                            @foreach ($listaApoderadosEstudiante as $apoderado)
+                                <tr>
+                                    <td scope="row">{{$apoderado->relacion_id}}</td>
+                                    <td>{{$apoderado->dni}}</td>
+                                    <td>{{$apoderado->apellidos.', '.$apoderado->nombres}}</td>
+                                    <td>{{$apoderado->parentesco}}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-success" title="Editar apoderado" wire:click="editarApoderado({{ $apoderado->relacion_id }})"> <i class="fa fa-pencil" aria-hidden="true"></i> </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td class=" text-center " colspan="5"> <span>Sin registros</span> </td>
+                            </tr>
+                        @endif
+                </tbody>
+            </table>
+        @else
+            <h5>No se encontro estudiante. </h5>
+        @endif
 
 
 
@@ -47,8 +51,8 @@
 
 
     <!-- begin: Modal apoderado -->
-    <x-modal-form-lg idForm='form-modal-apoderado' :titulo="$idRelacionApoderado? 'EDITAR APODERADO' :'NUEVO APODERADO'">
-        <form class="row " wire:submit.prevent="{{ $idRelacionApoderado? 'update' : 'create' }}">
+    <x-modal-form-lg idForm='form-modal-apoderado' :titulo="$formularioApoderado['relative_id']? 'EDITAR APODERADO' :'NUEVO APODERADO'">
+        <form class="row " wire:submit.prevent="{{ $formularioApoderado['relative_id']? 'update' : 'create' }}">
             <div class="col-lg-6">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -156,7 +160,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-md-2 col-lg-3 control-label">E. Civil</label>
-                        <div class="col-md-4 col-lg-3">
+                        <div class="col-md-4 col-lg-4">
                             <div class="input-group ">
                                 <select wire:model.defer="formularioApoderado.estado_marital" class="form-control">
                                     <option value="">Seleccione</option>
@@ -168,8 +172,8 @@
                             </div>
                         </div>
 
-                        <label class="col-md-2 col-lg-3 control-label">Sexo</label>
-                        <div class="col-md-4 col-lg-3">
+                        <label class="col-md-2 col-lg-1 control-label">Sexo</label>
+                        <div class="col-md-4 col-lg-4">
                             <select wire:model.defer="formularioApoderado.sexo" class="form-control">
                                 <option value="">Seleccione</option>
                                 <option value="male">Masculino</option>
@@ -189,21 +193,11 @@
                     </div>
                 </div>
             </div>
-
-            @error('formularioApoderado.student_id')
-            <div class="alert text-danger" role="alert">
-                * Para continuar, debe <strong>registrar un estudiante</strong>
-            </div>
-            @enderror
             <div class="col-12 text-center  ">
                 <span wire:loading wire:target="buscar_interno"> Buscando apoderado ...</span>
                 <span wire:loading wire:target="update, create"> Guardando ...</span>
                 <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{
-                    $idRelacionApoderado? 'Actualizar': 'Guardar'}} </button>
-                @if ($idRelacionApoderado)
-                <button class="btn btn-sm btn-success" type="button" style="padding: .75rem 3rem"
-                    wire:click="initialState"> Limpiar formulario </button>
-                @endif
+                    $formularioApoderado['relative_id']? 'Actualizar': 'Guardar'}} </button>
             </div>
         </form>
     </x-modal-form-lg>

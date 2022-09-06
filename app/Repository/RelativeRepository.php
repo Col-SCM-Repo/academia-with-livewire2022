@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Enums\TiposParentescosApoderadoEnum;
 use App\Models\Relative;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -120,7 +121,59 @@ class RelativeRepository extends Relative
         return false;
     }
 
-    public function getInformacionApoderado( string $dni, int $student_id = -1)
+    public function getListaApoderados( int $estudianteId ){
+        $listaApoderados = array();
+        $relacionesApoderado = Relative::where('student_id', $estudianteId)->get();
+        foreach ($relacionesApoderado as $relacion) {
+            $parentesco = "";
+            switch (strtolower($relacion->relative_relationship)) {
+                case TiposParentescosApoderadoEnum::PADRE:  $parentesco = 'PADRE';      break;
+                case TiposParentescosApoderadoEnum::MADRE:  $parentesco = 'MADRE';      break;
+                case TiposParentescosApoderadoEnum::HERMANO:$parentesco = 'HERMANO';    break;
+                case TiposParentescosApoderadoEnum::HERMANA:$parentesco = 'HERMANA';    break;
+                case TiposParentescosApoderadoEnum::TIO:    $parentesco = 'TIO';        break;
+                case TiposParentescosApoderadoEnum::ABUELO: $parentesco = 'ABUELO';     break;
+                case TiposParentescosApoderadoEnum::PRIMO:  $parentesco = 'PRIMO';      break;
+                case TiposParentescosApoderadoEnum::OTRO:   $parentesco = 'OTRO';       break;
+            }
+            $listaApoderados[] = ( object )[
+                'relacion_id'   =>  $relacion->id,
+                'entidad_id'    =>  $relacion->apoderado->id,
+                'nombres'       =>  $relacion->apoderado->name,
+                'apellidos'     =>  $relacion->apoderado->father_lastname.' '.$relacion->apoderado->mother_lastname,
+                'dni'     =>  $relacion->apoderado->document_number,
+                'parentesco'    =>  $parentesco,
+                'ocupacion'     =>  $relacion->occupation->name,
+            ];
+        }
+        return $listaApoderados;
+    }
+
+    public function getApoderadoPorId( int $apoderadoId ){
+        $apoderado = Relative::find($apoderadoId);
+        if($apoderado){
+            return (object)[
+                "idRelacionApoderado" => $apoderado->id,
+                "idEntity" => $apoderado->apoderado->id,
+                "apPaterno" => $apoderado->apoderado->father_lastname,
+                "apMaterno" => $apoderado->apoderado->mother_lastname,
+                "nombre" => $apoderado->apoderado->name,
+                "direccion" => $apoderado->apoderado->address,
+                "distrito" => $apoderado->apoderado->district->name,
+                "telefono" => $apoderado->apoderado->telephone,
+                "fechaNacimiento" => $apoderado->apoderado->birth_date,
+                "sexo" => $apoderado->apoderado->gender,
+                "dni" => $apoderado->apoderado->document_number,
+                "estado_marital" => $apoderado->apoderado->marital_status,
+                "photo_path" => $apoderado->apoderado->photo_path,
+                "ocupacion" => $apoderado->occupation->name,
+                "parentesco" => $apoderado->relative_relationship,
+            ];
+        }
+        throw new NotFoundResourceException("Error, no se encontro un apoderado con codigo $apoderadoId");
+    }
+
+    public function buscarApoderadoInterno( string $dni, int $student_id = -1)
     {
         $entidad = $this->_entidadRepository->buscarEntidadPorDNI($dni);
         if ($entidad) {

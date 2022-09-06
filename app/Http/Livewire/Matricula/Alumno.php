@@ -87,6 +87,7 @@ class Alumno extends Component
         try {
             $estudianteCreado = $this->_estudianteRepository->registrar($moEstudiante);
             $this->idEstudiante = $estudianteCreado->id;
+            $this->emit('cargar-data-apoderado', $estudianteCreado->id);
             sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
@@ -141,7 +142,7 @@ class Alumno extends Component
                 'sexo' => $informacionAlumno->sexo,
             ];
             $this->idEstudiante = $informacionAlumno->idEstudiante;
-            $this->emit('student-found', (object)[ 'name' => 'student_id', 'value' => $informacionAlumno->idEstudiante]);
+            $this->emit('cargar-data-apoderado', $informacionAlumno->idEstudiante);
             $this->validate();
         } else {
             toastAlert($this, 'El alumno no pudo ser encontrado', EstadosAlertasEnum::WARNING);
