@@ -42,4 +42,11 @@ class Exam extends Model
         return $this->belongsTo( User::class , 'user_id', 'id');
     }
 
+    public function course_scores(){
+        return $this->hasMany( CourseScore::class, 'exam_id', 'id')->orderBy('order', 'ASC');
+    }
+
+    public function questions(){
+        return $this->hasMany( ExamQuestion::class, 'exam_id', 'id' );
+    }
 }

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class EnrollmentRepository extends Enrollment
 {
-    protected $_cuotasRepository, $_carrerasRepository;
+    protected $_cuotasRepository, $_carrerasRepository, $_estudiantesReposiory;
 
     /*
         Cancelado::estados  (  activo ! 1 cancelado)
@@ -21,6 +21,7 @@ class EnrollmentRepository extends Enrollment
     {
         $this->_cuotasRepository = new InstallmentRepository();
         $this->_carrerasRepository = new CareerRepository();
+        $this->_estudiantesReposiory = new StudentRepository();
     }
 
     public function builderModelRepository()
@@ -118,4 +119,13 @@ class EnrollmentRepository extends Enrollment
             ->first();
         return $matriculaAlumno;
     }
+
+    public function buscarAlumnos( string $parametro ){
+        /* $estudiantes = $this->_estudiantesReposiory::all()
+        $listaAlumnos = array(); */
+
+
+
+    }
+
 }

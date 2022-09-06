@@ -142,24 +142,46 @@ class StudentRepository extends Student
         return false;
     }
 
-    public function getListaAlumnos($parameto = "")
+    public function getListaAlumnos($parameto = "", $take = null)
     {
-        $listaAlumnos = Student::join('entities', 'entities.id', 'students.entity_id')
-            ->where('entities.name', 'like', '%' . $parameto . '%')
-            ->orWhere('entities.father_lastname', 'like', '%' . $parameto . '%')
-            ->orWhere('entities.mother_lastname', 'like', '%' . $parameto . '%')
-            ->orWhere('entities.document_number', 'like', '%' . $parameto . '%')
-            ->select([
-                "students.id as id ",
-                "entities.father_lastname",
-                "entities.mother_lastname",
-                "entities.name",
-                "entities.telephone",
-                "entities.birth_date",
-                "entities.gender",
-                "entities.document_number",
-                "students.graduation_year",
-            ])->get();
+        if($take){
+            $listaAlumnos = Student::join('entities', 'entities.id', 'students.entity_id')
+                ->where('entities.name', 'like', '%' . $parameto . '%')
+                ->orWhere('entities.father_lastname', 'like', '%' . $parameto . '%')
+                ->orWhere('entities.mother_lastname', 'like', '%' . $parameto . '%')
+                ->orWhere('entities.document_number', 'like', '%' . $parameto . '%')
+                ->orderBy('entities.father_lastname')
+                ->select([
+                    "students.id as id ",
+                    "entities.father_lastname",
+                    "entities.mother_lastname",
+                    "entities.name",
+                    "entities.telephone",
+                    "entities.birth_date",
+                    "entities.gender",
+                    "entities.document_number",
+                    "students.graduation_year",
+                ])->take($take)->get();
+        }
+        else{
+            $listaAlumnos = Student::join('entities', 'entities.id', 'students.entity_id')
+                ->where('entities.name', 'like', '%' . $parameto . '%')
+                ->orWhere('entities.father_lastname', 'like', '%' . $parameto . '%')
+                ->orWhere('entities.mother_lastname', 'like', '%' . $parameto . '%')
+                ->orWhere('entities.document_number', 'like', '%' . $parameto . '%')
+                ->orderBy('entities.father_lastname')
+                ->select([
+                    "students.id as id ",
+                    "entities.father_lastname",
+                    "entities.mother_lastname",
+                    "entities.name",
+                    "entities.telephone",
+                    "entities.birth_date",
+                    "entities.gender",
+                    "entities.document_number",
+                    "students.graduation_year",
+                ])->get();
+        }
         return $listaAlumnos;
     }
 }
