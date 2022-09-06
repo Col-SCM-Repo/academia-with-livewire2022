@@ -37,11 +37,14 @@
                         class="fa arrow"></span>
                 </a>
                 <ul class="nav nav-second-level">
-                    <li><a href="{{ route('matricula.buscar') }}">Buscar</a></li>
-                    <li><a href="{{ route('matricula.nueva') }}">Nueva</a></li>
-                    <li><a href="{{ route('matricula.pagos') }}">Pagos</a></li>
-                    <li><a href="{{ route('matricula.alumno') }}">Alumnos</a></li>
-                    <li><a href="{{ route('matricula.apoderado') }}">Apoderados</a></li>
+                    {{-- <li><a href="{{ route('matricula.buscar') }}">Buscar</a></li> --}}
+                    <li><a href="{{ route('matricula.nueva') }}">Nueva matricula</a></li>
+                    <li><a href="{{ route('matricula.informacion-alumno') }}">Información del alumno</a></li>
+                    {{--
+                        <li><a href="{{ route('matricula.pagos') }}">Pagos</a></li>
+                        <li><a href="{{ route('matricula.alumno') }}">Alumnos</a></li>
+                        <li><a href="{{ route('matricula.apoderado') }}">Apoderados</a></li>
+                    --}}
                 </ul>
             </li>
             <li>

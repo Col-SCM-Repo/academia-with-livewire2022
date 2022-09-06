@@ -20,6 +20,9 @@
     @livewireStyles
     <style>
 
+        *{
+            font-size: 12px;
+        }
         .modal-backdrop {
             background: #00000085;
         }
@@ -32,7 +35,7 @@
             display: block;
             width: 100%
         }
-        
+
         .d-inline {
             display: block !important;
         }
@@ -41,7 +44,7 @@
             display: inline-block !important;
         }
 
-        
+
 
         .p-0{
             padding: 0 !important;
@@ -65,7 +68,7 @@
 
     </style>
     @stack('styles')
-    
+
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
@@ -143,7 +146,7 @@
         Livewire.on('alert-warning', ({mensaje, titulo = 'Error'})=>{
             toastr.warning(mensaje,titulo);
         });
-        
+
         Livewire.on('alert-error', ({mensaje, titulo = 'Alerta'})=>{
             toastr.error(mensaje,titulo);
         });
@@ -151,7 +154,7 @@
         Livewire.on('change-modal', ({query, estado}) => {
             $(query).modal(estado);
         });
-        
+
         Livewire.on('sweet-success', ({mensaje, titulo}) => {
             swal({
                 title: titulo,
@@ -171,7 +174,7 @@
                 timer: 2000,
             });
         });
-        
+
         Livewire.on('sweet-error', ({mensaje, titulo}) => {
             swal({
                 title: titulo,
@@ -186,7 +189,7 @@
             console.log("el doc esta listo")
         });
     </script>
-    
+
 </body>
 
 </html>
