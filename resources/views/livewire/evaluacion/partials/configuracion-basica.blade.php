@@ -78,7 +78,6 @@
                     </div>
                 @enderror
             </div> --}}
-
         </div>
         <div class="col-12 text-right" style="padding-right: 3rem">
             <span wire:loading wire:target="actualizarExamen crearExamen"> Guardando ...</span>

@@ -2,7 +2,7 @@
     <div class="ibox-title">
         <span style="display: flex">
             <div style="flex-grow: 1">
-                <h5 > Cuotas de pago </h5>
+                <h5 > REGISTRO DE PAGOS </h5>
                     @if ($cuotas)
                         @if ( $cuotas['total_pagado'])
                             <span class="label label-primary"> Sin deuda </span>

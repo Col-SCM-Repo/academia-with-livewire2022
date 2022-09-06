@@ -13,19 +13,16 @@ use Livewire\Component;
 class Alumno extends Component
 {
     // checar eso del ID ESTUDIANTE *WARNING*
-    public $idEstudiante;
-    public $formularioAlumno;
+    public $idEstudiante, $formularioAlumno;
 
     public $lista_distritos, $lista_ie_procedencia;
-
     private $distritosRepository, $ie_procedenciaRepository, $_estudianteRepository;
 
-    private $componenteExterno; // 1 = externo  <> 0 = componente interno
-
     protected $listeners = [
-        //    'reset-form-alumno' => 'initialState',
+        'reset-form-alumno' => 'initialState',
         'pagina-cargada-alumno' => 'enviarDataAutocomplete',
         'change-props-alumno' => 'setData',
+        'cargar-data-alumno' => 'cargarDataAlumno',
     ];
 
     protected $rules = [
@@ -49,13 +46,13 @@ class Alumno extends Component
         $this->_estudianteRepository = new StudentRepository();
     }
 
-    public function mount($ambito = 0)
+    public function mount()
     {
         self::initialState();
-
-        $this->componenteExterno = $ambito == 1;
         $this->lista_distritos = $this->distritosRepository->listaDistritos();
         $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
+        $this->formularioAlumno = [ 'dni' => null, 'f_nac' => null, 'telefono' => null, 'distrito' => null, 'direccion' => null, 'nombres' => null,
+                                    'ap_paterno' => null, 'ap_materno' => null, 'Ie_procedencia' => null, 'anio_egreso' => null, 'sexo' => null ];
     }
 
     public function render()
@@ -72,8 +69,6 @@ class Alumno extends Component
     public function create()
     {
         $this->validate();
-        // Reglas de validacion
-        // * Evaluar si el alumno ya se encuentra en la base de datos, e impedir que se registre como nuevo alumno
         $moEstudiante = $this->_estudianteRepository->builderModelRepository();
         $moEstudiante->apellido_paterno = formatInputStr( $this->formularioAlumno['ap_paterno'] ) ;
         $moEstudiante->apellido_materno = formatInputStr( $this->formularioAlumno['ap_materno'] );
@@ -81,27 +76,18 @@ class Alumno extends Component
         $moEstudiante->direccion = formatInputStr( $this->formularioAlumno['direccion'] );
         $moEstudiante->distrito = formatInputStr( $this->formularioAlumno['distrito'] );
         $moEstudiante->telefono = formatInputStr( $this->formularioAlumno['telefono'] );
-        // $moEstudiante->celular = formatInputStr( $this->formularioAlumno['telefono'] );
+        // $moEstudiante->celular = '';
         $moEstudiante->fecha_nacimiento = formatInputStr( $this->formularioAlumno['f_nac'] );
         $moEstudiante->sexo = formatInputStr( $this->formularioAlumno['sexo'] );
         $moEstudiante->dni = formatInputStr( $this->formularioAlumno['dni'] );
         $moEstudiante->nombre_escuela = formatInputStr( $this->formularioAlumno['Ie_procedencia'] );
         $moEstudiante->anio_graduacion = formatInputStr( $this->formularioAlumno['anio_egreso'] );
-        // $moEstudiante->nombre_archivo_foto = formatInputStr( $this->formularioAlumno['ap_materno'] );
+        // $moEstudiante->nombre_archivo_foto = '';
 
         try {
             $estudianteCreado = $this->_estudianteRepository->registrar($moEstudiante);
             $this->idEstudiante = $estudianteCreado->id;
-
             sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
-
-            if ($this->componenteExterno) {
-                openModal($this, 'form-modal-alumno', false);
-                self::initialState();
-            } else {
-                // siguiente paso  o habilitar boton
-                $this->emit('student-found', (object)[ 'name' => 'student_id', 'value' => $estudianteCreado->id]);
-            }
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
         }
@@ -110,7 +96,6 @@ class Alumno extends Component
     public function update()
     {
         $this->validate();
-
         $moEstudiante = $this->_estudianteRepository->builderModelRepository();
         $moEstudiante->apellido_paterno = formatInputStr( $this->formularioAlumno['ap_paterno'] ) ;
         $moEstudiante->apellido_materno = formatInputStr( $this->formularioAlumno['ap_materno'] );
@@ -118,30 +103,21 @@ class Alumno extends Component
         $moEstudiante->direccion = formatInputStr( $this->formularioAlumno['direccion'] );
         $moEstudiante->distrito = formatInputStr( $this->formularioAlumno['distrito'] );
         $moEstudiante->telefono = formatInputStr( $this->formularioAlumno['telefono'] );
-        // $moEstudiante->celular = formatInputStr( $this->formularioAlumno['telefono'] );
+        // $moEstudiante->celular = '';
         $moEstudiante->fecha_nacimiento = formatInputStr( $this->formularioAlumno['f_nac'] );
         $moEstudiante->sexo = formatInputStr( $this->formularioAlumno['sexo'] );
         $moEstudiante->dni = formatInputStr( $this->formularioAlumno['dni'] );
         $moEstudiante->nombre_escuela = formatInputStr( $this->formularioAlumno['Ie_procedencia'] );
         $moEstudiante->anio_graduacion = formatInputStr( $this->formularioAlumno['anio_egreso'] );
-        // $moEstudiante->nombre_archivo_foto = formatInputStr( $this->formularioAlumno['ap_materno'] );
+        // $moEstudiante->nombre_archivo_foto = '';
 
         try {
             $this->_estudianteRepository->actualizar($this->idEstudiante, $moEstudiante);
-            if ($this->componenteExterno) {
-                openModal($this, 'form-modal-alumno', false);
-                self::initialState();
-                // cerrar modal y limpiar formulario
-            } /* else {
-                //  siguiente paso  o habilitar boton
-                //  $this->emit('wizzard-step', 'next');
-            } */
             sweetAlert($this, 'alumno', EstadosEntidadEnum::UPDATED);
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage() );
         }
     }
-
 
     /***********************************************************  Funciones listeners *************************************************************/
     public function buscar_interno()
@@ -178,6 +154,30 @@ class Alumno extends Component
     {
     }
 
+    public function cargarDataAlumno( string $dniEstudiante ){
+        if( is_string($dniEstudiante) && strlen($dniEstudiante)>=8 ){
+            $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($dniEstudiante);
+            if ($informacionAlumno) {
+                $this->formularioAlumno = [
+                    'dni' => $informacionAlumno->dni,
+                    'f_nac' => $informacionAlumno->fechaNacimiento,
+                    'telefono' => $informacionAlumno->telefono,
+                    'distrito' => $informacionAlumno->distrito,
+                    'direccion' => $informacionAlumno->direccion,
+                    'nombres' => $informacionAlumno->nombre,
+                    'ap_paterno' => $informacionAlumno->apPaterno,
+                    'ap_materno' => $informacionAlumno->apMaterno,
+                    'Ie_procedencia' => $informacionAlumno->ieProcedencia,
+                    'anio_egreso' => $informacionAlumno->anioGraduacion,
+                    'sexo' => $informacionAlumno->sexo,
+                ];
+                $this->idEstudiante = $informacionAlumno->idEstudiante;
+                $this->validate();
+            } else  toastAlert($this, "No se pudo encontrar informacion del alumno con dni $dniEstudiante", EstadosAlertasEnum::WARNING);
+        }
+        else toastAlert($this, "Dni $dniEstudiante con formato incorrecto", EstadosAlertasEnum::WARNING);
+    }
+
     public function setData( $data )
     {
         $this->formularioAlumno[$data['name']] = $data['value'];
@@ -192,7 +192,5 @@ class Alumno extends Component
     }
 
     /***********************************************************  Funciones internas *************************************************************/
-
-
 
 }

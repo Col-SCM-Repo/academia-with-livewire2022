@@ -10,4 +10,15 @@ abstract class TipoEvaluacionEnum
     const DIARIO = 'daily';
     const RAPIDO = 'quick';
     const OTRO = 'other';
+
+    public static function getArrayTypesEvaluation(){
+        return [
+            self::SIMULACRO,
+            self::MENSUAL,
+            self::SEMANAL,
+            self::DIARIO,
+            self::RAPIDO,
+            self::OTRO,
+        ];
+    }
 }

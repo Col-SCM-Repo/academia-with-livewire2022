@@ -2,7 +2,7 @@
     <div class="ibox-title">
         <span style="display: flex">
             <div style="flex-grow: 1">
-                <h5 > Nueva matricula </h5>
+                <h5 > DATOS DE LA MATRICULA </h5>
                 @if ( $matricula_id )
                     <span class="label label-primary"> Registrado </span>
                 @else

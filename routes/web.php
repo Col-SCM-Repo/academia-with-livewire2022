@@ -16,7 +16,8 @@ Route::get('/main', [HomeController::class, 'index'])->name('dashboard');
 
 Route::middleware(['auth'])->prefix('matricula')->group(function () {
     // Listos
-    Route::get('/nueva', [HomeController::class, 'nuevaMatricula'])->name('matricula.nueva');
+    Route::get('/nueva', [HomeController::class, 'nuevaMatriculaView'])->name('matricula.nueva');
+    Route::get('/informacion-alumno', [HomeController::class, 'informacionAlumnoView'])->name('matricula.informacion-alumno');
 
 
     // Pendientes

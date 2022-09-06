@@ -1,22 +1,59 @@
 <div class="ibox">
     <div class="ibox-title">
-        <h5> Formulario apoderado </h5>
-        <div class="ibox-tools">
-            @if ($idRelacionApoderado)
-            <span class="label label-primary pull-right"> Registrado </span>
-            @else
-            <span class="label label-warning-light pull-right"> Sin registrar </span>
-            @endif
-        </div>
-
+        <span style="display: flex">
+            <div style="flex-grow: 1">
+                <h5> APODERADOS REGISTRADOS </h5>
+            </div>
+            <div class="ibox-tools">
+                <button class="btn btn-xs btn-success" wire:click="nuevoApoderado">  <i class="fa fa-plus" aria-hidden="true"></i> Nuevo </button>
+            </div>
+        </span>
     </div>
     <div class="ibox-content">
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" >Codigo</th>
+                    <th scope="col" >DNI</th>
+                    <th scope="col" >Apellidos y nombres</th>
+                    <th scope="col" >Parentesco</th>
+                    <th scope="col" >Acciones</th>
+                </tr>
+            </thead>
+            <tbody style="cursor: pointer;">
+                @if (count($listaApoderadosEstudiante)>0)
+                    @foreach ($listaApoderadosEstudiante as $apoderado)
+                        <tr>
+                            <td scope="row">0001</td>
+                            <td>1111123</td>
+                            <td>Juan Manuel Jose perez bejar</td>
+                            <td>Padre</td>
+                            <td>
+                                <button class="btn btn-xs btn-success" title="Editar apoderado" wire:click="editarApoderado(1)"> <i class="fa fa-pencil" aria-hidden="true"></i> </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td class=" text-center " colspan="5"> <span>Sin registros</span> </td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+
+
+
+
+
+
+    <!-- begin: Modal apoderado -->
+    <x-modal-form-lg idForm='form-modal-apoderado' :titulo="$idRelacionApoderado? 'EDITAR APODERADO' :'NUEVO APODERADO'">
         <form class="row " wire:submit.prevent="{{ $idRelacionApoderado? 'update' : 'create' }}">
             <div class="col-lg-6">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">DNI</label>
-                        <div class="col-lg-10">
+                        <label class="col-md-2 col-lg-3 control-label">DNI</label>
+                        <div class="col-md-10 col-lg-9">
                             <div class="input-group ">
                                 <input type="text" wire:model="formularioApoderado.dni"
                                     placeholder="Numero de DNI o carnet de extranjeria "
@@ -29,14 +66,13 @@
                                     </button>
                                 </span>
                             </div>
-                            <small class="help-block m-b-none text-muted"> Presionar el boton de buscar para obtener
-                                informacion del alumno </small>
+                            <small class="help-block m-b-none text-muted"> Presionar el boton para buscar en la base de datos interna </small>
                             <x-input-error variable='formularioApoderado.dni'> </x-input-error>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">F Nac.</label>
-                        <div class="col-lg-10">
+                        <label class="col-md-2 col-lg-3 control-label">F Nac.</label>
+                        <div class="col-md-10 col-lg-9">
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                 <input type="date" autocomplete="off " wire:model.defer="formularioApoderado.f_nac"
@@ -45,30 +81,30 @@
                             <x-input-error variable='formularioApoderado.f_nac'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Telefono:</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Telefono:</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioApoderado.telefono"
                                 title="Ingrese un numero de contacto. " class="form-control text-uppercase">
                             <x-input-error variable='formularioApoderado.telefono'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Distrito</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Distrito</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" autocomplete="off " wire:model.defer="formularioApoderado.distrito"
                                 name="distrito" id="distrito_apoderado" title="Distrito de procedencia. "
                                 class="text-uppercase form-control">
                             <x-input-error variable='formularioApoderado.distrito'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Dirección</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Dirección</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioApoderado.direccion"
                                 title="Direciòn de procedencia. " class="form-control text-uppercase">
                             <x-input-error variable='formularioApoderado.direccion'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Parentesco</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Parentesco</label>
+                        <div class="col-md-10 col-lg-9">
                             <select class="form-control" wire:model.defer="formularioApoderado.parentesco">
                                 <option value="">SELECCIONE</option>
                                 <option value="father">PADRE</option>
@@ -87,31 +123,31 @@
             </div>
             <div class="col-lg-6">
                 <div class="form-horizontal">
-                    <div class="form-group"><label class="col-lg-2 control-label">Nombres:</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Nombres:</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioApoderado.nombres"
                                 title="Nombres completos del alumno." class="form-control text-uppercase">
                             <x-input-error variable='formularioApoderado.nombres'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">A.Paterno</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">A.Paterno</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioApoderado.ap_paterno"
                                 title="Apellido paterno del alumno." class="form-control text-uppercase">
                             <x-input-error variable='formularioApoderado.ap_paterno'> </x-input-error>
                         </div>
                     </div>
 
-                    <div class="form-group"><label class="col-lg-2 control-label">A.Materno</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">A.Materno</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioApoderado.ap_materno"
                                 title="Apellido materno del alumno." class="form-control  text-uppercase">
                             <x-input-error variable='formularioApoderado.ap_materno'> </x-input-error>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">Ocupacion.</label>
-                        <div class="col-lg-10">
+                        <label class="col-md-2 col-lg-3 control-label">Ocupacion.</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" autocomplete="off " wire:model.defer="formularioApoderado.ocupacion"
                                 name="ocupacion" title="Ocupacion del apoderado" id="ocupacion_apoderado"
                                 class="form-control typeahead text-uppercase" data-provide="typeahead">
@@ -119,8 +155,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">E. Civil</label>
-                        <div class="col-lg-4">
+                        <label class="col-md-2 col-lg-3 control-label">E. Civil</label>
+                        <div class="col-md-4 col-lg-3">
                             <div class="input-group ">
                                 <select wire:model.defer="formularioApoderado.estado_marital" class="form-control">
                                     <option value="">Seleccione</option>
@@ -132,20 +168,20 @@
                             </div>
                         </div>
 
-                        <label class="col-lg-2 control-label">Sexo</label>
-                        <div class="col-lg-4">
+                        <label class="col-md-2 col-lg-3 control-label">Sexo</label>
+                        <div class="col-md-4 col-lg-3">
                             <select wire:model.defer="formularioApoderado.sexo" class="form-control">
                                 <option value="">Seleccione</option>
                                 <option value="male">Masculino</option>
                                 <option value="female">Femenino</option>
                             </select>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-md-6">
                             @error('formularioApoderado.estado_marital')
                             <small class="pr-1 text-danger" role="alert"> * El campo estado civil es requerido </small>
                             @enderror
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-md-6">
                             @error('formularioApoderado.sexo')
                             <small class="pr-1 text-danger" role="alert"> * El campo sexo es requerido </small>
                             @enderror
@@ -170,6 +206,17 @@
                 @endif
             </div>
         </form>
+    </x-modal-form-lg>
+    <!-- end: Modal apoderado -->
+
+
+
+
+
+
+
+
+
 
     </div>
     @push('scripts')

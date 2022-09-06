@@ -53,7 +53,7 @@ class Pago extends Component
 
     public function render()
     {
-        $this->matricula_id = 1;
+        // $this->matricula_id = 1;
         $this->cuotas = $this->matricula_id? $this->_cuotaRepository->getInformacionPagosYCuotas($this->matricula_id) : null ;
         if($this->historial_tipo_cuota &&  $this->historial_cuota_id){
             $this->historial = (array) $this->cuotas[$this->historial_tipo_cuota][$this->historial_cuota_id];

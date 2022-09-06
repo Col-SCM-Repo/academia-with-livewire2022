@@ -1,6 +1,6 @@
 <div class="ibox">
     <div class="ibox-title">
-            <h5> Formulario alumno </h5>
+            <h5> DATOS DEL ALUMNO </h5>
             <div class="ibox-tools">
                 @if ($idEstudiante)
                     <span class="label label-primary pull-right"> Registrado </span>
@@ -14,8 +14,8 @@
             <div class="col-lg-6">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">DNI</label>
-                        <div class="col-lg-10">
+                        <label class="col-md-2 col-lg-3 control-label">DNI</label>
+                        <div class="col-md-10 col-lg-9">
                             <div class="input-group ">
                                 <input type="text" wire:model.defer="formularioAlumno.dni"
                                     placeholder="Numero de DNI o carnet de extranjeria "
@@ -34,8 +34,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">F Nac.</label>
-                        <div class="col-lg-10">
+                        <label class="col-md-2 col-lg-3  control-label">F Nac.</label>
+                        <div class="col-md-10 col-lg-9">
                             <div class="input-group ">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                 <input type="date" autocomplete="off" wire:model.defer="formularioAlumno.f_nac"
@@ -44,23 +44,23 @@
                             <x-input-error variable='formularioAlumno.f_nac'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Telefono:</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Telefono:</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioAlumno.telefono"
                                 title="Ingrese un numero de contacto. " class="form-control ">
                             <x-input-error variable='formularioAlumno.telefono'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group" x-data="" ><label class="col-lg-2 control-label">Distrito</label>
-                        <div class="col-lg-10 ui-widget">
+                    <div class="form-group" x-data="" ><label class="col-md-2 col-lg-3 control-label">Distrito</label>
+                        <div class="col-md-10 col-lg-9 ui-widget">
                             <input type="text" name="distrito" wire:model.defer="formularioAlumno.distrito"
                                 id="distrito" title="Distrito de procedencia. "
                                 class=" form-control" autocomplete="off"  >
                             <x-input-error variable='formularioAlumno.distrito'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">Dirección</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Dirección</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioAlumno.direccion"
                                 title="Direciòn de procedencia. " class="form-control ">
                             <x-input-error variable='formularioAlumno.direccion'> </x-input-error>
@@ -70,49 +70,48 @@
             </div>
             <div class="col-lg-6">
                 <div class="form-horizontal">
-                    <div class="form-group"><label class="col-lg-2 control-label">Nombres:</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Nombres:</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioAlumno.nombres"
                                 title="Nombres completos del alumno." class="form-control ">
                             <x-input-error variable='formularioAlumno.nombres'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group"><label class="col-lg-2 control-label">A.Paterno</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">A.Paterno</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioAlumno.ap_paterno"
                                 title="Apellido paterno del alumno." class="form-control ">
                             <x-input-error variable='formularioAlumno.ap_paterno'> </x-input-error>
                         </div>
                     </div>
 
-                    <div class="form-group"><label class="col-lg-2 control-label">A.Materno</label>
-                        <div class="col-lg-10">
+                    <div class="form-group"><label class="col-md-2 col-lg-3 control-label">A.Materno</label>
+                        <div class="col-md-10 col-lg-9">
                             <input type="text" wire:model.defer="formularioAlumno.ap_materno"
                                 title="Apellido materno del alumno." class="form-control  ">
                             <x-input-error variable='formularioAlumno.ap_materno'> </x-input-error>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">I.E. Proc.</label>
-                        <div class="col-lg-10">
-                            <input type="text" name="Ie_procedencia" autocomplete="off " wire:model.defer="formularioAlumno.Ie_procedencia"
+                        <label class="col-md-2 col-lg-3 control-label">I.E. Proc.</label>
+                        <div class="col-md-10 col-lg-9">
+                            <input type="text" name="Ie_procedencia" autocomplete="off" wire:model.defer="formularioAlumno.Ie_procedencia"
                                 title="instituciòn de procedencia" id="Ie_procedencia"
                                 class="form-control " >
                             <x-input-error variable='formularioAlumno.Ie_procedencia'> </x-input-error>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-lg-2 control-label">Egreso</label>
-                        <div class="col-lg-4">
+                        <label class="col-md-2 col-lg-3 control-label">Egreso</label>
+                        <div class="col-md-4 col-lg-3">
                             <div class="input-group ">
-                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                 <input type="text" autocomplete="off " wire:model.defer="formularioAlumno.anio_egreso"
                                     class="form-control" placeholder="2022" title="Año de egreso" id="datepicker-year">
                             </div>
                         </div>
 
-                        <label class="col-lg-2 control-label">Sexo</label>
-                        <div class="col-lg-4">
+                        <label class="col-md-2 col-lg-2 control-label">Sexo</label>
+                        <div class="col-md-4 col-lg-4">
                             <select wire:model.defer="formularioAlumno.sexo" class="form-control">
                                 <option value="">Seleccione</option>
                                 <option value="male">Masculino</option>
@@ -136,16 +135,9 @@
             <div class="col-12 text-right  ">
                 <span wire:loading wire:target="buscar_interno"> Buscando alumno ...</span>
                 <span wire:loading wire:target="update, create"> Guardando ...</span>
-                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem">
+                <button class="btn btn-sm btn-primary " type="submit" style="padding: .75rem 3rem">
                     <i class="fa fa-save    "></i> {{ $idEstudiante? 'Actualizar': 'Guardar'}}
                 </button>
-
-                @if ($idEstudiante)
-                <button class="btn btn-sm btn-success" type="button" style="padding: .75rem 3rem"
-                    wire:click="initialState"> Limpiar formulario
-                </button>
-                @endif
-
             </div>
         </form>
     </div>

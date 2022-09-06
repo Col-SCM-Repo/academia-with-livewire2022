@@ -38,9 +38,13 @@ class HomeController extends Controller
     }
 
     /********************** Modulo Matricula **********************/
-    public function nuevaMatricula()
+    public function nuevaMatriculaView()
     {
         return view('modulos.matricula.nueva');
+    }
+    public function informacionAlumnoView()
+    {
+        return view('modulos.matricula.informacion-alumno');
     }
 
 

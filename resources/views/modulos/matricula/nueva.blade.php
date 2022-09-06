@@ -12,7 +12,7 @@ $slot = ''
 
 
     <style>
-        .wizard .content {
+        /* .wizard .content {
             min-height: 100px;
         }
         .wizard .content > .body {
@@ -23,7 +23,7 @@ $slot = ''
         }
         .wizard .content .body.current {
             position: relative;
-        }
+        } */
 
         .typeahead   > li  {
             list-style:none;
@@ -39,15 +39,15 @@ $slot = ''
     <!-- Jquery Validate -->
     <script src="{{ asset('inspinia_admin/js/plugins/validate/jquery.validate.min.js') }}"></script>
     <!-- Data picker -->
-    <script src="{{ asset('inspinia_admin/js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
+    {{-- <script src="{{ asset('inspinia_admin/js/plugins/datapicker/bootstrap-datepicker.js') }}"></script> --}}
     <!-- Data table -->
-    <script src=" {{ asset('inspinia_admin/js/plugins/dataTables/datatables.min.js') }} "></script>
+    {{-- <script src=" {{ asset('inspinia_admin/js/plugins/dataTables/datatables.min.js') }} "></script> --}}
 
     <!-- Typehead -->
     <script src="{{ asset('inspinia_admin/js/plugins/typehead/bootstrap3-typeahead.min.js') }}"></script>
 
     <script>
-        var settings = {
+        /* var settings = {
             stepsOrientation: $.fn.steps.stepsOrientation.horizontal,
             autoFocus: false,
             enableAllSteps: true,
@@ -84,7 +84,7 @@ $slot = ''
 
         Livewire.on('wizzard-step', step => {
             $("#wizard").steps(step);
-        } );
+        } ); */
     </script>
 @endpush
 
@@ -115,24 +115,42 @@ $slot = ''
 @section('content')
     <div class="row" >
         <div class="col-lg-12">
-            <div class="ibox" style="min-width: 60vh;">
-                <div class="ibox-content">
-                    <div id="wizard" wire:ignore.self>
-                        <h1>Crear alumno</h1>
-                        <div>
-                            @livewire('matricula.alumno')
-                        </div>
-                        <h1>Crear apoderado</h1>
-                        <div>
-                            @livewire('matricula.apoderado')
-                        </div>
-                        <h1>Matricular</h1>
-                        <div>
-                            @livewire('matricula.matricula')
-                        </div>
-                        <h1>Pagos</h1>
-                        <div>
-                            @livewire('matricula.pago')
+            <div class="ibox">
+                <div class="ibox-content" style="padding: 0">
+                    <div class="tabs-nueva-matricula " style="min-height: 85vh">
+                        <ul class="nav nav-tabs">
+                            <li class=" active"><a data-toggle="tab" href="#tab-1"> ALUMNO</a></li>
+                            <li class=" "><a data-toggle="tab" href="#tab-2">APODERADO</a></li>
+                            <li class=" "><a data-toggle="tab" href="#tab-3">MATRICULA</a></li>
+                            <li class=" "><a data-toggle="tab" href="#tab-4">PAGOS</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab-1" class="tab-pane active">
+                                <div class="panel-body ">
+                                    <!-- Begin: contenido alumno -->
+                                        @livewire('matricula.alumno')
+                                    <!-- End: contenido alumno -->
+                                </div>
+                            </div>
+                            <div id="tab-2" class="tab-pane">
+                                <div class="panel-body ">
+                                    <!-- Begin: contenido apoderado -->
+                                        @livewire('matricula.apoderado')
+                                    <!-- End: contenido apoderado -->
+                                </div>
+                            </div>
+                            <div id="tab-3" class="tab-pane">
+                                <div class="panel-body ">
+                                    <!-- Begin: contenido matricula -->
+                                        @livewire('matricula.matricula')
+                                    <!-- End: contenido matricula -->
+                                </div>
+                            </div>
+                            <div id="tab-4" class="tab-pane">
+                                <!-- Begin: contenido pagos -->
+                                        @livewire('matricula.pago')
+                                <!-- End: contenido pagos -->
+                            </div>
                         </div>
                     </div>
                 </div>
