@@ -8,7 +8,7 @@ use Livewire\Component;
 class BuscarListaAlumnos extends Component
 {
     public $busqueda;
-
+    public $listaEstudiantes, $estudianteSeleccionado;
     private $_estudianteRepository;
 
     public function __construct()
@@ -30,7 +30,12 @@ class BuscarListaAlumnos extends Component
 
     public function render()
     {
-        $listaAlumnos = $this->_estudianteRepository->getListaAlumnos($this->busqueda, 25);
-        return view('livewire.matricula.buscar-lista-alumnos')->with('alumnos', $listaAlumnos);
+        $this->listaEstudiantes = $this->_estudianteRepository->getListaAlumnos($this->busqueda, 25);
+        return view('livewire.matricula.buscar-lista-alumnos');
+    }
+
+    public function seleccionarEstudiante( int $estudiante_id ){
+        $this->estudianteSeleccionado = $estudiante_id;
+        $this->emitTo('matricula.informacion-alumno','cargar-data-informacion-alumno', $estudiante_id);
     }
 }

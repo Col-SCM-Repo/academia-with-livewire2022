@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadosEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -36,6 +37,12 @@ class Student extends Model
 
     public function enrollment()
     {
-        return $this->hasOne(Enrollment::class);
+        // Ultima matricula
+        return $this->hasOne(Enrollment::class, 'student_id', 'id')->where('enrollments.status', EstadosEnum::ACTIVO)->orderBy('id', 'desc')->first();
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class, 'student_id', 'id');
     }
 }

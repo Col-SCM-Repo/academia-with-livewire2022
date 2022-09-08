@@ -23,7 +23,7 @@
                                 <span class="input-group-btn">
                                     <button type="button" wire:click="buscar_interno"
                                         class="btn btn-outline btn-primary"
-                                        title="Buscar en la base de datos interna del colegio">
+                                        title="Buscar en la base de datos interna del colegio" {{ $idEstudiante ? 'disabled':'' }}>
                                         <i class="fa fa-search" aria-hidden="true"></i>
                                     </button>
                                 </span>
@@ -132,7 +132,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 text-right  ">
+            <div class="col-12 text-right">
                 <span wire:loading wire:target="buscar_interno"> Buscando alumno ...</span>
                 <span wire:loading wire:target="update, create"> Guardando ...</span>
                 <button class="btn btn-sm btn-primary " type="submit" style="padding: .75rem 3rem">

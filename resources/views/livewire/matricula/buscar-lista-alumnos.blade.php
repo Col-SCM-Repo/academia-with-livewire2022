@@ -23,27 +23,25 @@
         <div class="ibox-content">
             <form>
                 <div class="form-group">
-                    <input type="text" class="form-control" wire:model='busqueda' placeholder="Buscar alumno">
+                    <input type="text" class="form-control" wire:model='busqueda' placeholder="Buscar estudiante">
                 </div>
                 <div>
-                    <table class="table table-sm table-hover">
+                    <table class="table table-sm table-hover table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th scope="col" >Cod.</th>
                                 <th scope="col" >Apellidos y nombres</th>
                             </tr>
                         </thead>
                         <tbody style="cursor: pointer;">
-                            @if ( count($alumnos) > 0)
-                                @foreach ($alumnos as $alumno)
-                                    <tr>
-                                        <td scope="row">{{ $alumno->id }}</td>
-                                        <td>{{ $alumno->father_lastname.' '.$alumno->mother_lastname.', '.$alumno->name }}</td>
+                            @if ( count($listaEstudiantes) > 0)
+                                @foreach ($listaEstudiantes as $estudiante)
+                                    <tr wire:click="seleccionarEstudiante({{$estudiante->id}})" >
+                                        <td class="{{ $estudianteSeleccionado == $estudiante->id? 'bg-success':'' }}" scope="row">{{ $estudiante->father_lastname.' '.$estudiante->mother_lastname.', '.$estudiante->name }}</td>
                                     </tr>
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="2" class="text-center" > <small>Sin resultados</small> </td>
+                                        <td class="text-center" > <small>Sin resultados</small> </td>
                                     </tr>
                             @endif
                         </tbody>

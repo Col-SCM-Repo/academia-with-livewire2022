@@ -9,10 +9,20 @@
                     <span class="label label-warning-light"> Sin registrar </span>
                 @endif
             </div>
-            <div class="ibox-tools">
+            <div>
+                @livewire('matricula.partials.becas')
+
                 <button class="btn btn-xs btn-success ">
-                    Descargar
+                    <i class="fa fa-download" aria-hidden="true"></i> Ver ficha
                 </button>
+
+                <button class="btn btn-xs btn-danger ">
+                    <i class="fa fa-download" aria-hidden="true"></i> Retirar alumno
+                </button>
+
+                @if ($matricula_id )
+
+                @endif
             </div>
         </span>
     </div>

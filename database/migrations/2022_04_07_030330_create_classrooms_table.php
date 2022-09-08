@@ -13,7 +13,7 @@ class CreateClassroomsTable extends Migration
 			$table->text('name', 65535);
 			$table->bigInteger('level_id')->index('FK_classrooms_levels');
 			$table->integer('vacancy');
-			$table->decimal('score')->unsigned()->nullable();
+			$table->decimal('price', 10)->nullable();
 			$table->softDeletes();
 			$table->timestamps();
 		});

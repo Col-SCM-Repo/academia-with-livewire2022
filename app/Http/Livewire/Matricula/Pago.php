@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Matricula;
 
 use App\Enums\EstadosAlertasEnum;
 use App\Enums\EstadosEntidadEnum;
+use App\Enums\EstadosEnum;
+use App\Repository\EnrollmentRepository;
 use App\Repository\InstallmentRepository;
 use App\Repository\PaymentRepository;
 use Exception;
@@ -18,7 +20,7 @@ class Pago extends Component
     public $historial_tipo_cuota, $historial_cuota_id;
 
     public $cuotas, $historial;
-    private $_pagoRepository, $_cuotaRepository;
+    private $_pagoRepository, $_cuotaRepository, $_matriculaRepository;
 
     protected $rules = [
         'matricula_id' => 'required|integer|min:0',
@@ -30,12 +32,14 @@ class Pago extends Component
     protected $listeners = [
         'enrollment-found' => 'setData',
         'anular-pago' => 'anularPago',
+        'cargar-data-pagos' => 'cargarDataPagos',
     ];
 
     public function __construct()
     {
         $this->_cuotaRepository = new InstallmentRepository();
         $this->_pagoRepository = new PaymentRepository();
+        $this->_matriculaRepository = new EnrollmentRepository();
     }
 
     public function mount(){
@@ -44,7 +48,7 @@ class Pago extends Component
 
     public function initialState()
     {
-        $this->reset(['formularioPago','matricula_id' ]);
+        $this->reset(['formularioPago','matricula_id', 'historial_tipo_cuota' ,'historial_cuota_id' ]);
         $this->matricula_id=null;
         $this->formularioPago['cuota_id'] = null;
         $this->formularioPago['monto_pendiente_cuota'] = null;
@@ -161,6 +165,17 @@ class Pago extends Component
     {
         self::initialState();
         $this->formularioPago[$nuevaData['name']] = $nuevaData['value'];
+    }
+
+    public function cargarDataPagos( int $estudiante_id ){
+        self::initialState();
+        $ultimaMatricula = $this->_matriculaRepository::where('student_id', $estudiante_id)->where('status', EstadosEnum::ACTIVO)->orderBy('id', 'desc')->first();
+        if($ultimaMatricula ){
+            $this->matricula_id = $ultimaMatricula->id;
+        }
+
+        //dd( $ultimaMatricula);
+
     }
 
     /***********************************************************  Funciones internas *************************************************************/

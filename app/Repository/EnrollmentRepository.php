@@ -128,4 +128,29 @@ class EnrollmentRepository extends Enrollment
 
     }
 
+    public function listaMatriculasEstudiante( int $estudianteId ){
+
+        $matriculas = array();
+        foreach (Enrollment::where('student_id', $estudianteId)->get() as $matricula) {
+            if($matricula->classroom->level->period->active == EstadosEnum::ACTIVO)
+                $estadoMatricula = ($matricula->status == EstadosEnum::ACTIVO)? "ACTIVO" : "RETIRADO";
+            else
+                $estadoMatricula = ($matricula->status == EstadosEnum::ACTIVO)? "INACTIVO" : "RETIRADO";
+
+            $matriculas[] = (object)[
+                'matricula_id' => $matricula->id,
+                'matricula_codigo' => $matricula->code,
+                'estudiante_id' => $matricula->student_id,
+                'aula' => $matricula->classroom->name,
+                'nivel' => $matricula->classroom->level->level_type->description,
+                'periodo' => $matricula->classroom->level->period->name,
+                'anio' => $matricula->classroom->level->period->year,
+                'descripcion'=> $matricula->classroom->level->period->name.'/'.$matricula->classroom->level->level_type->description.'/'.$matricula->classroom->name,
+                'estado_matricula' => $estadoMatricula,
+                'fecha'=>date ( 'Y-m-d h:i:s A', strtotime($matricula->created_at))
+            ];
+        }
+        return $matriculas;
+    }
+
 }

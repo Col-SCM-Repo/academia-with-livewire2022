@@ -3,6 +3,7 @@
         <span style="display: flex">
             <div style="flex-grow: 1">
                 <h5 > REGISTRO DE PAGOS </h5>
+                @if ($matricula_id)
                     @if ($cuotas)
                         @if ( $cuotas['total_pagado'])
                             <span class="label label-primary"> Sin deuda </span>
@@ -13,7 +14,7 @@
                     @else
                         <span class="label label-danger"> Sin registrar </span>
                     @endif
-
+                @endif
             </div>
             @if ($cuotas)
                 <div class="ibox-tools">

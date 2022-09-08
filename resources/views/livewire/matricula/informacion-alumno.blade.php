@@ -34,47 +34,7 @@
                     <div id="tab-3" class="tab-pane">
                         <div class="panel-body ">
                             <!-- Begin: contenido matricula -->
-                                <div class="header-info" style="display: flex;">
-                                <h5>Matriculas registradas</h5>
-                                <div style="flex-grow: 1;" class="text-right">
-                                    <button disabled>
-                                        <i class="fa fa-plus" aria-hidden="true"></i>
-                                        Nuevo
-                                    </button>
-                                </div>
-                            </div>
-                            <table class="table table-sm table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" >Cod.</th>
-                                        <th scope="col" >Matricula</th>
-                                        <th scope="col" >Fecha</th>
-                                        <th scope="col" >Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="cursor: pointer;">
-                                    <tr>
-                                        <td scope="row">0001</td>
-                                        <td>2022-I</td>
-                                        <td>20-12-2022</td>
-                                        <td>
-                                            <button class="btn btn-xs btn-success" title="Ver matricula"> <i class="fa fa-eye" aria-hidden="true"></i> </button>
-                                            <button class="btn btn-xs btn-warning" title="Editar matricula" disabled> <i class="fa fa-pencil-square" aria-hidden="true"></i> </button>
-                                            <button class="btn btn-xs btn-primary" title="Pagos"> <i class="fa fa-money" aria-hidden="true"></i> </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td scope="row">0002</td>
-                                        <td>2022-II</td>
-                                        <td>30-12-2022</td>
-                                        <td>
-                                            <button class="btn btn-xs btn-success" title="Ver matricula"> <i class="fa fa-eye" aria-hidden="true"></i> </button>
-                                            <button class="btn btn-xs btn-warning" title="Editar matricula" disabled> <i class="fa fa-pencil-square" aria-hidden="true"></i> </button>
-                                            <button class="btn btn-xs btn-primary" title="Pagos"> <i class="fa fa-money" aria-hidden="true"></i> </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            @livewire('matricula.registro-matriculas')
                             <!-- End: contenido matricula -->
                         </div>
                     </div>
@@ -88,11 +48,6 @@
         </div>
     </div>
 
-    <!-- Modales: edicion de la informacion del alumno -->
-    <div class="modals">
-
-
-    </div>
 
 
 </div>

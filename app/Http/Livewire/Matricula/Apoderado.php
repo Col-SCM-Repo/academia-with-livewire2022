@@ -137,7 +137,7 @@ class Apoderado extends Component
         $moApoderado->ocupacion = formatInputStr( $this->formularioApoderado['ocupacion'] );
 
         try {
-            $this->_apoderadoRepository->actualizar($this->idRelacionApoderado, $moApoderado);
+            $this->_apoderadoRepository->actualizar($this->formularioApoderado['relative_id'], $moApoderado);
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::UPDATED);
             openModal($this, '#form-modal-apoderado', false);
             self::initialState();

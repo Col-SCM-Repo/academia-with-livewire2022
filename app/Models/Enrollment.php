@@ -57,6 +57,17 @@ class Enrollment extends Model
         return $this->belongsTo(Classroom::class);
     }
 
+    public function scholarships(){
+        return $this->hasMany(Scholarship::class, 'enrollment_id', 'id');
+    }
+
+    public function scholarshipSummary(){
+        $monto = 0;
+        foreach ($this->scholarships as $becas)
+            $monto += $becas->discount;
+        return $monto;
+    }
+
     public function balance()
     {
         $total = 0;

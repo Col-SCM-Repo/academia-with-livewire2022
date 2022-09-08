@@ -152,7 +152,7 @@ class StudentRepository extends Student
                 ->orWhere('entities.document_number', 'like', '%' . $parameto . '%')
                 ->orderBy('entities.father_lastname')
                 ->select([
-                    "students.id as id ",
+                    "students.id as id",
                     "entities.father_lastname",
                     "entities.mother_lastname",
                     "entities.name",
@@ -171,7 +171,7 @@ class StudentRepository extends Student
                 ->orWhere('entities.document_number', 'like', '%' . $parameto . '%')
                 ->orderBy('entities.father_lastname')
                 ->select([
-                    "students.id as id ",
+                    "students.id as id",
                     "entities.father_lastname",
                     "entities.mother_lastname",
                     "entities.name",
@@ -182,6 +182,7 @@ class StudentRepository extends Student
                     "students.graduation_year",
                 ])->get();
         }
+
         return $listaAlumnos;
     }
 }

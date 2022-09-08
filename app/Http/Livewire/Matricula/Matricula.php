@@ -41,7 +41,7 @@ class Matricula extends Component
     protected $listeners = [
         'student-found' => 'setData',
         'change-prop-enrollment' => 'setData',
-
+        'reset-form-matricula' => 'initialState',
         'pagina-cargada-matricula' => 'enviarDataAutocomplete',
     ];
 
@@ -56,9 +56,17 @@ class Matricula extends Component
     public function initialState()
     {
         $this->reset(['formularioMatricula', 'matricula_id']);
+        //$this->formularioMatricula['relative_id'] = null;
+
+        $this->formularioMatricula['tipo_matricula'] = null;
+        $this->formularioMatricula['classroom_id'] = null;
+        $this->formularioMatricula['carrera'] = null;
+        $this->formularioMatricula['tipo_pago'] = null;
         $this->formularioMatricula['cuotas'] = 0;
         $this->formularioMatricula['lista_cuotas'] = array();
-        //$this->formularioMatricula['relative_id'] = null;
+        $this->formularioMatricula['costo_matricula'] = null;
+        $this->formularioMatricula['costo'] = null;
+        $this->formularioMatricula['observaciones'] = null;
         $this->formularioMatricula['student_id'] = null;
     }
 
@@ -156,6 +164,7 @@ class Matricula extends Component
             $matriculaCreada = $this->_matriculaRepository->registrar($modelMatricula);
             $this->matricula_id = $matriculaCreada->id;
             $this->emitTo('matricula.pago', 'enrollment-found', (object)[ 'name' => 'matricula_id', 'value'=> $matriculaCreada->id  ]);
+            $this->emitTo('matricula.registro-matriculas', 'enrollment-updated');
             sweetAlert($this, 'matricula', EstadosEntidadEnum::CREATED);
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
@@ -182,6 +191,7 @@ class Matricula extends Component
         // dd( $nuevaData,$this->formularioMatricula  );
         $this->formularioMatricula[$nuevaData['name']] = $nuevaData['value'];
     }
+
 
     /***********************************************************  Funciones internas *************************************************************/
     private function generarCuotasAutomatico ( bool $automatico = true ){

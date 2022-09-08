@@ -4,9 +4,11 @@
             <div style="flex-grow: 1">
                 <h5> APODERADOS REGISTRADOS </h5>
             </div>
-            <div class="ibox-tools">
-                <button class="btn btn-xs btn-success" wire:click="nuevoApoderado">  <i class="fa fa-plus" aria-hidden="true"></i> Nuevo </button>
-            </div>
+            @if ($idEstudiante)
+                <div class="ibox-tools">
+                    <button class="btn btn-xs btn-success" wire:click="nuevoApoderado">  <i class="fa fa-plus" aria-hidden="true"></i> Nuevo </button>
+                </div>
+            @endif
         </span>
     </div>
     <div class="ibox-content">

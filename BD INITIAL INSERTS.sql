@@ -2849,6 +2849,14 @@ INSERT INTO `careers` ( `id`, `group_id`, `career`, `nmonico`) VALUES
 	( 35, 3, 'BIOLOGIA Y BIOTECNOLOGIA' , 'B.B' ),
 	( 36, 2, 'INGENIERIA SANITARIA', 'I.SA' );
 
+/* Datos para los tipos de becas (descuentos) */
+INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 5%', null, 'precentage', 5);
+INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 10%', null, 'precentage', 10);
+INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 20%', null, 'precentage', 20);
+INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 50%', null, 'precentage', 50);
+INSERT INTO `type_scholarships` (`id`, `name`, `description`, `type`, `value`, `created_at`, `updated_at`) VALUES (NULL, 'Monto fijo', 'Genera una cuota de descuento fijo', 'static', NULL, NULL, NULL);
+
+
 -- Volcando datos para la tabla academia_cabrera.users: ~2 rows (aproximadamente)
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 INSERT INTO `users` (`id`, `entity_id`, `username`, `password`, `type`, `status`, `remember_token`, `created_at`, `updated_at`) VALUES
