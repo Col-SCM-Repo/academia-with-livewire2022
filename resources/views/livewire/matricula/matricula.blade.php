@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-3 control-label">Tipo de pago:</label>
+                    <label class="col-lg-3 control-label">Descuento: </label>
                     <div class="col-lg-9 " style="display: flex; flex-wrap: wrap">
                         <div class="form-check">
                             <input class="form-check-input d-inlineblock" type="radio" name="tipo_pago" id="rbtnContado"

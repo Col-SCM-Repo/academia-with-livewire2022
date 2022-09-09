@@ -20,10 +20,11 @@ class ScholarshipRepository extends Scholarship
 
     public function builderModel(){
         return (object)[
-            'idMatricula' => null,     // enrollment_id
-            'tipoBeca_id' => null,     // type_scholarship_id
-            'descripcion' => null,     // description
-            'descuento' => null,       // discount
+            'idMatricula' => null,          // enrollment_id
+            'tipoBeca_id' => null,          // type_scholarship_id
+            'descripcion' => null,          // description
+            'parameter_discount' => null,   // parametro decuento (% descuento, monto descuento)
+            //'descuento' => null,          // discount
 
             'parametroDescuento' => null,
             'costoCiclo' => null
@@ -39,6 +40,8 @@ class ScholarshipRepository extends Scholarship
             $beca->user_id = Auth::user()->id;
             $beca->discount = self::calcularDescuento($moBeca->tipoBeca_id, $moBeca->costoCiclo, $moBeca->parametroDescuento);
             $beca->save();
+            $beca->parameter_discount = $beca->typeScholarship->value ? $beca->typeScholarship->value : $moBeca->parametroDescuento ;
+            $beca->save();
             return $beca;
         }
         throw new NotFoundResourceException('Error, no se encontro la matricula del alumno [COD_MAT: '.$moBeca->idMatricula.'].');
@@ -52,11 +55,16 @@ class ScholarshipRepository extends Scholarship
         $beca->description = $moBeca->descripcion;
         $beca->discount = self::calcularDescuento($moBeca->tipoBeca_id, $moBeca->costoCiclo, $moBeca->parametroDescuento);
         $beca->save();
+        $beca->parameter_discount = $beca->typeScholarship->value ? $beca->typeScholarship->value : $moBeca->parametroDescuento ;
+        $beca->save();
         return true ;
     }
 
     public function eliminarBeca( int $idBeca ){
-
+        $beca = Scholarship::find($idBeca);
+        if(!$beca) throw new NotFoundResourceException("Error, no se encontro la beca [Codigo: $idBeca]");
+        $beca->delete();
+        return true;
     }
 
     public function listaTiposBecas(){
@@ -73,6 +81,20 @@ class ScholarshipRepository extends Scholarship
         return $tiposBecas;
     }
 
+    public function becasRegistradasMatricula( int $matriculaId ){
+        $becas = array();
+        foreach (Scholarship::where('enrollment_id', $matriculaId)->where('deleted_at', null)->get() as $beca ) {
+            $becas [$beca->id] = [
+                "id" => $beca->id,
+                "nombre" => $beca->description,
+                "tipo" => $beca->typeScholarship->name,
+                "descuento" => $beca->discount,
+                'fecha_creacion' => $beca->created_at,
+            ];
+        }
+        return $becas ;
+    }
+
     public function calcularDescuento( int $tipoDescuentoId, $montoEvaluar, $parametroDescuento = null ){
         if(!$montoEvaluar) throw new Exception('Error, no se encontro monto a aplicar descuento');
 
@@ -80,8 +102,9 @@ class ScholarshipRepository extends Scholarship
         if($tipoDescuento)
             switch ($tipoDescuento->type) {
                 case TiposBecasEnum::PORCENTUAL_FIJO:       return round($montoEvaluar * $tipoDescuento->value /100);
-                case TiposBecasEnum::PORCENTUAL_DINAMICO:   return round($montoEvaluar * $parametroDescuento->value /100);
-                case TiposBecasEnum::MONTO_FIJO:            return round($parametroDescuento);
+                case TiposBecasEnum::PORCENTUAL_DINAMICO:   return round($montoEvaluar * $parametroDescuento /100);
+                case TiposBecasEnum::MONTO_FIJO:            return round($tipoDescuento->value);
+                case TiposBecasEnum::MONTO_DINAMICO:        return round($parametroDescuento);
                 case TiposBecasEnum::OTRO:                  return 0;
             }
         throw new NotFoundResourceException('Error, no se encontro el tipo de beca especificado');

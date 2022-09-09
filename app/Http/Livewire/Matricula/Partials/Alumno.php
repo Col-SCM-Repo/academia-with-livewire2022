@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula;
+namespace App\Http\Livewire\Matricula\Partials;
 
 use App\Enums\EstadosAlertasEnum;
 use App\Enums\EstadosEntidadEnum;
@@ -57,7 +57,7 @@ class Alumno extends Component
 
     public function render()
     {
-        return view('livewire.matricula.alumno');
+        return view('livewire.matricula.partials.alumno');
     }
 
     public function initialState()

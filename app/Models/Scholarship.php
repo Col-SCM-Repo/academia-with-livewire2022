@@ -32,7 +32,7 @@ class Scholarship extends Model
 
     public function typeScholarship()
     {
-        return $this->belongsTo(User::class, 'type_scholarship_id', 'id');
+        return $this->belongsTo(typeScholarship::class, 'type_scholarship_id', 'id');
     }
 
 }

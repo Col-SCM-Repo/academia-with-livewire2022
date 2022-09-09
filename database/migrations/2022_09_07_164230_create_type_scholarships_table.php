@@ -18,7 +18,7 @@ class CreateTypeScholarshipsTable extends Migration
 
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('type', array( 'precentage', 'precentage_dinamic', 'static', 'other'))->nullable(); // descuento 20 % del monto, S/ 50, otro
+            $table->enum('type', array( 'precentage', 'precentage_dinamic', 'static','static_dinamic', 'other'))->nullable(); // descuento 20 % del monto, S/ 50, otro
             $table->double('value')->nullable();
 
             $table->timestamps();

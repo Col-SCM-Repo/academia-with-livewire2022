@@ -21,7 +21,8 @@ class CreateScholarshipsTable extends Migration
             $table->bigInteger('user_id')->unsigned()->nullable()->index('FK_scholarships_user');
 
             $table->text('description')->nullable();
-            $table->double('discount')->unsigned()->default(0);     // puntaje de curso
+            $table->double('discount')->unsigned()->default(0);
+            $table->double('parameter_discount')->unsigned()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

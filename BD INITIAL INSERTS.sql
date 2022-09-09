@@ -2850,11 +2850,19 @@ INSERT INTO `careers` ( `id`, `group_id`, `career`, `nmonico`) VALUES
 	( 36, 2, 'INGENIERIA SANITARIA', 'I.SA' );
 
 /* Datos para los tipos de becas (descuentos) */
-INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 5%', null, 'precentage', 5);
-INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 10%', null, 'precentage', 10);
-INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 20%', null, 'precentage', 20);
-INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES ('Descuento 50%', null, 'precentage', 50);
-INSERT INTO `type_scholarships` (`id`, `name`, `description`, `type`, `value`, `created_at`, `updated_at`) VALUES (NULL, 'Monto fijo', 'Genera una cuota de descuento fijo', 'static', NULL, NULL, NULL);
+INSERT INTO type_scholarships( `name`, `description`, `type`, `value`) VALUES
+    ('DESCUENTO 5%', null, 'precentage', 5),
+    ('DESCUENTO 10%', null, 'precentage', 10),
+    ('DESCUENTO 20%', null, 'precentage', 20),
+    ('DESCUENTO 50%', null, 'precentage', 50),
+    ('PORCENTAJE PERSONALIZADO', null, 'precentage_dinamic', null),
+
+    ('DESCUENTO 5 SOLES',   null,   'static',           5),
+    ('DESCUENTO 10 SOLES',  null,   'static',           1),
+    ('DESCUENTO 20 SOLES',  null,   'static',           20),
+    ('DESCUENTO 50 SOLES',  null,   'static',           50),
+    ('MONTO PERSONALIZADO', null,   'static_dinamic',   null);
+
 
 
 -- Volcando datos para la tabla academia_cabrera.users: ~2 rows (aproximadamente)
