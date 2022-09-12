@@ -28,3 +28,4 @@ $ php artisan server
 # Correr la app (apache)
 # Subir el proyecto en (c/wamp64/www/el_proyecto)
 ```
+probando cambios en mi pc
