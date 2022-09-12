@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula;
+namespace App\Http\Livewire\Matricula\Partials;
 
 use App\Enums\EstadosEntidadEnum;
 use App\Enums\FormasPagoEnum;
@@ -83,7 +83,7 @@ class Matricula extends Component
     public function render()
     {
         $this->lista_classrooms = Session::has('periodo') ? $this->_classroomRepository->getListaClases(Session::get('periodo')->id) : [];
-        return view('livewire.matricula.matricula');
+        return view('livewire.matricula.partials.matricula');
     }
 
     public function updated($name, $value)

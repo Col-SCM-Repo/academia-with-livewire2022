@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula;
+namespace App\Http\Livewire\Matricula\Partials;
 
 use App\Enums\EstadosAlertasEnum;
 use App\Enums\EstadosEntidadEnum;
@@ -68,7 +68,7 @@ class Pago extends Component
         }
 
         // Log::debug((array) $this->cuotas);
-        return view('livewire.matricula.pago');
+        return view('livewire.matricula.partials.pago');
     }
 
     /***********************************************************  CRUD *************************************************************/

@@ -28,4 +28,13 @@ $ php artisan server
 # Correr la app (apache)
 # Subir el proyecto en (c/wamp64/www/el_proyecto)
 ```
-probando cambios en mi pc
+
+## Creacion de link simbolicos y helpers
+```bash
+#Links simbolicos
+php artisan storage:link
+
+#Helpers (crear archivo en app/http) y modificar el archivo composer.json
+composer dump-autoload
+```
+

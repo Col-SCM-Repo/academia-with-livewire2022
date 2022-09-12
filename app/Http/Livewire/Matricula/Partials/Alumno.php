@@ -12,10 +12,12 @@ use Livewire\Component;
 
 class Alumno extends Component
 {
-    // checar eso del ID ESTUDIANTE *WARNING*
-    public $idEstudiante, $formularioAlumno;
+    // Propiedades del formularioAlumno
+    public  $idEstudiante, $formularioAlumno;
+    public  $fecha_nacimiento, $dni, $distrito, $telefono, $nombres, $direccion, $apellido_materno,
+            $apellido_paterno, $anio_egreso, $Ie_procedencia, $sexo;
 
-    public $lista_distritos, $lista_ie_procedencia;
+    public  $lista_distritos, $lista_ie_procedencia;
     private $distritosRepository, $ie_procedenciaRepository, $_estudianteRepository;
 
     protected $listeners = [
@@ -26,90 +28,83 @@ class Alumno extends Component
     ];
 
     protected $rules = [
-        'formularioAlumno.dni' => "required | string | min:8",
-        'formularioAlumno.f_nac' => "required | date_format:Y-m-d",
-        'formularioAlumno.telefono' => "required | string | min: 4",
-        'formularioAlumno.distrito' => "required | string ",
-        'formularioAlumno.direccion' => "required | string | min: 4",
-        'formularioAlumno.nombres' => "required | string | min: 4",
-        'formularioAlumno.ap_paterno' => "required | string | min: 4",
-        'formularioAlumno.ap_materno' => "required | string | min: 4",
-        'formularioAlumno.Ie_procedencia' => "required | string | min: 4",
-        'formularioAlumno.anio_egreso' => "required | date_format:Y",
-        'formularioAlumno.sexo' => "required | string | min:4 | max:8",
+        'dni' => "required | string | min:8",
+        'fecha_nacimiento' => "required | date_format:Y-m-d",
+        'telefono' => "required | string | min: 4",
+        'distrito' => "required | string ",
+        'direccion' => "required | string | min: 4",
+        'nombres' => "required | string | min: 4",
+        'apellido_paterno' => "required | string | min: 4",
+        'apellido_materno' => "required | string | min: 4",
+        'Ie_procedencia' => "required | string | min: 4",
+        'anio_egreso' => "required | date_format:Y",
+        'sexo' => "required | string | min:4 | max:8",
     ];
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->distritosRepository = new DistrictRepository();
         $this->ie_procedenciaRepository = new SchoolRepository();
         $this->_estudianteRepository = new StudentRepository();
     }
 
-    public function mount()
-    {
+    public function mount(){
         self::initialState();
         $this->lista_distritos = $this->distritosRepository->listaDistritos();
         $this->lista_ie_procedencia = $this->ie_procedenciaRepository->listarEscuelas();
-        $this->formularioAlumno = [ 'dni' => null, 'f_nac' => null, 'telefono' => null, 'distrito' => null, 'direccion' => null, 'nombres' => null,
-                                    'ap_paterno' => null, 'ap_materno' => null, 'Ie_procedencia' => null, 'anio_egreso' => null, 'sexo' => null ];
     }
 
-    public function render()
-    {
+    public function render(){
         return view('livewire.matricula.partials.alumno');
     }
 
-    public function initialState()
-    {
-        $this->reset(["formularioAlumno", "idEstudiante"]);
+    public function initialState(){
+        $this->reset([  "idEstudiante", "dni", "fecha_nacimiento", "telefono", "distrito", "direccion",
+                        "nombres", "apellido_paterno", "apellido_materno", "Ie_procedencia", "anio_egreso", "sexo" ]);
     }
 
     /***********************************************************  CRUD *************************************************************/
-    public function create()
-    {
+    public function create(){
         $this->validate();
         $moEstudiante = $this->_estudianteRepository->builderModelRepository();
-        $moEstudiante->apellido_paterno = formatInputStr( $this->formularioAlumno['ap_paterno'] ) ;
-        $moEstudiante->apellido_materno = formatInputStr( $this->formularioAlumno['ap_materno'] );
-        $moEstudiante->nombres = formatInputStr( $this->formularioAlumno['nombres'] );
-        $moEstudiante->direccion = formatInputStr( $this->formularioAlumno['direccion'] );
-        $moEstudiante->distrito = formatInputStr( $this->formularioAlumno['distrito'] );
-        $moEstudiante->telefono = formatInputStr( $this->formularioAlumno['telefono'] );
+        $moEstudiante->apellido_paterno = strtoupper($this->apellido_paterno);
+        $moEstudiante->apellido_materno = strtoupper($this->apellido_materno);
+        $moEstudiante->nombres = strtoupper( $this->nombres );
+        $moEstudiante->direccion = strtoupper( $this->direccion );
+        $moEstudiante->distrito = strtoupper( $this->distrito );
+        $moEstudiante->telefono = $this->telefono;
         // $moEstudiante->celular = '';
-        $moEstudiante->fecha_nacimiento = formatInputStr( $this->formularioAlumno['f_nac'] );
-        $moEstudiante->sexo = formatInputStr( $this->formularioAlumno['sexo'] );
-        $moEstudiante->dni = formatInputStr( $this->formularioAlumno['dni'] );
-        $moEstudiante->nombre_escuela = formatInputStr( $this->formularioAlumno['Ie_procedencia'] );
-        $moEstudiante->anio_graduacion = formatInputStr( $this->formularioAlumno['anio_egreso'] );
+        $moEstudiante->fecha_nacimiento = $this->fecha_nacimiento;
+        $moEstudiante->sexo = strtoupper( $this->sexo );
+        $moEstudiante->dni = $this->dni;
+        $moEstudiante->nombre_escuela = strtoupper( $this->Ie_procedencia );
+        $moEstudiante->anio_graduacion = $this->anio_egreso;
         // $moEstudiante->nombre_archivo_foto = '';
 
         try {
             $estudianteCreado = $this->_estudianteRepository->registrar($moEstudiante);
             $this->idEstudiante = $estudianteCreado->id;
-            $this->emit('cargar-data-apoderado', $estudianteCreado->id);
+            $this->emit('alumno-id-encontrado', $estudianteCreado->id);
             sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
         }
     }
 
-    public function update()
-    {
+    public function update(){
         $this->validate();
         $moEstudiante = $this->_estudianteRepository->builderModelRepository();
-        $moEstudiante->apellido_paterno = formatInputStr( $this->formularioAlumno['ap_paterno'] ) ;
-        $moEstudiante->apellido_materno = formatInputStr( $this->formularioAlumno['ap_materno'] );
-        $moEstudiante->nombres = formatInputStr( $this->formularioAlumno['nombres'] );
-        $moEstudiante->direccion = formatInputStr( $this->formularioAlumno['direccion'] );
-        $moEstudiante->distrito = formatInputStr( $this->formularioAlumno['distrito'] );
-        $moEstudiante->telefono = formatInputStr( $this->formularioAlumno['telefono'] );
+        $moEstudiante->apellido_paterno = strtoupper($this->apellido_paterno);
+        $moEstudiante->apellido_materno = strtoupper($this->apellido_materno);
+        $moEstudiante->nombres = strtoupper( $this->nombres );
+        $moEstudiante->direccion = strtoupper( $this->direccion );
+        $moEstudiante->distrito = strtoupper( $this->distrito );
+        $moEstudiante->telefono = $this->telefono;
         // $moEstudiante->celular = '';
-        $moEstudiante->fecha_nacimiento = formatInputStr( $this->formularioAlumno['f_nac'] );
-        $moEstudiante->sexo = formatInputStr( $this->formularioAlumno['sexo'] );
-        $moEstudiante->dni = formatInputStr( $this->formularioAlumno['dni'] );
-        $moEstudiante->nombre_escuela = formatInputStr( $this->formularioAlumno['Ie_procedencia'] );
-        $moEstudiante->anio_graduacion = formatInputStr( $this->formularioAlumno['anio_egreso'] );
+        $moEstudiante->fecha_nacimiento = $this->fecha_nacimiento;
+        $moEstudiante->sexo = strtoupper( $this->sexo );
+        $moEstudiante->dni = $this->dni;
+        $moEstudiante->nombre_escuela = strtoupper( $this->Ie_procedencia );
+        $moEstudiante->anio_graduacion = $this->anio_egreso;
         // $moEstudiante->nombre_archivo_foto = '';
 
         try {
@@ -121,57 +116,51 @@ class Alumno extends Component
     }
 
     /***********************************************************  Funciones listeners *************************************************************/
-    public function buscar_interno()
-    {
-        $this->validateOnly('formularioAlumno.dni');
-        $dni = $this->formularioAlumno['dni'];
-        $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($dni);
+    public function buscar_interno(){
+        $this->validateOnly('dni');
+        $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($this->dni);
 
         if ($informacionAlumno) {
-            $this->formularioAlumno = [
-                'dni' => $informacionAlumno->dni,
-                'f_nac' => $informacionAlumno->fechaNacimiento,
-                'telefono' => $informacionAlumno->telefono,
-                'distrito' => $informacionAlumno->distrito,
-                'direccion' => $informacionAlumno->direccion,
-                'nombres' => $informacionAlumno->nombre,
-                'ap_paterno' => $informacionAlumno->apPaterno,
-                'ap_materno' => $informacionAlumno->apMaterno,
-                'Ie_procedencia' => $informacionAlumno->ieProcedencia,
-                'anio_egreso' => $informacionAlumno->anioGraduacion,
-                'sexo' => $informacionAlumno->sexo,
-            ];
+            $this->dni = $informacionAlumno->dni;
+            $this->fecha_nacimiento = $informacionAlumno->fechaNacimiento;
+            $this->telefono = $informacionAlumno->telefono;
+            $this->distrito = $informacionAlumno->distrito;
+            $this->direccion = $informacionAlumno->direccion;
+            $this->nombres = $informacionAlumno->nombre;
+            $this->apellido_paterno = $informacionAlumno->apPaterno;
+            $this->apellido_materno = $informacionAlumno->apMaterno;
+            $this->Ie_procedencia = $informacionAlumno->ieProcedencia;
+            $this->anio_egreso = $informacionAlumno->anioGraduacion;
+            $this->sexo = $informacionAlumno->sexo;
             $this->idEstudiante = $informacionAlumno->idEstudiante;
-            $this->emit('cargar-data-apoderado', $informacionAlumno->idEstudiante);
+
+            $this->emit('alumno-id-encontrado', $informacionAlumno->idEstudiante);
             $this->validate();
         } else {
             toastAlert($this, 'El alumno no pudo ser encontrado', EstadosAlertasEnum::WARNING);
-            self::initialState();
-            $this->formularioAlumno['dni'] = $dni;
+            $this->reset([  "idEstudiante", "fecha_nacimiento", "telefono", "distrito", "direccion",
+                            "nombres", "apellido_paterno", "apellido_materno", "Ie_procedencia", "anio_egreso", "sexo" ]);
         }
     }
 
-    public function buscar_externo()
-    {
+    public function buscar_externo(){
     }
 
     public function cargarDataAlumno( string $dniEstudiante ){
         if( is_string($dniEstudiante) && strlen($dniEstudiante)>=8 ){
             $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($dniEstudiante);
             if ($informacionAlumno) {
-                $this->formularioAlumno = [
-                    'dni' => $informacionAlumno->dni,
-                    'f_nac' => $informacionAlumno->fechaNacimiento,
-                    'telefono' => $informacionAlumno->telefono,
-                    'distrito' => $informacionAlumno->distrito,
-                    'direccion' => $informacionAlumno->direccion,
-                    'nombres' => $informacionAlumno->nombre,
-                    'ap_paterno' => $informacionAlumno->apPaterno,
-                    'ap_materno' => $informacionAlumno->apMaterno,
-                    'Ie_procedencia' => $informacionAlumno->ieProcedencia,
-                    'anio_egreso' => $informacionAlumno->anioGraduacion,
-                    'sexo' => $informacionAlumno->sexo,
-                ];
+                $this->dni = $informacionAlumno->dni;
+                $this->fecha_nacimiento = $informacionAlumno->fechaNacimiento;
+                $this->telefono = $informacionAlumno->telefono;
+                $this->distrito = $informacionAlumno->distrito;
+                $this->direccion = $informacionAlumno->direccion;
+                $this->nombres = $informacionAlumno->nombre;
+                $this->apellido_paterno = $informacionAlumno->apPaterno;
+                $this->apellido_materno = $informacionAlumno->apMaterno;
+                $this->Ie_procedencia = $informacionAlumno->ieProcedencia;
+                $this->anio_egreso = $informacionAlumno->anioGraduacion;
+                $this->sexo = $informacionAlumno->sexo;
                 $this->idEstudiante = $informacionAlumno->idEstudiante;
                 $this->validate();
             } else  toastAlert($this, "No se pudo encontrar informacion del alumno con dni $dniEstudiante", EstadosAlertasEnum::WARNING);
@@ -179,13 +168,15 @@ class Alumno extends Component
         else toastAlert($this, "Dni $dniEstudiante con formato incorrecto", EstadosAlertasEnum::WARNING);
     }
 
-    public function setData( $data )
-    {
-        $this->formularioAlumno[$data['name']] = $data['value'];
+    public function setData( $data ){
+        $this['name'] = $data['value'];
     }
 
-    public function enviarDataAutocomplete()
-    {
+    public function tesdt($asd){
+        toastAlert($this, $asd);
+    }
+
+    public function enviarDataAutocomplete(){
         $this->emit('data-autocomplete-alumno', (object)[
             "distritos" => $this->lista_distritos,
             "instituciones" => $this->lista_ie_procedencia,

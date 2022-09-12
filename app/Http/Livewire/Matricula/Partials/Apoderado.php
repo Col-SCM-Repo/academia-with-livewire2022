@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Matricula;
+namespace App\Http\Livewire\Matricula\Partials;
 
 use App\Enums\EstadosAlertasEnum;
 use App\Enums\EstadosEntidadEnum;
@@ -80,7 +80,7 @@ class Apoderado extends Component
     {
         if($this->idEstudiante)
             $this->listaApoderadosEstudiante = $this->_apoderadoRepository->getListaApoderados($this->idEstudiante);
-        return view('livewire.matricula.apoderado');
+        return view('livewire.matricula.partials.apoderado');
     }
 
     /***********************************************************  CRUD *************************************************************/

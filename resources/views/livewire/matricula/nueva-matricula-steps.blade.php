@@ -11,27 +11,27 @@
             <div id="tab-1" class="tab-pane active">
                 <div class="panel-body ">
                     <!-- Begin: contenido alumno -->
-                        @livewire('matricula.alumno')
+                        @livewire('matricula.partials.alumno')
                     <!-- End: contenido alumno -->
                 </div>
             </div>
             <div id="tab-2" class="tab-pane">
                 <div class="panel-body ">
                     <!-- Begin: contenido apoderado -->
-                        @livewire('matricula.apoderado')
+                        @livewire('matricula.partials.apoderado')
                     <!-- End: contenido apoderado -->
                 </div>
             </div>
             <div id="tab-3" class="tab-pane">
                 <div class="panel-body ">
                     <!-- Begin: contenido matricula -->
-                        @livewire('matricula.matricula')
+                        @livewire('matricula.partials.matricula')
                     <!-- End: contenido matricula -->
                 </div>
             </div>
             <div id="tab-4" class="tab-pane">
                 <!-- Begin: contenido pagos -->
-                        @livewire('matricula.pago')
+                        @livewire('matricula.partials.pago')
                 <!-- End: contenido pagos -->
             </div>
         </div>
