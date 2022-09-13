@@ -21,7 +21,7 @@ class Alumno extends Component
     private $distritosRepository, $ie_procedenciaRepository, $_estudianteRepository;
 
     protected $listeners = [
-        'reset-form-alumno' => 'initialState',
+        'reset-alumno' => 'initialState',
         'pagina-cargada-alumno' => 'enviarDataAutocomplete',
         'cargar-data-alumno' => 'cargarDataAlumno',
     ];
@@ -64,25 +64,11 @@ class Alumno extends Component
     /***********************************************************  CRUD *************************************************************/
     public function create(){
         $this->validate();
-        $moEstudiante = $this->_estudianteRepository->builderModelRepository();
-        $moEstudiante->apellido_paterno = strtoupper($this->apellido_paterno);
-        $moEstudiante->apellido_materno = strtoupper($this->apellido_materno);
-        $moEstudiante->nombres = strtoupper( $this->nombres );
-        $moEstudiante->direccion = strtoupper( $this->direccion );
-        $moEstudiante->distrito = strtoupper( $this->distrito );
-        $moEstudiante->telefono = $this->telefono;
-        // $moEstudiante->celular = '';
-        $moEstudiante->fecha_nacimiento = $this->fecha_nacimiento;
-        $moEstudiante->sexo = strtoupper( $this->sexo );
-        $moEstudiante->dni = $this->dni;
-        $moEstudiante->nombre_escuela = strtoupper( $this->Ie_procedencia );
-        $moEstudiante->anio_graduacion = $this->anio_egreso;
-        // $moEstudiante->nombre_archivo_foto = '';
-
+        $modeloEstudiante = self::buildModeloEstudiante();
         try {
-            $estudianteCreado = $this->_estudianteRepository->registrar($moEstudiante);
+            $estudianteCreado = $this->_estudianteRepository->registrar($modeloEstudiante);
             $this->idEstudiante = $estudianteCreado->id;
-            $this->emit('alumno-id-encontrado', $estudianteCreado->id);
+            $this->emitUp('alumno-id-encontrado', $estudianteCreado->id);
             sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
@@ -91,23 +77,9 @@ class Alumno extends Component
 
     public function update(){
         $this->validate();
-        $moEstudiante = $this->_estudianteRepository->builderModelRepository();
-        $moEstudiante->apellido_paterno = strtoupper($this->apellido_paterno);
-        $moEstudiante->apellido_materno = strtoupper($this->apellido_materno);
-        $moEstudiante->nombres = strtoupper( $this->nombres );
-        $moEstudiante->direccion = strtoupper( $this->direccion );
-        $moEstudiante->distrito = strtoupper( $this->distrito );
-        $moEstudiante->telefono = $this->telefono;
-        // $moEstudiante->celular = '';
-        $moEstudiante->fecha_nacimiento = $this->fecha_nacimiento;
-        $moEstudiante->sexo = strtoupper( $this->sexo );
-        $moEstudiante->dni = $this->dni;
-        $moEstudiante->nombre_escuela = strtoupper( $this->Ie_procedencia );
-        $moEstudiante->anio_graduacion = $this->anio_egreso;
-        // $moEstudiante->nombre_archivo_foto = '';
-
+        $modeloEstudiante = self::buildModeloEstudiante();
         try {
-            $this->_estudianteRepository->actualizar($this->idEstudiante, $moEstudiante);
+            $this->_estudianteRepository->actualizar($this->idEstudiante, $modeloEstudiante);
             sweetAlert($this, 'alumno', EstadosEntidadEnum::UPDATED);
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage() );
@@ -120,21 +92,8 @@ class Alumno extends Component
         $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($this->dni);
 
         if ($informacionAlumno) {
-            $this->dni = $informacionAlumno->dni;
-            $this->fecha_nacimiento = $informacionAlumno->fechaNacimiento;
-            $this->telefono = $informacionAlumno->telefono;
-            $this->distrito = $informacionAlumno->distrito;
-            $this->direccion = $informacionAlumno->direccion;
-            $this->nombres = $informacionAlumno->nombre;
-            $this->apellido_paterno = $informacionAlumno->apPaterno;
-            $this->apellido_materno = $informacionAlumno->apMaterno;
-            $this->Ie_procedencia = $informacionAlumno->ieProcedencia;
-            $this->anio_egreso = $informacionAlumno->anioGraduacion;
-            $this->sexo = $informacionAlumno->sexo;
-            $this->idEstudiante = $informacionAlumno->idEstudiante;
-
-            $this->emit('alumno-id-encontrado', $informacionAlumno->idEstudiante);
-            $this->validate();
+            self::vincularInformacionEstudiante($informacionAlumno);
+            $this->emitUp('alumno-id-encontrado', $informacionAlumno->idEstudiante);
         } else {
             toastAlert($this, 'El alumno no pudo ser encontrado', EstadosAlertasEnum::WARNING);
             $this->reset([  "idEstudiante", "fecha_nacimiento", "telefono", "distrito", "direccion",
@@ -145,35 +104,50 @@ class Alumno extends Component
     public function buscar_externo(){
     }
 
-    public function cargarDataAlumno( string $dniEstudiante ){
-        if( is_string($dniEstudiante) && strlen($dniEstudiante)>=8 ){
-            $informacionAlumno = $this->_estudianteRepository->getInformacionEstudiante($dniEstudiante);
-            if ($informacionAlumno) {
-                $this->dni = $informacionAlumno->dni;
-                $this->fecha_nacimiento = $informacionAlumno->fechaNacimiento;
-                $this->telefono = $informacionAlumno->telefono;
-                $this->distrito = $informacionAlumno->distrito;
-                $this->direccion = $informacionAlumno->direccion;
-                $this->nombres = $informacionAlumno->nombre;
-                $this->apellido_paterno = $informacionAlumno->apPaterno;
-                $this->apellido_materno = $informacionAlumno->apMaterno;
-                $this->Ie_procedencia = $informacionAlumno->ieProcedencia;
-                $this->anio_egreso = $informacionAlumno->anioGraduacion;
-                $this->sexo = $informacionAlumno->sexo;
-                $this->idEstudiante = $informacionAlumno->idEstudiante;
-                $this->validate();
-            } else  toastAlert($this, "No se pudo encontrar informacion del alumno con dni $dniEstudiante", EstadosAlertasEnum::WARNING);
-        }
-        else toastAlert($this, "Dni $dniEstudiante con formato incorrecto", EstadosAlertasEnum::WARNING);
-    }
-
-    public function enviarDataAutocomplete(){
-        $this->emit('data-autocomplete-alumno', (object)[
-            "distritos" => $this->lista_distritos,
-            "instituciones" => $this->lista_ie_procedencia,
-        ]);
+    public function cargarDataAlumno( string $estudiante_dni ){
+        $this->validateOnly('dni');
+        self::initialState();
+        $this->dni = $estudiante_dni;
+        $informacionEstudiante = $this->_estudianteRepository->getInformacionEstudiante($estudiante_dni);
+        if ($informacionEstudiante) self::vincularInformacionEstudiante($informacionEstudiante);
+        else  toastAlert($this, "No se pudo encontrar informacion del alumno con dni $estudiante_dni", EstadosAlertasEnum::WARNING);
     }
 
     /***********************************************************  Funciones internas *************************************************************/
+    private function buildModeloEstudiante(){
+        $moEstudiante = $this->_estudianteRepository->builderModelRepository();
+        $moEstudiante->apellido_paterno = strtoupper($this->apellido_paterno);
+        $moEstudiante->apellido_materno = strtoupper($this->apellido_materno);
+        $moEstudiante->nombres = strtoupper( $this->nombres );
+        $moEstudiante->direccion = strtoupper( $this->direccion );
+        $moEstudiante->distrito = strtoupper( $this->distrito );
+        $moEstudiante->telefono = $this->telefono;
+        // $moEstudiante->celular = '';
+        $moEstudiante->fecha_nacimiento = $this->fecha_nacimiento;
+        $moEstudiante->sexo = strtoupper( $this->sexo );
+        $moEstudiante->dni = $this->dni;
+        $moEstudiante->nombre_escuela = strtoupper( $this->Ie_procedencia );
+        $moEstudiante->anio_graduacion = $this->anio_egreso;
+        // $moEstudiante->nombre_archivo_foto = '';
+        return $moEstudiante;
+    }
+    private function vincularInformacionEstudiante($alumno){
+        $this->dni = $alumno->dni;
+        $this->fecha_nacimiento = $alumno->fechaNacimiento;
+        $this->telefono = $alumno->telefono;
+        $this->distrito = $alumno->distrito;
+        $this->direccion = $alumno->direccion;
+        $this->nombres = $alumno->nombre;
+        $this->apellido_paterno = $alumno->apPaterno;
+        $this->apellido_materno = $alumno->apMaterno;
+        $this->Ie_procedencia = $alumno->ieProcedencia;
+        $this->anio_egreso = $alumno->anioGraduacion;
+        $this->sexo = $alumno->sexo;
+        $this->idEstudiante = $alumno->idEstudiante;
+        $this->validate();
+    }
 
+    public function enviarDataAutocomplete(){
+        $this->emit('data-autocomplete-alumno', (object)[ "distritos" => $this->lista_distritos, "instituciones" => $this->lista_ie_procedencia]);
+    }
 }

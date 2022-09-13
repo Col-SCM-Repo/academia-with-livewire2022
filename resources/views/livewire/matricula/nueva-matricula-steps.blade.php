@@ -30,9 +30,11 @@
                 </div>
             </div>
             <div id="tab-4" class="tab-pane">
+                <div class="panel-body ">
                 <!-- Begin: contenido pagos -->
                         @livewire('matricula.partials.pago')
                 <!-- End: contenido pagos -->
+                </div>
             </div>
         </div>
     </div>

@@ -111,17 +111,16 @@ class RelativeRepository extends Relative
         return $apoderado;
     }
 
-    public function eliminar($dni)
+    public function eliminar(int $apoderadoId)
     {
-        $Apoderado = self::buscarApoderado($dni);
-        if ($Apoderado) {
-            $Apoderado->delete();
-            return true;
-        }
-        return false;
+        $apoderado = Relative::find($apoderadoId);
+        if (!$apoderado)  throw new NotFoundResourceException("Error, no se encontro el apoderado con el codigo: $apoderadoId");
+        $apoderado->delete();
+        return true;
     }
 
-    public function getListaApoderados( int $estudianteId ){
+    public function getListaApoderados( $estudianteId ){
+        if(!$estudianteId) return  array();
         $listaApoderados = array();
         $relacionesApoderado = Relative::where('student_id', $estudianteId)->get();
         foreach ($relacionesApoderado as $relacion) {

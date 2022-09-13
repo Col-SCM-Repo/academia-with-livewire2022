@@ -122,6 +122,7 @@
     <!-- Sweet Alert -->
     <script src="{{ asset('inspinia_admin/js/plugins/sweetalert/sweetalert.min.js') }}"></script>
 
+    @livewireScripts
     <!-- Application (laravel) -->
     <script src="{{ asset('js/app.js') }}"></script>
 
@@ -134,7 +135,6 @@
                 });
             });
     </script>
-    @livewireScripts
 
     @stack('scripts')
     <!------ Alerts ------>

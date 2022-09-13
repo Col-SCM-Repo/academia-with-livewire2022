@@ -2,20 +2,19 @@
 
 namespace App\Http\Livewire\Matricula\Partials;
 
-use App\Enums\EstadosAlertasEnum;
-use App\Enums\EstadosEntidadEnum;
-use App\Repository\DistrictRepository;
-use App\Repository\OccupationRepository;
-use App\Repository\RelativeRepository;
+use App\Enums\{EstadosAlertasEnum, EstadosEntidadEnum};
+use App\Repository\{DistrictRepository, OccupationRepository, RelativeRepository};
 use Exception;
 use Livewire\Component;
 
 class Apoderado extends Component
 {
-    // $formularioApoderado
-    public  $idEstudiante, $listaApoderadosEstudiante;
-    public  $relative_id, $dni, $fecha_nacimiento, $telefono, $distrito, $direccion, 
-            $parentesco,$apellido_paterno, $apellido_materno, $ocupacion, $sexo, $estado_marital;
+    public  $idEstudiante;
+
+    //Formulario Apoderado
+    public  $relative_id;
+    public  $dni, $fecha_nacimiento, $telefono, $distrito, $direccion,
+            $parentesco, $nombres, $apellido_paterno, $apellido_materno, $ocupacion, $sexo, $estado_marital;
 
     public  $lista_distritos, $lista_ocupaciones;
     private $_distritosRepository, $_ocupacionRepository, $_apoderadoRepository;
@@ -24,12 +23,13 @@ class Apoderado extends Component
         'reset-form-apoderado' => 'initialState',
         'pagina-cargada-apoderado' => 'enviarDataAutocomplete',
         'change-props-apoderado' => 'setData',
-        'cargar-data-apoderado' => 'cargarDataApoderado',
+        'cargar-id-estudiante' => 'cambiarIdEstudiante',
+        'eliminar-apoderado' => 'delete',
     ];
 
     protected $rules = [
         'idEstudiante' => "required | integer | min:0",
-        
+
         'relative_id' => "nullable | integer | min:0",
         'dni' => "required | string | min:8",
         'fecha_nacimiento' => "required | date_format:Y-m-d",
@@ -55,7 +55,7 @@ class Apoderado extends Component
 
     public function initialState( )
     {
-        $this->reset([  'relative_id', 'dni', 'fecha_nacimiento', 'telefono', 'distrito', 'direccion', 'parentesco', 
+        $this->reset([  'relative_id', 'dni', 'fecha_nacimiento', 'telefono', 'distrito', 'direccion', 'parentesco',
                         'nombres', 'apellido_paterno', 'apellido_materno', 'ocupacion', 'sexo', 'estado_marital']);
     }
 
@@ -68,35 +68,16 @@ class Apoderado extends Component
 
     public function render()
     {
-        if($this->idEstudiante)
-            $this->listaApoderadosEstudiante = $this->_apoderadoRepository->getListaApoderados($this->idEstudiante);
-        return view('livewire.matricula.partials.apoderado');
+        return view('livewire.matricula.partials.apoderado')->with('lista_apoderados', $this->_apoderadoRepository->getListaApoderados($this->idEstudiante));
     }
 
     /***********************************************************  CRUD *************************************************************/
     public function create()
     {
         $this->validate();
-        $moApoderado = $this->_apoderadoRepository->builderModelRepository();
-        $moApoderado->apellido_paterno = strtoupper($this->apellido_paterno);
-        $moApoderado->apellido_materno = strtoupper($this->apellido_materno);
-        $moApoderado->nombres = strtoupper($this->nombres);
-        $moApoderado->direccion = strtoupper($this->direccion);
-        $moApoderado->distrito = strtoupper($this->distrito);
-        $moApoderado->telefono = $this->telefono;
-        //$moApoderado->celular = '';
-        //$moApoderado->email = '';
-        $moApoderado->fecha_nacimiento = $this->fecha_nacimiento;
-        $moApoderado->sexo = strtoupper($this->sexo);
-        $moApoderado->dni = $this->dni;
-        $moApoderado->estado_marital = strtoupper($this->estado_marital);
-        //$moApoderado->grado_de_instruccion = '';
-        $moApoderado->estudiante_id = $this->idEstudiante ;
-        $moApoderado->parentesco = strtoupper($this->parentesco);
-        $moApoderado->ocupacion = strtoupper($this->ocupacion);
-
+        $modeloApoderado =self::buildModeloApoderado();
         try {
-            $this->_apoderadoRepository->registrar($moApoderado);
+            $this->_apoderadoRepository->registrar($modeloApoderado);
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::CREATED);
             openModal($this, '#form-modal-apoderado', false);
             self::initialState();
@@ -108,28 +89,23 @@ class Apoderado extends Component
     public function update()
     {
         $this->validate();
-        $moApoderado = $this->_apoderadoRepository->builderModelRepository();
-        $moApoderado->apellido_paterno = strtoupper($this->apellido_paterno);
-        $moApoderado->apellido_materno = strtoupper($this->apellido_materno);
-        $moApoderado->nombres = strtoupper($this->nombres);
-        $moApoderado->direccion = strtoupper($this->direccion);
-        $moApoderado->distrito = strtoupper($this->distrito);
-        $moApoderado->telefono = $this->telefono;
-        //$moApoderado->celular = '';
-        //$moApoderado->email = '';
-        $moApoderado->fecha_nacimiento = $this->fecha_nacimiento;
-        $moApoderado->sexo = strtoupper($this->sexo);
-        $moApoderado->dni = $this->dni;
-        $moApoderado->estado_marital = strtoupper($this->estado_marital);
-        //$moApoderado->grado_de_instruccion = '';
-        $moApoderado->estudiante_id = $this->idEstudiante ;
-        $moApoderado->parentesco = strtoupper($this->parentesco);
-        $moApoderado->ocupacion = strtoupper($this->ocupacion);
-
+        $modeloApoderado =self::buildModeloApoderado();
         try {
-            $this->_apoderadoRepository->actualizar($this->relative_id, $moApoderado);
+            $this->_apoderadoRepository->actualizar($this->relative_id, $modeloApoderado);
             sweetAlert($this, 'apoderado', EstadosEntidadEnum::UPDATED);
             openModal($this, '#form-modal-apoderado', false);
+            self::initialState();
+        } catch (Exception $err) {
+            toastAlert( $this, $err->getMessage());
+        }
+    }
+
+    public function delete( int $apoderado_id )
+    {
+        dd($apoderado_id);
+        try {
+            $this->_apoderadoRepository->eliminar($apoderado_id);
+            sweetAlert($this, 'apoderado', EstadosEntidadEnum::DELETED);
             self::initialState();
         } catch (Exception $err) {
             toastAlert( $this, $err->getMessage());
@@ -141,43 +117,18 @@ class Apoderado extends Component
     {
         $this->validateOnly('dni');
         $this->validateOnly('idEstudiante');
-
         $informacionApoderado = $this->_apoderadoRepository->buscarApoderadoInterno($this->dni, $this->idEstudiante);
         if ($informacionApoderado) {
-            $this->idEstudiante= $this->idEstudiante;                   // eva;liar
-
-            $this->relative_id= $informacionApoderado->idRelacionApoderado;
-            $this->dni= $informacionApoderado->dni;
-            $this->fecha_nacimiento= $informacionApoderado->fechaNacimiento;
-            $this->telefono= $informacionApoderado->telefono;
-            $this->distrito= $informacionApoderado->distrito;
-            $this->direccion= $informacionApoderado->direccion;
-            $this->parentesco= $informacionApoderado->parentesco;
-            $this->nombres= $informacionApoderado->nombre;
-            $this->apellido_paterno= $informacionApoderado->apPaterno;
-            $this->apellido_materno= $informacionApoderado->apMaterno;
-            $this->ocupacion= $informacionApoderado->ocupacion;
-            $this->sexo= $informacionApoderado->sexo;
-            $this->estado_marital= $informacionApoderado->estado_marital;
-            $this->validate();
+            self::vincularInformacionApoderado($informacionApoderado);
         } else {
-            $this->reset([  'relative_id', 'fecha_nacimiento', 'telefono', 'distrito', 'direccion', 'parentesco', 
-                            'nombres', 'apellido_paterno', 'apellido_materno', 'ocupacion', 'sexo', 'estado_marital']);
+            $this->reset([  'relative_id', 'fecha_nacimiento', 'telefono', 'distrito', 'direccion', 'parentesco', 'nombres', 'apellido_paterno', 'apellido_materno', 'ocupacion', 'sexo', 'estado_marital']);
             toastAlert($this, 'No se encontrò al apoderado.', EstadosAlertasEnum::WARNING);
         }
     }
 
-    public function enviarDataAutocomplete()
-    {
-        $this->emit('data-autocomplete-apoderado', (object)[
-            "distritos" => $this->lista_distritos,
-            "ocupaciones" => $this->lista_ocupaciones,
-        ]);
-    }
-
-    public function cargarDataApoderado( int $estudianteId){
-        $this->idEstudiante = $estudianteId;
-        $this->listaApoderadosEstudiante = $this->_apoderadoRepository->getListaApoderados($estudianteId);
+    public function cambiarIdEstudiante( int $estudiante_id){
+        self::initialState();
+        $this->idEstudiante = $estudiante_id;
     }
 
     /***********************************************************  Funciones modal *************************************************************/
@@ -190,31 +141,58 @@ class Apoderado extends Component
     public function editarApoderado(int $apoderadoId)
     {
         self::initialState();
-
-        $this->formularioApoderado['relative_id'] = $apoderadoId;
-        $apoderado = $this->_apoderadoRepository->getApoderadoPorId( $apoderadoId );
-        if($apoderado){
-            $this->formularioApoderado = [
-                'dni' => $apoderado->dni,
-                'f_nac' => $apoderado->fechaNacimiento,
-                'telefono' => $apoderado->telefono,
-                'distrito' => $apoderado->distrito,
-                'direccion' => $apoderado->direccion,
-                'nombres' => $apoderado->nombre,
-                'ap_paterno' => $apoderado->apPaterno,
-                'ap_materno' => $apoderado->apMaterno,
-                'ocupacion' => $apoderado->ocupacion,
-                'parentesco' => $apoderado->parentesco,
-                'sexo' => $apoderado->sexo,
-                'estado_marital' => $apoderado->estado_marital,
-                'student_id'=> $this->idEstudiante,
-                'relative_id'=> $apoderado->idRelacionApoderado,
-            ];
+        $this->relative_id = $apoderadoId;
+        $apoderado = $this->_apoderadoRepository->getApoderadoPorId($apoderadoId);
+        if($apoderado) {
+            self::vincularInformacionApoderado($apoderado);
+            openModal($this, '#form-modal-apoderado');
         }
-        else toastAlert($this, 'Error al cargar datos del apoderado.', EstadosAlertasEnum::WARNING);
-        $this->validate();
-        openModal($this, '#form-modal-apoderado');
+        else
+            toastAlert($this, 'Error al cargar datos del apoderado.', EstadosAlertasEnum::WARNING);
     }
-    /***********************************************************  Funciones internas *************************************************************/
 
+    /***********************************************************  Funciones internas *************************************************************/
+    private function buildModeloApoderado(){
+        $moApoderado = $this->_apoderadoRepository->builderModelRepository();
+        $moApoderado->apellido_paterno = strtoupper($this->apellido_paterno);
+        $moApoderado->apellido_materno = strtoupper($this->apellido_materno);
+        $moApoderado->nombres = strtoupper($this->nombres);
+        $moApoderado->direccion = strtoupper($this->direccion);
+        $moApoderado->distrito = strtoupper($this->distrito);
+        $moApoderado->telefono = $this->telefono;
+        //$moApoderado->celular = '';
+        //$moApoderado->email = '';
+        $moApoderado->fecha_nacimiento = $this->fecha_nacimiento;
+        $moApoderado->sexo = strtoupper($this->sexo);
+        $moApoderado->dni = $this->dni;
+        $moApoderado->estado_marital = strtoupper($this->estado_marital);
+        //$moApoderado->grado_de_instruccion = '';
+        $moApoderado->estudiante_id = $this->idEstudiante ;
+        $moApoderado->parentesco = strtoupper($this->parentesco);
+        $moApoderado->ocupacion = strtoupper($this->ocupacion);
+        return $moApoderado;
+    }
+
+    private function vincularInformacionApoderado( object $apoderadoObj ){
+        /* $this->idEstudiante= $this->idEstudiante; */                   // eva;liar
+        $this->relative_id= $apoderadoObj->idRelacionApoderado;
+        $this->dni= $apoderadoObj->dni;
+        $this->fecha_nacimiento= $apoderadoObj->fechaNacimiento;
+        $this->telefono= $apoderadoObj->telefono;
+        $this->distrito= $apoderadoObj->distrito;
+        $this->direccion= $apoderadoObj->direccion;
+        $this->parentesco= $apoderadoObj->parentesco;
+        $this->nombres= $apoderadoObj->nombre;
+        $this->apellido_paterno= $apoderadoObj->apPaterno;
+        $this->apellido_materno= $apoderadoObj->apMaterno;
+        $this->ocupacion= $apoderadoObj->ocupacion;
+        $this->sexo= $apoderadoObj->sexo;
+        $this->estado_marital= $apoderadoObj->estado_marital;
+        $this->validate();
+    }
+
+    public function enviarDataAutocomplete()
+    {
+        $this->emit('data-autocomplete-apoderado', (object)[ "distritos" => $this->lista_distritos, "ocupaciones" => $this->lista_ocupaciones ]);
+    }
 }

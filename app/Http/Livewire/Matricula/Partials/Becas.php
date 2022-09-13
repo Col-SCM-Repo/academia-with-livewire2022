@@ -50,7 +50,7 @@ class Becas extends Component
         $this->descuento=0;
         self::initialState();
 
-        $this->matriculaId=100;
+        $this->matriculaId=300;
     }
 
     public function render()

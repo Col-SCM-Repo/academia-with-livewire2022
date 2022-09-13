@@ -18,12 +18,11 @@
                         <div class="col-md-10 col-lg-9">
                             <div class="input-group ">
                                 <input type="text" wire:model.defer="dni"
-                                    placeholder="Numero de DNI o carnet de extranjeria " class="form-control ">
+                                    placeholder="Numero de DNI o carnet de extranjeria " class="form-control " {{ $idEstudiante?'disabled':''}}>
                                 <span class="input-group-btn">
                                     <button type="button" wire:click="buscar_interno"
                                         class="btn btn-outline btn-primary"
-                                        title="Buscar en la base de datos interna del colegio" {{ $idEstudiante
-                                        ? 'disabled' :'' }}>
+                                        title="Buscar en la base de datos interna del colegio" {{ $idEstudiante?'disabled':''}}>
                                         <i class="fa fa-search" aria-hidden="true"></i>
                                     </button>
                                 </span>
@@ -53,7 +52,7 @@
                     </div>
                     <div class="form-group" x-data=""><label class="col-md-2 col-lg-3 control-label">Distrito</label>
                         <div class="col-md-10 col-lg-9 ui-widget">
-                            <input type="text" name="distrito" id="distrito" title="Distrito de procedencia. "
+                            <input type="text" name="distrito" id="distrito" title="Distrito de procedencia. " wire:model.defer="distrito"
                                 wire:change="$set('distrito', $event.target.value)" class=" form-control"
                                 autocomplete="off">
                             <x-input-error variable='distrito'> </x-input-error>
@@ -97,7 +96,7 @@
                         <div class="col-md-10 col-lg-9">
                             <input type="text" name="Ie_procedencia" autocomplete="off"
                                 wire:change="$set('Ie_procedencia', $event.target.value)"
-                                title="instituciòn de procedencia" id="Ie_procedencia" class="form-control ">
+                                title="instituciòn de procedencia" id="Ie_procedencia" class="form-control " wire:model.defer="Ie_procedencia">
                             <x-input-error variable='Ie_procedencia'> </x-input-error>
                         </div>
                     </div>
