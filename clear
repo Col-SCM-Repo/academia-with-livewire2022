@@ -1,0 +1,10 @@
+
+                                            
+  Command "config" is not defined.          
+                                            
+  Did you mean one of these?                
+      config:cache                          
+      config:clear                          
+      livewire:configure-s3-upload-cleanup  
+                                            
+

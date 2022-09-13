@@ -1,13 +1,13 @@
 <div class="ibox">
     <div class="ibox-title">
-            <h5> DATOS DEL ALUMNO </h5>
-            <div class="ibox-tools">
-                @if ($idEstudiante)
-                    <span class="label label-primary pull-right"> Registrado </span>
-                @else
-                    <span class="label label-warning-light pull-right"> Sin registrar </span>
-                @endif
-            </div>
+        <h5> DATOS DEL ALUMNO </h5>
+        <div class="ibox-tools">
+            @if ($idEstudiante)
+            <span class="label label-primary pull-right"> Registrado </span>
+            @else
+            <span class="label label-warning-light pull-right"> Sin registrar </span>
+            @endif
+        </div>
     </div>
     <div class="ibox-content">
         <form class="row " wire:submit.prevent="{{ $idEstudiante? 'update' : 'create' }}">
@@ -18,12 +18,12 @@
                         <div class="col-md-10 col-lg-9">
                             <div class="input-group ">
                                 <input type="text" wire:model.defer="dni"
-                                    placeholder="Numero de DNI o carnet de extranjeria "
-                                    class="form-control ">
+                                    placeholder="Numero de DNI o carnet de extranjeria " class="form-control ">
                                 <span class="input-group-btn">
                                     <button type="button" wire:click="buscar_interno"
                                         class="btn btn-outline btn-primary"
-                                        title="Buscar en la base de datos interna del colegio" {{ $idEstudiante ? 'disabled':'' }}>
+                                        title="Buscar en la base de datos interna del colegio" {{ $idEstudiante
+                                        ? 'disabled' :'' }}>
                                         <i class="fa fa-search" aria-hidden="true"></i>
                                     </button>
                                 </span>
@@ -46,23 +46,23 @@
                     </div>
                     <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Telefono:</label>
                         <div class="col-md-10 col-lg-9">
-                            <input type="text" wire:model.defer="telefono"
-                                title="Ingrese un numero de contacto. " class="form-control ">
+                            <input type="text" wire:model.defer="telefono" title="Ingrese un numero de contacto. "
+                                class="form-control ">
                             <x-input-error variable='telefono'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group" x-data="" ><label class="col-md-2 col-lg-3 control-label">Distrito</label>
+                    <div class="form-group" x-data=""><label class="col-md-2 col-lg-3 control-label">Distrito</label>
                         <div class="col-md-10 col-lg-9 ui-widget">
-                            <input type="text" name="distrito" {{-- wire:model.defer="distrito" --}}
-                                id="distrito" title="Distrito de procedencia. " wire:change="tesdt"
-                                class=" form-control" autocomplete="off"  >
+                            <input type="text" name="distrito" id="distrito" title="Distrito de procedencia. "
+                                wire:change="$set('distrito', $event.target.value)" class=" form-control"
+                                autocomplete="off">
                             <x-input-error variable='distrito'> </x-input-error>
                         </div>
                     </div>
                     <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Dirección</label>
                         <div class="col-md-10 col-lg-9">
-                            <input type="text" wire:model.defer="direccion"
-                                title="Direciòn de procedencia. " class="form-control ">
+                            <input type="text" wire:model.defer="direccion" title="Direciòn de procedencia. "
+                                class="form-control ">
                             <x-input-error variable='direccion'> </x-input-error>
                         </div>
                     </div>
@@ -72,32 +72,32 @@
                 <div class="form-horizontal">
                     <div class="form-group"><label class="col-md-2 col-lg-3 control-label">Nombres:</label>
                         <div class="col-md-10 col-lg-9">
-                            <input type="text" wire:model.defer="nombres"
-                                title="Nombres completos del alumno." class="form-control ">
+                            <input type="text" wire:model.defer="nombres" title="Nombres completos del alumno."
+                                class="form-control ">
                             <x-input-error variable='nombres'> </x-input-error>
                         </div>
                     </div>
                     <div class="form-group"><label class="col-md-2 col-lg-3 control-label">A.Paterno</label>
                         <div class="col-md-10 col-lg-9">
-                            <input type="text" wire:model.defer="apellido_paterno"
-                                title="Apellido paterno del alumno." class="form-control ">
+                            <input type="text" wire:model.defer="apellido_paterno" title="Apellido paterno del alumno."
+                                class="form-control ">
                             <x-input-error variable='apellido_paterno'> </x-input-error>
                         </div>
                     </div>
 
                     <div class="form-group"><label class="col-md-2 col-lg-3 control-label">A.Materno</label>
                         <div class="col-md-10 col-lg-9">
-                            <input type="text" wire:model.defer="apellido_materno"
-                                title="Apellido materno del alumno." class="form-control  ">
+                            <input type="text" wire:model.defer="apellido_materno" title="Apellido materno del alumno."
+                                class="form-control  ">
                             <x-input-error variable='apellido_materno'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" x-data="">
                         <label class="col-md-2 col-lg-3 control-label">I.E. Proc.</label>
                         <div class="col-md-10 col-lg-9">
-                            <input type="text" name="Ie_procedencia" autocomplete="off" wire:model.defer="Ie_procedencia"
-                                title="instituciòn de procedencia" id="Ie_procedencia"
-                                class="form-control " >
+                            <input type="text" name="Ie_procedencia" autocomplete="off"
+                                wire:change="$set('Ie_procedencia', $event.target.value)"
+                                title="instituciòn de procedencia" id="Ie_procedencia" class="form-control ">
                             <x-input-error variable='Ie_procedencia'> </x-input-error>
                         </div>
                     </div>
@@ -121,12 +121,12 @@
                         <br>
                         <div class="col-lg-6">
                             @error('anio_egreso')
-                                <small class="pr-1 text-danger" role="alert"> * El año de egreso es requerido </small>
+                            <small class="pr-1 text-danger" role="alert"> * El año de egreso es requerido </small>
                             @enderror
                         </div>
                         <div class="col-lg-6">
                             @error('sexo')
-                                <small class="pr-1 text-danger" role="alert"> * El campo sexo es requerido </small>
+                            <small class="pr-1 text-danger" role="alert"> * El campo sexo es requerido </small>
                             @enderror
                         </div>
                     </div>
@@ -149,13 +149,6 @@
             Livewire.on( 'data-autocomplete-alumno', ({ distritos, instituciones  })=>{
                 $( "#distrito" ).typeahead({ source: distritos });
                 $( "#Ie_procedencia" ).typeahead({ source: instituciones });
-
-                /* $( "#distrito" ).change( (e) => {
-                    console.log($wire)
-                } ); */
-                $( "#Ie_procedencia" ).change( (e) => {
-                    Livewire.emit('change-props-alumno', { name: e.target.name, value: e.target.value   })
-                } );
             });
         });
     </script>

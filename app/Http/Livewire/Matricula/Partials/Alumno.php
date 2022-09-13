@@ -12,8 +12,8 @@ use Livewire\Component;
 
 class Alumno extends Component
 {
-    // Propiedades del formularioAlumno
-    public  $idEstudiante, $formularioAlumno;
+    // Formulario alumno
+    public  $idEstudiante;
     public  $fecha_nacimiento, $dni, $distrito, $telefono, $nombres, $direccion, $apellido_materno,
             $apellido_paterno, $anio_egreso, $Ie_procedencia, $sexo;
 
@@ -23,7 +23,6 @@ class Alumno extends Component
     protected $listeners = [
         'reset-form-alumno' => 'initialState',
         'pagina-cargada-alumno' => 'enviarDataAutocomplete',
-        'change-props-alumno' => 'setData',
         'cargar-data-alumno' => 'cargarDataAlumno',
     ];
 
@@ -166,14 +165,6 @@ class Alumno extends Component
             } else  toastAlert($this, "No se pudo encontrar informacion del alumno con dni $dniEstudiante", EstadosAlertasEnum::WARNING);
         }
         else toastAlert($this, "Dni $dniEstudiante con formato incorrecto", EstadosAlertasEnum::WARNING);
-    }
-
-    public function setData( $data ){
-        $this['name'] = $data['value'];
-    }
-
-    public function tesdt($asd){
-        toastAlert($this, $asd);
     }
 
     public function enviarDataAutocomplete(){
