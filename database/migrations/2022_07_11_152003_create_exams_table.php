@@ -10,8 +10,8 @@ class CreateExamsTable extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->bigInteger('id', true)->unsigned();
-            $table->integer('period_id')->unsigned()->index('FK_exams_period');
-            $table->bigInteger('level_id')->unsigned()->nullable()->index('FK_exams_level');
+            $table->bigInteger('period_id')->index('FK_exams_period');
+            $table->bigInteger('level_id')->nullable()->index('FK_exams_level');
             $table->bigInteger('group_id')->unsigned()->index('FK_exams_group');
             $table->string('group_code')->nullable();             // 2 primeros digitos
             $table->string('name');
