@@ -25,6 +25,7 @@ class MatriculaConfiguracionGeneral extends Component
         'pagina-cargada-matricula' => 'enviarDataAutocomplete',
         'matricula-estudiante-id' => 'cargarIdEstudiante',
         'cargar-id-matricula' => 'cargarIdMatricula',
+        'descuentos-actualizados' => 'render'
     ];
 
     protected $rules = [

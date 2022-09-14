@@ -33,12 +33,19 @@
             <div class="form-group">
                 <label class="col-lg-3 control-label ">Descuento: </label>
                 <div class="col-lg-9">
-                    <select class="form-control"  title="Tipo de matricula"  {{$classroom? "":"disabled"}} wire:model="descuento">
-                        <option value=""> Sin descuento </option>
-                        @foreach ($listaDescuentos as $descuento)
-                            <option value="{{$descuento->id}}"> {{$descuento->nombre}} </option>
-                        @endforeach
-                    </select>
+                    <div style="display: flex">
+                        <select class="form-control text-uppercase" style="flex-grow: 1"  title="Tipo de matricula"  {{$classroom? "":"disabled"}} wire:model="descuento">
+                            <option value=""> Sin descuento </option>
+                            @foreach ($listaDescuentos as $descuento)
+                                <option value="{{$descuento->id}}"> {{$descuento->nombre}} </option>
+                            @endforeach
+                        </select>
+                        {{-- <div>
+                            <button class="btn btn-xs btn-outline-success text-success" style="margin-top: 0.5rem; border: none; background: transparent;" type="button">
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                            </button>
+                        </div> --}}
+                    </div>
                     <x-input-error variable='formularioMatricula.tipo_matricula'> </x-input-error>
                 </div>
             </div>

@@ -24,6 +24,7 @@ class Matricula extends Component
 
         'cargar-id-estudiante' => 'cambiarIdEstudiante',
         'cargar-id-matricula' =>  'cambiarIdMatricula',
+        'retirar-matricula' => 'retirarAlumno'
     ];
 
 
@@ -46,6 +47,10 @@ class Matricula extends Component
     {
         $matricula = $this->matriculaId ? $this->_matriculaRepository::find($this->matriculaId):null;
         return view('livewire.matricula.partials.matricula', compact('matricula'));
+    }
+
+    public function retirarAlumno( $matricula_id ){
+        dd($matricula_id);
     }
 
     public function cambiarIdEstudiante( int $estudiante_id ){

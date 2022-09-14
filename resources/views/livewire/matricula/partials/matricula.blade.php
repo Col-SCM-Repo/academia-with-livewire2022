@@ -21,13 +21,13 @@
             </div>
             <div>
                 @if ($matriculaId)
-                    <div>
-                       {{--  @livewire('matricula.partials.becas') --}}
+                    <div style="display: inline">
+                        @livewire('matricula.partials.becas')
                     </div>
                     <button class="btn btn-xs btn-success ">
                         <i class="fa fa-download" aria-hidden="true"></i> Ver ficha
                     </button>
-                    <button class="btn btn-xs btn-danger ">
+                    <button class="btn btn-xs btn-danger btn-retirar-matricula" onclick="showConfirmacionMatricula({{$matriculaId}})">
                         <i class="fa fa-download" aria-hidden="true"></i> Retirar alumno
                     </button>
                 @endif
@@ -45,4 +45,31 @@
             </div>
         @endif
     </div>
+
+    @push('scripts')
+        <script>
+            function showConfirmacionMatricula(matricula_id){
+                swal({
+                        title: "Estas Seguro?",
+                        text: "Se retirara la matricula del estudiante",
+                        icon: "warning",
+                        buttons: true,
+                        buttons: ["Cancelar", "Eliminar"],
+                        dangerMode: true,
+                    }).then((eliminar) => { if (eliminar) Livewire.emit('retirar-matricula',matricula_id) });
+            }
+
+
+            function showConfirmacionDescuento(descuento_id){
+                swal({
+                        title: "Estas Seguro?",
+                        text: "Se eliminara el descuento permanentemente",
+                        icon: "warning",
+                        buttons: true,
+                        buttons: ["Cancelar", "Eliminar"],
+                        dangerMode: true,
+                        }).then((eliminar) => { if (eliminar) { Livewire.emit('eliminar-descuento', descuento_id); } });
+            }
+        </script>
+    @endpush
 </div>
