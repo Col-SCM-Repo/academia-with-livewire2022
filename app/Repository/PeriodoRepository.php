@@ -32,7 +32,6 @@ class PeriodoRepository extends Period
 
     public function registrarPeriodo(object $obj)
     {
-        Log::debug("eNTRO A REGISTRAR PERIODO");
         $periodo = self::buscarPeriodo($obj->nombre);
         if (!$periodo) {
             $periodo = new Period();

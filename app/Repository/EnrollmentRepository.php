@@ -3,23 +3,20 @@
 namespace App\Repository;
 
 use App\Enums\EstadosEnum;
+use App\Enums\EstadosMatriculaEnum;
 use App\Enums\FormasPagoEnum;
 use App\Models\Enrollment;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class EnrollmentRepository extends Enrollment
 {
-    protected $_cuotasRepository, $_carrerasRepository, $_estudiantesReposiory;
+    private $_carrerasRepository, $_estudiantesReposiory;
 
-    /*
-        Cancelado::estados  (  activo ! 1 cancelado)
-        *** code  type  student_id  classroom_id  user_id  career_id  payment_type  fees_quantity  period_cost  status  observations ***
-    */
     public function __construct()
     {
-        $this->_cuotasRepository = new InstallmentRepository();
         $this->_carrerasRepository = new CareerRepository();
         $this->_estudiantesReposiory = new StudentRepository();
     }
@@ -27,17 +24,28 @@ class EnrollmentRepository extends Enrollment
     public function builderModelRepository()
     {
         return (object) [
-            'tipo_matricula' => null,       // type
+            /*
+                'tipo_matricula' => null,       // type
+                'estudiante_id' => null,        // student_id
+                'aula_id' => null,              // classroom_id
+                'carrera' => null,              // nombre carrera
+                'tipo_pago' => null,            // payment_type
+                'observaciones' => null,        // observations
+
+                'costo_matricula' => null,      //
+                'costo_ciclo' => null,          // period_cost
+                'cantidad_cuotas' => null,      // fees_quantity
+                'cuotas_detalle' => null,       // fees_quantity
+            */
+
+            /* 'tipo_matricula' => null,       // type */
+            'descuento_id' => null,         // scholarship_id
             'estudiante_id' => null,        // student_id
             'aula_id' => null,              // classroom_id
             'carrera' => null,              // nombre carrera
-            'tipo_pago' => null,            // payment_type
-            'observaciones' => null,        // observations
-
-            'costo_matricula' => null,      //
             'costo_ciclo' => null,          // period_cost
-            'cantidad_cuotas' => null,      // fees_quantity
-            'cuotas_detalle' => null,       // fees_quantity
+            'costo_ciclo_final' => null,    // period_cost_final
+            'observaciones' => null,        // observations
         ];
     }
 
@@ -47,55 +55,74 @@ class EnrollmentRepository extends Enrollment
             throw new BadRequestException('El alumno ya se encuentra matriculado');
 
         $matricula = new Enrollment();
-        $matricula->type = $mEnrollment->tipo_matricula;
+        $matricula->type = 'normal';
         $matricula->student_id = $mEnrollment->estudiante_id;
         $matricula->classroom_id = $mEnrollment->aula_id;
         $matricula->user_id = Auth::user()->id;
         $matricula->career_id = $this->_carrerasRepository->buscarRegistrarCarrera($mEnrollment->carrera)->id;
-        $matricula->payment_type = $mEnrollment->tipo_pago;
-        $matricula->fees_quantity = ($mEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $mEnrollment->cantidad_cuotas : 0;
+        $matricula->scholarship_id = $mEnrollment->descuento_id;
         $matricula->period_cost = $mEnrollment->costo_ciclo;
+        $matricula->period_cost_final = $mEnrollment->costo_ciclo_final;
+        $matricula->amount_paid = 0;
         $matricula->observations = $mEnrollment->observaciones;
         $matricula->save();
         $matricula->code = str_pad($matricula->id, 6, "0", STR_PAD_LEFT);
         $matricula->save();
+        return $matricula;
+        /*
+            $matricula->fees_quantity = ($mEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $mEnrollment->cantidad_cuotas : 0;
+            $matricula->payment_type = $mEnrollment->tipo_pago;
+            // Cuotas de pago (Installments)
+            $mIntallment = $this->_cuotasRepository->builderModelRepository();
+            $mIntallment->matricula_id = $matricula->id;
+            $mIntallment->tipo_pago = $mEnrollment->tipo_pago;
+            $mIntallment->costo_matricula = $mEnrollment->costo_matricula;
+            $mIntallment->costo_ciclo = $mEnrollment->costo_ciclo;
+            $mIntallment->cuotas = $matricula->fees_quantity;
+            $mIntallment->detalle_cuotas = $matricula->fees_quantity >0 ? $mEnrollment->cuotas_detalle : array() ;
 
-        // Cuotas de pago (Installments)
-        $mIntallment = $this->_cuotasRepository->builderModelRepository();
-        $mIntallment->matricula_id = $matricula->id;
-        $mIntallment->tipo_pago = $mEnrollment->tipo_pago;
-        $mIntallment->costo_matricula = $mEnrollment->costo_matricula;
-        $mIntallment->costo_ciclo = $mEnrollment->costo_ciclo;
-        $mIntallment->cuotas = $matricula->fees_quantity;
-        $mIntallment->detalle_cuotas = $matricula->fees_quantity >0 ? $mEnrollment->cuotas_detalle : array() ;
-
-        $cuotasGeneradas = null;
-        try {
-            $cuotasGeneradas = $this->_cuotasRepository->generarCoutasPago($mIntallment);
-            if(! $cuotasGeneradas) throw new Exception('Ocurrio un error al generar las cuotas de pago');
-            return $matricula;
-        } catch (Exception $e) {
-            self::eliminar( $matricula->id );
-            throw new BadRequestException($e->getMessage());
-        }
+            $cuotasGeneradas = null;
+            try {
+                $cuotasGeneradas = $this->_cuotasRepository->generarCoutasPago($mIntallment);
+                if(! $cuotasGeneradas) throw new Exception('Ocurrio un error al generar las cuotas de pago');
+                return $matricula;
+            } catch (Exception $e) {
+                self::eliminar( $matricula->id );
+                throw new BadRequestException($e->getMessage());
+            }
+        */
     }
 
     public function actualizar( int $matricula_id, object $mEnrollment)
     {
+        $matricula = Enrollment::find($matricula_id);
+        if(!$matricula) throw new NotFoundResourceException('Error, no se encontrò la matricula');
+
+        $matricula->type = 'normal';
+        $matricula->classroom_id = $mEnrollment->aula_id;
+        $matricula->career_id = $this->_carrerasRepository->buscarRegistrarCarrera($mEnrollment->carrera)->id;
+        $matricula->scholarship_id = $mEnrollment->descuento_id;
+        $matricula->period_cost = $mEnrollment->costo_ciclo;
+        $matricula->period_cost_final = $mEnrollment->costo_ciclo_final;
+        $matricula->observations = $mEnrollment->observaciones;
+        $matricula->status = EstadosMatriculaEnum::PENDIENTE_ACTIVACION;
+        $matricula->save();
+        return $matricula;
     }
 
     public function eliminar( int $matricula_id, bool $automatico = false)
     {
         $matricula = Enrollment::find($matricula_id);
-        if($matricula){
-            if($automatico){
-                $matricula->observations = "Autoeliminacion" ;
-                $matricula->save();
-            }
+        if(!$matricula) throw new NotFoundResourceException('Error, no se encontrò la matricula');
+
+        if($automatico){
+            $matricula->observations = "Autoeliminacion" ;
             $matricula->delete();
-            return true;
+        }else{
+            $matricula->status = EstadosMatriculaEnum::INACTIVO;
+            $matricula->save();
         }
-        return false;
+        return true;
     }
 
     public function matriculados(int $aula_id)
@@ -115,7 +142,7 @@ class EnrollmentRepository extends Enrollment
         $matriculaAlumno = self::where('student_id', $estudiante_id)
             ->where('classroom_id', $aula_id)
             ->where('deleted_at', null)
-            ->where('status', EstadosEnum::ACTIVO)
+            ->where('status', '!=', EstadosMatriculaEnum::INACTIVO)
             ->first();
         return $matriculaAlumno;
     }
@@ -126,6 +153,21 @@ class EnrollmentRepository extends Enrollment
 
 
 
+    }
+
+    public function buscarMatriculaVigente( int $estudiante_id, int $periodo_id ){
+        return Enrollment::join('classrooms', 'enrollments.classroom_id', 'classrooms.id')
+                                ->join('levels', 'classrooms.level_id' ,'levels.id')
+                                ->where('enrollments.deleted_at', null)
+                                ->where('classrooms.deleted_at', null)
+                                ->where('enrollments.student_id', $estudiante_id)
+                                ->where('levels.period_id', $periodo_id)
+                                ->select(   'enrollments.id as id',
+                                            'enrollments.student_id as student_id',
+                                            'enrollments.status as status',
+                                            'enrollments.status as status',
+                                             )
+                                ->first();
     }
 
     public function listaMatriculasEstudiante( int $estudianteId ){
