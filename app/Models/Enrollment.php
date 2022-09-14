@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadosMatriculaEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -34,39 +35,37 @@ class Enrollment extends Model
 
     public function installments()
     {
-        return $this->hasMany(installments::class)->where('state', null);
+        return $this->hasMany(installments::class, 'enrollment_id', 'id')->where('state', null);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id ', 'id' );
     }
 
     public function student()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_id', 'id' );
     }
 
     public function career()
     {
-        return $this->belongsTo(Career::class);
+        return $this->belongsTo(Career::class, 'career_id', 'id' );
     }
 
     public function classroom()
     {
-        return $this->belongsTo(Classroom::class);
+        return $this->belongsTo(Classroom::class, 'classroom_id', 'id' );
     }
 
-    public function scholarships(){
-        return $this->hasMany(Scholarship::class, 'enrollment_id', 'id');
+    public function scholarship(){
+        return $this->belongsTo(Scholarship::class, 'scholarship_id', 'id' );
     }
 
-    public function scholarshipSummary(){
-        $monto = 0;
-        foreach ($this->scholarships as $becas)
-            $monto += $becas->discount;
-        return $monto;
+    public function statusStudent(){
+        return EstadosMatriculaEnum::getEstado($this->status);
     }
+
 
     public function balance()
     {

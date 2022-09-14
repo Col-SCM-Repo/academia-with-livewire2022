@@ -18,6 +18,7 @@ class CreateEnrollmentsTable extends Migration
 			$table->bigInteger('classroom_id')->unsigned()->index('FK_enrollments_classrooms');
 			$table->bigInteger('user_id')->unsigned()->index('FK_enrollments_users');
 			$table->bigInteger('career_id')->unsigned()->index('FK_enrollments_carreer');
+			$table->bigInteger('scholarship_id')->unsigned()->nullable()->index('FK_enrollments_scholarship');
 			$table->enum('payment_type', array('cash', 'credit'))->nullable();
 			$table->integer('fees_quantity')->unsigned()->default(0);
 			$table->decimal('period_cost', 10)->nullable();

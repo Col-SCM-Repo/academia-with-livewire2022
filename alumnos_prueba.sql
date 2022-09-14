@@ -1,6 +1,35 @@
+INSERT INTO scholarships (type_scholarship, description, parameter_discount) VALUES
+    ('percentaje', 'Descuento del 5% ', 5),
+    ('percentaje', 'Descuento del 10% ', 10),
+    ('fixed', 'Descuento 5 soles ', 5);
+
+-- Volcado de datos para la tabla `periods`
+INSERT INTO `periods` (`id`, `name`, `year`, `active`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, '2022-II', 2022, 1, '2022-09-12 13:36:38', '2022-09-12 13:36:38', NULL);
+
+INSERT INTO `levels` (`id`, `type_id`, `period_id`, `start_date`, `end_date`, `price`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '2022-09-01', '2022-09-22', '280.00', 1, '2022-09-12 13:36:38', '2022-09-12 13:37:07'),
+(2, 2, 1, NULL, NULL, NULL, 0, '2022-09-12 13:36:38', '2022-09-12 13:36:38'),
+(3, 3, 1, NULL, NULL, NULL, 0, '2022-09-12 13:36:38', '2022-09-12 13:36:38'),
+(4, 4, 1, NULL, NULL, NULL, 0, '2022-09-12 13:36:38', '2022-09-12 13:36:38');
+
+-- Volcado de datos para la tabla `classrooms`
+INSERT INTO `classrooms` (`id`, `name`, `level_id`, `vacancy`, `price`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(1, 'A1', 1, 100, NULL, NULL, '2022-09-12 13:37:34', '2022-09-12 13:37:34'),
+(2, 'A2', 1, 80, NULL, NULL, '2022-09-12 13:37:57', '2022-09-12 13:37:57'),
+(3, 'A3', 1, 50, NULL, NULL, '2022-09-12 13:38:20', '2022-09-12 13:38:20');
+
+
+-- Volcado de datos para la tabla relatives
+INSERT INTO `relatives` (`id`, `order`, `student_id`, `entity_id`, `relative_relationship`, `occupation_id`, `created_at`, `updated_at`) VALUES
+(2, NULL, 300, 301, 'mother', 2, '2022-09-13 16:53:12', '2022-09-13 21:17:47');
+
+
 
 /*Escuelas*/
-INSERT INTO `schools` (`id`, `name`, `address`, `district_id`, `country_id`, `created_at`, `updated_at`) VALUES (NULL, 'SEGUNDO CABRERA MUÑOZ', 'JR SAN MARTIN 000', '1', '1', NULL, NULL);
+INSERT INTO `schools` (`id`, `name`, `address`, `district_id`, `country_id`, `created_at`, `updated_at`) VALUES
+(1, 'SEGUNDO CABRERA MUÑOZ', 'JR SAN MARTIN 000', 1, 1, NULL, NULL),
+(2, 'ISAAC NEWTON', NULL, NULL, 173, '2022-09-13 16:36:22', '2022-09-13 16:36:22');
 
 /*Creacion de entidades*/
 INSERT INTO `entities`(`id`, `father_lastname`, `mother_lastname`, `name`,  `document_type`, `document_number`, `district_id`) VALUES
@@ -205,6 +234,9 @@ INSERT INTO `entities`(`id`, `father_lastname`, `mother_lastname`, `name`,  `doc
     (298,'CASTILLO MEDINA','-','MILAGROS LISETH','dni','77241182', 1),
     (299,'CASTREJÓN CALDERÓN','-','ARNHOL ALFREDO','dni','71820271', 1);
 
+INSERT INTO `entities` (`id`, `father_lastname`, `mother_lastname`, `name`, `address`, `district_id`, `telephone`, `mobile_phone`, `email`, `birth_date`, `gender`, `country_id`, `document_type`, `document_number`, `marital_status`, `instruction_degree`, `photo_path`, `deleted_at`, `created_at`, `updated_at`) VALUES
+(300, 'PEREZ', 'ROJAS', 'JUAN', 'AV ABC 446', 579, '00000000', NULL, NULL, '2022-09-01', 'male', 173, 'dni', '123456789', NULL, NULL, 'avatar_default.png', NULL, '2022-09-13 15:52:17', '2022-09-13 16:36:22'),
+(301, 'CASTILLO ', 'BEJAR', 'MARIA', 'AV ABC 556', 584, '111111111', NULL, NULL, '2022-09-01', 'female', 173, 'dni', '987654321', 'single', NULL, 'avatar_default.png', NULL, '2022-09-13 16:47:55', '2022-09-13 21:17:47');
 
 
 
@@ -409,7 +441,8 @@ INSERT INTO `students`(`id`, `entity_id`, `school_id`, `graduation_year` ) VALUE
 (296,296,1,2022),
 (297,297,1,2022),
 (298,298,1,2022),
-(299,299,1,2022);
+(299,299,1,2022),
+(300,300,2,2022);
 
 
 /*Matriculas*/

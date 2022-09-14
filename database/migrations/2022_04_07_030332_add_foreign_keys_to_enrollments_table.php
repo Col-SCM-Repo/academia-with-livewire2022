@@ -13,6 +13,7 @@ class AddForeignKeysToEnrollmentsTable extends Migration
 			$table->foreign('student_id', 'FK_enrollments_students')->references('id')->on('students')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 			$table->foreign('user_id', 'FK_enrollments_users')->references('id')->on('users')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 			$table->foreign('career_id', 'FK_enrollments_carreer')->references('id')->on('careers')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+			$table->foreign('scholarship_id', 'FK_enrollments_scholarship')->references('id')->on('scholarships')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 	}
 
@@ -23,6 +24,7 @@ class AddForeignKeysToEnrollmentsTable extends Migration
 			$table->dropForeign('FK_enrollments_students');
 			$table->dropForeign('FK_enrollments_users');
 			$table->dropForeign('FK_enrollments_carreer');
+			$table->dropForeign('FK_enrollments_scholarship');
 		});
 	}
 }
