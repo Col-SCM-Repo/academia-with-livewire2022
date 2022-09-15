@@ -2,9 +2,12 @@
 
 namespace App\Http\Livewire\Matricula\Partials;
 
+use App\Enums\EstadosAlertasEnum;
+use App\Enums\EstadosEntidadEnum;
 use App\Enums\FormasPagoEnum;
 use App\Repository\EnrollmentRepository;
 use App\Repository\InstallmentRepository;
+use Exception;
 use Livewire\Component;
 
 class MatriculaConfiguracionPagos extends Component
@@ -54,7 +57,16 @@ class MatriculaConfiguracionPagos extends Component
     public function create(){
         $this->validate();
         $modeloPagos = self::buildModeloPagos();
-        /* dd('create', $modeloPagos); */
+
+        try {
+            $msg = $this->_cuotasRepository->generarCoutasPago($modeloPagos);
+            toastAlert($this, $msg, EstadosAlertasEnum::SUCCESS);
+            sweetAlert($this, 'cuota', EstadosEntidadEnum::CREATED);
+            $this->emitUp('cuota-generada', $this->matriculaId);
+            openModal($this, '#form-modal-cuotas-pago', false);
+        } catch (Exception $ex) {
+            toastAlert($this, $ex->getMessage());
+        }
     }
 
     public function update(){
@@ -116,14 +128,18 @@ class MatriculaConfiguracionPagos extends Component
         $this->costoCiclo = $matricula->period_cost_final;
         $this->costoAbonado = $matricula->amount_paid;
 
-        $cuotasExistentes = true;       // buscar cuotas de pago existentes
-        if($cuotasExistentes){
-            $this->costoMatricula = null;
-            $this->tipoPago = null;
-            $this->numeroCuotas = null;
-            $this->detalleCuotas = null;
+        try {
+            $cuotasExistentes = $this->_cuotasRepository->getInformacionCuotasActivas($matricula->id);
+            if($cuotasExistentes){
+                $this->costoMatricula = $cuotasExistentes->costo_matricula;
+                $this->tipoPago = $cuotasExistentes->tipo_pago;
+                $this->numeroCuotas = $cuotasExistentes->cuotas;
+                $this->detalleCuotas = $cuotasExistentes->detalle_cuotas;
+            }
+            else $this->reset(['costoMatricula','tipoPago','numeroCuotas','detalleCuotas']);
+        } catch ( Exception $ex) {
+            toastAlert($this, $ex->getMessage());
         }
-        else $this->reset(['costoMatricula','tipoPago','numeroCuotas','detalleCuotas']);
     }
 
     public function calcularMontoCuotas( $indiceArray = null ){

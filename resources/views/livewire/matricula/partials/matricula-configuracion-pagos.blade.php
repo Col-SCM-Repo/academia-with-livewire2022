@@ -7,7 +7,7 @@
         <div>
             <!-- begin: Modal configuracion cuotas de pago -->
                 <x-modal-form idForm='form-modal-cuotas-pago' :titulo="$matricula_status == 1? 'ACTUALIZAR CUOTAS DE PAGO' :'GENERAR CUOTAS DE PAGO'">
-                    <form  wire:submit.prevent="{{ $matricula_status == 1? 'update' : 'create' }}">
+                    <form  wire:submit.prevent="{{ $matricula_status == 1? 'update' : 'create' }}" style="padding-right: .125rem;">
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <label class="col-md-3 control-label">Costo matricula:</label>
@@ -80,7 +80,7 @@
 
                             @endif
 
-                            <div class="" style="padding-right: 1rem;" style="display: flex">
+                            <div class="" style="display: flex">
                                 <span wire:loading wire:target="update, create"> Guardando ...</span>
                                 <div style="flex-grow: 1" class="text-right">
                                     <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem"> {{ $matricula_status == 1? 'Actualizar': 'Guardar'}} </button>
