@@ -57,16 +57,19 @@
                 </div>
             </div>
         </div>
-        <div class="text-right">
+        <div class="col-lg-12 " style="display: flex">
             <span wire:loading wire:target="create, update"> Guardando ...</span>
-            @if ($matriculaId)
-                <button class="btn btn-sm btn-warning" type="button" style="padding: .75rem 3rem">
-                    <i class="fa fa-money" aria-hidden="true"></i> Generar cuotas de pago
+            <div style="flex-grow: 1" class="text-right">
+                @if ($matriculaId)
+                    @livewire('matricula.partials.matricula-configuracion-pagos', ['matricula_id' => $matriculaId])
+                @endif
+                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem" {{$classroom? "":"disabled"}}>
+                    <i class="fa fa-save"></i> {{$matriculaId? 'Actualizar' : 'Registrar' }} matricula
                 </button>
-            @endif
-            <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem" {{$classroom? "":"disabled"}}>
-                <i class="fa fa-save"></i> {{$matriculaId? 'Actualizar' : 'Registrar' }} matricula
-            </button>
+            </div>
+        </div>
+        <div class="col-lg-12  text-right" style="padding-top: 1rem" >
+            <small>NOTA: Debe generar las cuotas de pago despues de guardar los cambios de la matricula </small>
         </div>
     </form>
 

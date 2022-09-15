@@ -30,6 +30,7 @@ class InstallmentRepository extends Installment
             'costo_ciclo' => null,          //
             'cuotas' => null,               //
 
+            'detalle_cuotas' => null        // Lista de cuotas para el tipo de pago a credito
             // 'status' => null,            // status
         ];
     }
