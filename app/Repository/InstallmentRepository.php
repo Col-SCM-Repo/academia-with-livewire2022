@@ -10,10 +10,11 @@ use App\Models\Installment;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class InstallmentRepository extends Installment
 {
-    private $_matriculaRepository;
+    private $_matriculaRepository, $_pagosRepository;
 
     /*  Columnas:
             id enrollment_id order type amount status deadline
@@ -22,6 +23,7 @@ class InstallmentRepository extends Installment
     public function __construct()
     {
         $this->_matriculaRepository = new EnrollmentRepository();
+        $this->_pagosRepository = new PaymentRepository();
     }
 
     public function builderModelRepository()
@@ -79,34 +81,29 @@ class InstallmentRepository extends Installment
         // generar nuevas cuotas
 
     }
-    public function desactivarCuotasyCrearNotasPago(int $matricula_id){
+
+    /*INCONCLUSOOOOOOOOOOOOOO */
+    // llamara a un metodo de pagosRepository para generar un codigo de pago para cada pago realizado en la cuota
+    // Crear un metodo en payments para generar notas y colocar un parametro para descontar el amountpayment automatico de la matricula
+
+    public function desactivarCuotasMatricula(int $matricula_id){
         $cuotasActivas = Installment::where('enrollment_id', $matricula_id)->where('status', EstadosEnum::ACTIVO)->where('deleted_at', null)->get();
+
         $numeroCuotas = count($cuotasActivas);
-
         foreach ($cuotasActivas as $key=>$cuota) {
-            /*INCONCLUSOOOOOOOOOOOOOO */
-            // llamara a un metodo de pagosRepository para generar un codigo de pago para cada pago realizado en la cuota
-            // Crear un metodo en payments para generar notas y colocar un parametro para descontar el amountpayment automatico de la matricula
-
-
             $cuota->status = EstadosEnum::INACTIVO;
             $cuota->observations = "Eliminada automaticamente por Usuario:". Auth::user()->id .' el '. date('Y-m-d h:i:s')."( $key / $numeroCuotas )";
             $cuota->save();
+            $cuota->delete();
         }
-
+        return "$numeroCuotas cuotas eliminadas satisfactoriamente";
     }
 
 
     public function getInformacionCuotasActivas( int $matricula_id ){
-        $cuotasCiclo =  Installment::where('enrollment_id', $matricula_id) ->where('type', TiposCuotaEnum::CICLO)
-                                    ->where('status', EstadosEnum::ACTIVO) ->where('deleted_at', null)
-                                    ->orderBy('order', 'asc')->get();
-
-        $cuotaMatricula = Installment::where('enrollment_id', $matricula_id)->where('type', TiposCuotaEnum::MATRICULA)
-                                    ->where('status', EstadosEnum::ACTIVO)  ->where('deleted_at', null)
-                                    ->first();
-
         $matricula = $this->_matriculaRepository::find($matricula_id);
+        $cuotaMatricula = self::cuotasActivasMatricula($matricula_id);
+        $cuotasCiclo =  self::cuotasActivasCiclo($matricula_id);
 
         if(count($cuotasCiclo)==0 || ! $cuotaMatricula | !$matricula) return null;
 
@@ -135,10 +132,9 @@ class InstallmentRepository extends Installment
         return $modeloInformacionCuotas;
     }
 
-    public function getInformacionPagosYCuotas($matricula_id)
+    public function getInformacionPagosYCuotas($matricula_id) // Cambiar de nombre a informacionPagosCuotasConNotas()
     {
-        $cuotas = Installment::where('enrollment_id', $matricula_id)->where('status', EstadosEnum::ACTIVO)
-                ->where('deleted_at', null)->get();
+        $cuotas = self::cuotasActivasTotales($matricula_id);
         if (count($cuotas) == 0) return null;
 
         $cuotas_matricula = array();
@@ -147,62 +143,15 @@ class InstallmentRepository extends Installment
         $monto_pagado = 0;          // Monto total abonado;
 
         foreach ($cuotas as $cuotaIterador) {
-            $cuotaTemp = (object)[
-                'id' => $cuotaIterador->id,
-                'orden' => $cuotaIterador->order,
-                'tipo' => null,
-                'monto_cuota' => $cuotaIterador->amount,
-                'pagos' => null,
-                'monto_pagado' => 0,
-                'total_pagado' => $cuotaIterador->amount == 0,
-                'fecha_limite' => $cuotaIterador->deadline ,
-                'fecha_matricula' => $cuotaIterador->created_at,
-            ];
+            $informacionCuota = self::buildInformacionCuotas($cuotaIterador, true);
+
             $monto_deuda_inicial += $cuotaIterador->amount;
+            $monto_pagado += $informacionCuota->monto_pagado;
 
-            $pagosAbonados = $cuotaIterador->payments;
-            if (count($pagosAbonados)>0) {
-                $pagos = array();
-                $montoAbonado =0;
-                foreach ($pagosAbonados as $pago) {
-                    $pagoTemp = (object) [
-                        'id' => $pago->id,
-                        'cuota_id' => $pago->installment_id,
-                        'monto' => $pago->amount,
-                        'tipo' => $pago->type,
-                        'concepto' => $pago->concept_type,
-                        'usuario' => $pago->user->nombreCompleto(),
-                        'serie' => $pago->serie,
-                        'numeracion' => $pago->numeration,
-                        'fecha_pago' => date ( 'Y-m-d h:i:s A', strtotime($pago->created_at)),
-                        'es_devolucion' => null,
-                        'fecha_devolucion' => null,
-                    ];
-
-                    $notaPago = $pago->note;
-                    if(!$notaPago){
-                        $pagoTemp->es_devolucion=false;
-                        $pagoTemp->fecha_devolucion=null;
-                        $montoAbonado+=$pago->amount;
-                    }
-                    else{
-                        $pagoTemp->es_devolucion=true;
-                        $pagoTemp->fecha_devolucion= date ( 'Y-m-d h:i:s A', strtotime($notaPago->created_at));       // pendiente de agregar fecha .... en funcion a la nota de credito
-                    }
-                    $pagos[] = $pagoTemp;
-                }
-                $cuotaTemp->monto_pagado = $montoAbonado ;
-                $cuotaTemp->total_pagado = round((float) $cuotaIterador->amount, 2) <= round((float) $montoAbonado, 2);
-                $cuotaTemp->pagos = $pagos;
-                $monto_pagado += $montoAbonado;
-            }
-
-            if ($cuotaIterador->type == TiposCuotaEnum::CICLO) {
-                $cuotaTemp->tipo = 'CICLO';
-                $cuotas_ciclo[$cuotaIterador->id] = $cuotaTemp;
-            } else {
-                $cuotaTemp->tipo = 'MATRICULA';
-                $cuotas_matricula[$cuotaIterador->id] = $cuotaTemp;
+            switch ($cuotaIterador->type) {
+                case TiposCuotaEnum::CICLO: $cuotas_ciclo[$cuotaIterador->id] = $informacionCuota; break;
+                case TiposCuotaEnum::MATRICULA: $cuotas_matricula[$cuotaIterador->id] = $informacionCuota; break;
+                default: throw new NotFoundResourceException('Error, tipo de cuota no identificado ['. $cuotaIterador->type .']');
             }
         }
         return [
@@ -215,14 +164,9 @@ class InstallmentRepository extends Installment
         ];
     }
 
-    public function getCuotasCiclo($matricula_id)
+    public function getCuotasCiclo($matricula_id)   // Cambiar de nombre a informacionPagosCuotas()
     {
-        $cuotas = Installment::where('enrollment_id', $matricula_id)
-            ->where('type',  TiposCuotaEnum::CICLO)
-            ->where('status', EstadosEnum::ACTIVO)
-            ->where('deleted_at', null)
-            ->orderBy('order')
-            ->get();
+        $cuotas = self::cuotasActivasCiclo($matricula_id);
         if (count($cuotas) == 0) return null;
 
         $cuotas_ciclo = array();
@@ -230,44 +174,10 @@ class InstallmentRepository extends Installment
         $monto_pagado = 0;          // Costo de la deuda inicial;
 
         foreach ($cuotas as $cuotaIterador) {
-            $cuotaTemp = (object)[
-                'id' => $cuotaIterador->id,
-                'orden' => $cuotaIterador->order,
-                'monto_cuota' => $cuotaIterador->amount,
-                'monto_pagado' => null,
-                'pagos' => null,
-                'total_pagado' => $cuotaIterador->amount == 0,
-                'fecha_limite' => $cuotaIterador->deadline ,
-            ];
-
+            $informacionCuota = self::buildInformacionCuotas($cuotaIterador);
             $monto_deuda_inicial += $cuotaIterador->amount;
-
-            $pagosAbonados = $cuotaIterador->payments;
-            if (count($pagosAbonados)>0) {
-                $pagos = array();
-                $montoAbonado =0;
-                foreach ($pagosAbonados as $pago) {
-                    $notaPago = $pago->note;
-                    if(!$notaPago ){
-                        $pagos[$pago->id] = (object) [
-                            'id' => $pago->id,
-                            'cuota_id' => $pago->installment_id,
-                            'monto' => $pago->amount,
-                            'tipo' => $pago->type,
-                            'concepto' => $pago->concept_type,
-                            'usuario' => $pago->user->nombreCompleto(),
-                            'serie' => $pago->serie,
-                            'numeracion' => $pago->numeration,
-                        ];
-                        $montoAbonado+=$pago->amount;
-                    }
-                }
-                $cuotaTemp->monto_pagado = $montoAbonado ;
-                $cuotaTemp->total_pagado = round((float) $cuotaIterador->amount, 2) <= round((float) $montoAbonado, 2);
-                $cuotaTemp->pagos = $pagos;
-                $monto_pagado += $montoAbonado;
-            }
-            $cuotas_ciclo [] = $cuotaTemp;
+            $monto_pagado += $informacionCuota->monto_pagado;
+            $cuotas_ciclo [] = $informacionCuota;
         }
 
         return [
@@ -278,6 +188,94 @@ class InstallmentRepository extends Installment
             'total_pagado' => ($monto_deuda_inicial - $monto_pagado) == 0,
         ];
     }
+
+     // Calcular monto abonado
+    public function montoAbonadoDeMatricula( int $matricula_id ){
+
+
+    }
+
+    private function cuotasActivasTotales(int $matricula_id){
+        return  Installment::where('enrollment_id', $matricula_id)
+                            ->where('status', EstadosEnum::ACTIVO)
+                            ->where('deleted_at', null)
+                            ->orderBy('order', 'asc')
+                            ->get();
+    }
+
+    private function cuotasActivasMatricula(int $matricula_id){
+        $cuotasMatricula =  Installment::where('enrollment_id', $matricula_id)
+                                        ->where('type',  TiposCuotaEnum::MATRICULA)
+                                        ->where('status', EstadosEnum::ACTIVO)
+                                        ->where('deleted_at', null)
+                                        ->orderBy('order', 'asc')
+                                        ->get();
+        $numeroCuotas = count($cuotasMatricula);
+        if($numeroCuotas !=1 ) throw new Exception("Error, el numero de cuotas para la matricula no es valido,  [$numeroCuotas cuotas encontradas] ");
+        return $numeroCuotas[0];
+    }
+
+    private function cuotasActivasCiclo(int $matricula_id){
+        return  Installment::where('enrollment_id', $matricula_id)
+                            ->where('type',  TiposCuotaEnum::CICLO)
+                            ->where('status', EstadosEnum::ACTIVO)
+                            ->where('deleted_at', null)
+                            ->orderBy('order', 'asc')
+                            ->get();
+    }
+
+    private function buildInformacionCuotas( Installment $cuota, bool $conNotasCredito =false ){
+        $informacionCuota = (object)[
+                                        'id' => $cuota->id,
+                                        'orden' => $cuota->order,
+                                        'tipo' => TiposCuotaEnum::getName($cuota->type),
+                                        'monto_cuota' => $cuota->amount,
+                                        'monto_pagado' => 0,
+                                        'pagos' => array(),
+                                        'total_pagado' => $cuota->amount == 0,  // verdadero si no se tiene deuda
+                                        'fecha_limite' => $cuota->deadline ,
+                                        'fecha_matricula' => $cuota->created_at,
+                                    ];
+        $pagosRealizados = $cuota->payments;
+        if (count($pagosRealizados)>0) {
+            $pagos = array();
+            $montoAbonado =0;
+            foreach ($pagosRealizados as $pago) {
+                $pagosTemporal = (object) [
+                                            'id' => $pago->id,
+                                            'cuota_id' => $pago->installment_id,
+                                            'monto' => $pago->amount,
+                                            'tipo' => $pago->type,
+                                            'concepto' => $pago->concept_type,
+                                            'usuario' => $pago->user->nombreCompleto(),
+                                            'serie' => $pago->serie,
+                                            'numeracion' => $pago->numeration,
+                                            'fecha_pago' => date ( 'Y-m-d h:i:s A', strtotime($pago->created_at)),
+                                            'es_devolucion' => null,
+                                            'fecha_devolucion' => null,
+                                        ];
+                $notaPago = $pago->note;
+                if(! $notaPago ){
+                    $pagosTemporal->es_devolucion=false;
+                    $pagosTemporal->fecha_devolucion=null;
+                    $pagos[$pago->id] = $pagosTemporal;
+                    $montoAbonado+=$pago->amount;
+                }
+                else
+                    if($conNotasCredito){
+                        $pagosTemporal->es_devolucion=true;
+                        $pagosTemporal->fecha_devolucion= date ( 'Y-m-d h:i:s A', strtotime($notaPago->created_at));
+                        $pagos[$pago->id] = $pagosTemporal;
+                    }
+            }
+            $informacionCuota->monto_pagado = $montoAbonado;
+            $informacionCuota->pagos = $pagos;
+            $informacionCuota->total_pagado = round((float) $cuota->amount, 2) <= round((float) $montoAbonado, 2);
+        }
+        return $informacionCuota;
+    }
+
+
 
     /* public function getHistorialPagos(int $matricula_id)
         {
