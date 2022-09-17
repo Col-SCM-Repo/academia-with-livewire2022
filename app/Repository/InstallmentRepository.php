@@ -14,7 +14,7 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class InstallmentRepository extends Installment
 {
-    private $_matriculaRepository, $_pagosRepository;
+    private $_matriculaRepository;
 
     /*  Columnas:
             id enrollment_id order type amount status deadline
@@ -23,7 +23,6 @@ class InstallmentRepository extends Installment
     public function __construct()
     {
         $this->_matriculaRepository = new EnrollmentRepository();
-        $this->_pagosRepository = new PaymentRepository();
     }
 
     public function builderModelRepository()
@@ -41,6 +40,7 @@ class InstallmentRepository extends Installment
     }
 
     public function generarCoutasPago(object $moInstallment)
+    //Modificar para que devueva un array de cuotas
     {
         $cuotas = [];
         switch ($moInstallment->tipo_pago) {
@@ -67,45 +67,56 @@ class InstallmentRepository extends Installment
         $matricula->save();
         Installment::insert($cuotas);
 
-        return (count($cuotas))." Cuotas generadas";
+        return (count($cuotas))." Cuotas generadas.";
     }
 
     public function actualizarCoutasPago(int $matricula_id, object $moInstallment)
     {
-        // Calcular monto abonado
+        $informacionPagos = self::informacionPagosCuotas($matricula_id);
+        $matricula = $this->_matriculaRepository::find($matricula_id);
+        $matricula->status = EstadosMatriculaEnum::ACTIVO;
 
-        // validar monto abonado y monto de matricula
+        if(!$informacionPagos || !$matricula /* || (round($informacionPagos->monto_deuda_pagado, 2) == ( round((float) $matricula->amount_paid, 2)))  */)
+            throw new Exception('Error, la matricula presenta incoherencias en las cuotas de pago');
 
-        // crear notas de pagos
-
-        // generar nuevas cuotas
-
+        $cuotasDesactivadas = self::desactivarCuotasMatricula($matricula_id);
+        $cuotasCreadas = self::generarCoutasPago($moInstallment);
+        return "$cuotasDesactivadas \n $cuotasCreadas";
     }
 
-    /*INCONCLUSOOOOOOOOOOOOOO */
-    // llamara a un metodo de pagosRepository para generar un codigo de pago para cada pago realizado en la cuota
-    // Crear un metodo en payments para generar notas y colocar un parametro para descontar el amountpayment automatico de la matricula
+    public function evaluarRequisitosActualizacion ( int $matricula_id ){
+        $matricula = $this->_matriculaRepository::find($matricula_id);
+        if(!$matricula) throw new NotFoundResourceException('Error, no se encontró la matricula');
 
-    public function desactivarCuotasMatricula(int $matricula_id){
-        $cuotasActivas = Installment::where('enrollment_id', $matricula_id)->where('status', EstadosEnum::ACTIVO)->where('deleted_at', null)->get();
+        $costoCiclo = 0;
+        foreach( self::cuotasActivasCiclo($matricula_id) as $cuota )
+            $costoCiclo+= $cuota->amount;
 
+        if($costoCiclo != $matricula->period_cost_final){
+            $matricula->status = EstadosMatriculaEnum::PENDIENTE_ACTIVACION;
+            $matricula->save();
+            self::desactivarCuotasMatricula($matricula_id, false);
+        }
+    }
+
+    public function desactivarCuotasMatricula(int $matricula_id, bool $autoEliminacion=true){
+        $cuotasActivas = self::cuotasActivasTotales($matricula_id);
         $numeroCuotas = count($cuotasActivas);
         foreach ($cuotasActivas as $key=>$cuota) {
             $cuota->status = EstadosEnum::INACTIVO;
-            $cuota->observations = "Eliminada automaticamente por Usuario:". Auth::user()->id .' el '. date('Y-m-d h:i:s')."( $key / $numeroCuotas )";
+            $cuota->observations = "Eliminada automaticamente por Usuario:". Auth::user()->id .' el '. date('Y-m-d h:i:s')."( ".($key + 1)." / $numeroCuotas )";
             $cuota->save();
-            $cuota->delete();
+            if($autoEliminacion) $cuota->delete();
         }
-        return "$numeroCuotas cuotas eliminadas satisfactoriamente";
+        return "$numeroCuotas Cuotas eliminadas.";
     }
-
 
     public function getInformacionCuotasActivas( int $matricula_id ){
         $matricula = $this->_matriculaRepository::find($matricula_id);
         $cuotaMatricula = self::cuotasActivasMatricula($matricula_id);
         $cuotasCiclo =  self::cuotasActivasCiclo($matricula_id);
 
-        if(count($cuotasCiclo)==0 || ! $cuotaMatricula | !$matricula) return null;
+        if(count($cuotasCiclo)==0 || !$cuotaMatricula || !$matricula) return null;
 
         $modeloInformacionCuotas = self::builderModelRepository();
         $modeloInformacionCuotas->matricula_id = $matricula->id;
@@ -132,7 +143,7 @@ class InstallmentRepository extends Installment
         return $modeloInformacionCuotas;
     }
 
-    public function getInformacionPagosYCuotas($matricula_id) // Cambiar de nombre a informacionPagosCuotasConNotas()
+    public function informacionPagosCuotasConNotas($matricula_id) // Antes getInformacionPagosYCuotas
     {
         $cuotas = self::cuotasActivasTotales($matricula_id);
         if (count($cuotas) == 0) return null;
@@ -154,7 +165,7 @@ class InstallmentRepository extends Installment
                 default: throw new NotFoundResourceException('Error, tipo de cuota no identificado ['. $cuotaIterador->type .']');
             }
         }
-        return [
+        return (object) [
             'matricula' => $cuotas_matricula,
             'ciclo' => $cuotas_ciclo,
             'monto_deuda_inicial' => $monto_deuda_inicial,
@@ -164,7 +175,7 @@ class InstallmentRepository extends Installment
         ];
     }
 
-    public function getCuotasCiclo($matricula_id)   // Cambiar de nombre a informacionPagosCuotas()
+    public function informacionPagosCuotas($matricula_id)   //Antes getCuotasCiclo
     {
         $cuotas = self::cuotasActivasCiclo($matricula_id);
         if (count($cuotas) == 0) return null;
@@ -180,19 +191,13 @@ class InstallmentRepository extends Installment
             $cuotas_ciclo [] = $informacionCuota;
         }
 
-        return [
+        return (object) [
             'cuotas_ciclo' => $cuotas_ciclo,
             'monto_deuda_inicial' => $monto_deuda_inicial,
             'monto_deuda_pagado' => $monto_pagado,
             'monto_deuda_pendiente' => $monto_deuda_inicial - $monto_pagado,
             'total_pagado' => ($monto_deuda_inicial - $monto_pagado) == 0,
         ];
-    }
-
-     // Calcular monto abonado
-    public function montoAbonadoDeMatricula( int $matricula_id ){
-
-
     }
 
     private function cuotasActivasTotales(int $matricula_id){
@@ -211,8 +216,8 @@ class InstallmentRepository extends Installment
                                         ->orderBy('order', 'asc')
                                         ->get();
         $numeroCuotas = count($cuotasMatricula);
-        if($numeroCuotas !=1 ) throw new Exception("Error, el numero de cuotas para la matricula no es valido,  [$numeroCuotas cuotas encontradas] ");
-        return $numeroCuotas[0];
+        if($numeroCuotas >1 ) throw new Exception("Error, el numero de cuotas para la matricula no es valido,  [$numeroCuotas cuotas encontradas] ");
+        return $numeroCuotas == 1 ? $cuotasMatricula[0] : null;
     }
 
     private function cuotasActivasCiclo(int $matricula_id){

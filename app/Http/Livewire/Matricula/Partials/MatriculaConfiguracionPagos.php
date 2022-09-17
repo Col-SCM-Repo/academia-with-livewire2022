@@ -50,6 +50,7 @@ class MatriculaConfiguracionPagos extends Component
 
     public function render()
     {
+        toastAlert($this, 'Render PAGOS ');
         $matricula_status = $this->matriculaId? $this->_matriculaRepository::find($this->matriculaId)->status : null;
         return view('livewire.matricula.partials.matricula-configuracion-pagos', compact('matricula_status'));
     }
@@ -64,6 +65,7 @@ class MatriculaConfiguracionPagos extends Component
             sweetAlert($this, 'cuota', EstadosEntidadEnum::CREATED);
             $this->emitUp('cuota-generada', $this->matriculaId);
             openModal($this, '#form-modal-cuotas-pago', false);
+            $this->matriculaId=$this->matriculaId;
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
         }
@@ -72,7 +74,16 @@ class MatriculaConfiguracionPagos extends Component
     public function update(){
         $this->validate();
         $modeloPagos = self::buildModeloPagos();
-        dd('update', $modeloPagos);
+        try {
+            $msg = $this->_cuotasRepository->actualizarCoutasPago($this->matriculaId, $modeloPagos);
+            toastAlert($this, $msg, EstadosAlertasEnum::SUCCESS);
+            sweetAlert($this, 'cuota', EstadosEntidadEnum::UPDATED);
+            $this->emitUp('cuota-generada', $this->matriculaId);
+            openModal($this, '#form-modal-cuotas-pago', false);
+        } catch (Exception $ex) {
+            toastAlert($this, $ex->getMessage());
+        }
+            /* dd('update', $modeloPagos); */
     }
 
     /* Funciones listeners */
@@ -108,9 +119,7 @@ class MatriculaConfiguracionPagos extends Component
         }
         self::calcularMontoCuotas();
     }
-    public function updatedDetalleCuotas($value){
-        $this->validateOnly('detalleCuotas');
-    }
+
 
     public function abrirModalCuotasPago(){
         self::initialState();

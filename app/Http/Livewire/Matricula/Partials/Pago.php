@@ -1,5 +1,10 @@
 <?php
 
+/*
+    NOMBRE DE BANCO, NUMERO DE OPERACION, MODO DE PAGO (EFECTIVO, DEPOSITO)
+    CREAR TABLA DE FECHAS
+*/
+
 namespace App\Http\Livewire\Matricula\Partials;
 
 use App\Enums\EstadosAlertasEnum;

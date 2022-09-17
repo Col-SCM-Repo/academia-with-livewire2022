@@ -105,7 +105,7 @@ class EnrollmentRepository extends Enrollment
         $matricula->period_cost = $mEnrollment->costo_ciclo;
         $matricula->period_cost_final = $mEnrollment->costo_ciclo_final;
         $matricula->observations = $mEnrollment->observaciones;
-        $matricula->status = EstadosMatriculaEnum::PENDIENTE_ACTIVACION;
+        /* $matricula->status = EstadosMatriculaEnum::PENDIENTE_ACTIVACION; */
         $matricula->save();
         return $matricula;
     }

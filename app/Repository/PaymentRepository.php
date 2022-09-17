@@ -19,6 +19,10 @@ class PaymentRepository extends Payment
                     user_id	payment_id	serie	numeration
     */
 
+    /*PENDIENTE */
+    // llamara a un metodo de pagosRepository para generar un codigo de pago para cada pago realizado en la cuota
+    // Crear un metodo en payments para generar notas y colocar un parametro para descontar el amountpayment automatico de la matricula
+
     private $_cuotasRepository;
 
     public function __construct()
@@ -31,19 +35,17 @@ class PaymentRepository extends Payment
         return (object) [
             //'id' => null,
             'cuota_id' => null,                 // installment_id
-            'matricula_id' => null,                 //
+            'matricula_id' => null,             //
             'montoPagado' => null,              // amount
-            //'tipo' => null,                     // type
-            //'concepto' => null,                 // concept_type
+
             'pago_id' => null                   // payment_id
-            // 'autoFraccionamiento' => true
-            // 'payment_id' => null,
+
             // 'serie' => null,                 // ...evaluar
             // 'numeration' => null,            // ...evaluar
         ];
     }
 
-    public function pagarMatricula( object $modelBuilder ){
+    public function pagarMatricula( object $modelBuilder ){     // Solo requiere de cuota_id y montoPagado
         $cuota = $this->_cuotasRepository::find($modelBuilder->cuota_id);
         if (!$cuota) throw new NotFoundResourceException('No se encontro la cuota especificada');
         if($cuota->abonado() >= $cuota->amount) throw new NotFoundResourceException('La cuota ya esta pagada');
@@ -54,14 +56,14 @@ class PaymentRepository extends Payment
         throw new Exception('Error, el pago de la matricula no se puede fraccionar');
     }
 
-    public function pagarCiclo( object $modelBuilder ){
-        $informacionDeuda = $this->_cuotasRepository->getCuotasCiclo($modelBuilder->matricula_id);
+    public function pagarCiclo( object $modelBuilder ){     // Solo requiere de matricula_id y montoPagado
+        $informacionDeuda = $this->_cuotasRepository->informacionPagosCuotas($modelBuilder->matricula_id);
         if(!$informacionDeuda) throw new NotFoundResourceException('Error, no se encontro informacion sobre la deuda');
 
-        if( $informacionDeuda['monto_deuda_pendiente'] >= $modelBuilder->montoPagado  ){
+        if( $informacionDeuda->monto_deuda_pendiente >= $modelBuilder->montoPagado  ){
             $pagos = array();
             $saldo=round($modelBuilder->montoPagado,2);
-            foreach ( $informacionDeuda['cuotas_ciclo']  as $cuotaIterador ) {
+            foreach ( $informacionDeuda->cuotas_ciclo  as $cuotaIterador ) {
                 if( $saldo < 0){
                     Log::debug("[PaymentRepository::pagarCiclo] [CRITICO] El saldo [$saldo] es negativo  ".$cuotaIterador->id.' fecha '.date('Y-m-d H:i:s'));
                     throw new Exception('Ocurrio un error critico al registrar pagos.'.$cuotaIterador->id);
@@ -94,7 +96,7 @@ class PaymentRepository extends Payment
             return $pagos;
         }
         else
-            throw new Exception('Error, el monto abonado no puede ser mayor a la deuda pendiente de S./'.$informacionDeuda['monto_deuda_pendiente'].'');
+            throw new Exception('Error, el monto abonado no puede ser mayor a la deuda pendiente de S./'.$informacionDeuda->monto_deuda_pendiente.'');
     }
 
     public function anularPago( int $pago_id ){
@@ -141,7 +143,7 @@ class PaymentRepository extends Payment
             if ($cuota->amount == $modelBuilder->montoPagado)       // (sin fraccionar)
                 $pago = self::crearPago($modelBuilder->cuota_id, $modelBuilder->montoPagado);
             else {  // (Fraccionado)
-                $cuotasDeCiclo = (object) $this->_cuotasRepository->getCuotasCiclo($cuota->enrollment_id);
+                $cuotasDeCiclo = (object) $this->_cuotasRepository->informacionPagosCuotas($cuota->enrollment_id);
 
                 if ($modelBuilder->montoPagado > $cuotasDeCiclo->monto_deuda_pendiente)
                     throw new BadRequestException('Error, el monto pagado no puede ser mayor a la deuda');

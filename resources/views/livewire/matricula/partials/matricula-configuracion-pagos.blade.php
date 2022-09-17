@@ -1,4 +1,4 @@
-<div wire:ignore.self style="display: inline-block; text-align: left !important">
+<div style="display: inline-block; text-align: left !important">
     @if ($matriculaId)
         <button class="btn btn-sm {{ $matricula_status == 1? 'bg-warning':'' }} {{ $matricula_status == -1 ? 'bg-danger':'' }}  btn-warning" type="button" style="padding: .75rem 3rem" {{ $matricula_status == 0? 'display':'' }} wire:click="abrirModalCuotasPago">
             <i class="fa fa-money" aria-hidden="true"></i> {{ $matricula_status == 1? 'Actualizar':'Crear' }} cuotas de pago

@@ -6,6 +6,7 @@ use App\Enums\EstadosEntidadEnum;
 use App\Repository\CareerRepository;
 use App\Repository\ClassroomRepository;
 use App\Repository\EnrollmentRepository;
+use App\Repository\InstallmentRepository;
 use App\Repository\ScholarshipRepository;
 use Exception;
 use Illuminate\Support\Facades\Session;
@@ -19,13 +20,17 @@ class MatriculaConfiguracionGeneral extends Component
     public  $descuento, $estudianteId, $classroom, $carrera, $costoCiclo, $costoCicloFinal, $observaciones;
 
     public  $listaClassrooms, $listaCarreras, $listaDescuentos, $totalVacantes, $vacantesDisponibles;
-    private $_classroomRepository, $_matriculaRepository, $_carrerasRepository, $_descuentosRepository;
+    private $_classroomRepository, $_matriculaRepository, $_carrerasRepository, $_descuentosRepository, $_cuotasRepository;
 
     protected $listeners = [
         'pagina-cargada-matricula' => 'enviarDataAutocomplete',
         'matricula-estudiante-id' => 'cargarIdEstudiante',
         'cargar-id-matricula' => 'cargarIdMatricula',
-        'descuentos-actualizados' => 'render'
+        'descuentos-actualizados' => 'render',
+
+        // Eventos de matricula-configuracion-pagos
+        'cuota-generada'=> 'cuotaGenerada',
+
     ];
 
     protected $rules = [
@@ -46,6 +51,7 @@ class MatriculaConfiguracionGeneral extends Component
         $this->_carrerasRepository = new CareerRepository();
         $this->_matriculaRepository = new EnrollmentRepository();
         $this->_descuentosRepository = new ScholarshipRepository();
+        $this->_cuotasRepository = new InstallmentRepository();
     }
 
     public function initialState(){
@@ -62,6 +68,8 @@ class MatriculaConfiguracionGeneral extends Component
 
     public function render()
     {
+        $this->emit('render-matriculageneral');
+        toastAlert($this, 'Render GENERAL');
         $this->listaDescuentos = $this->_descuentosRepository->listaDescuentos();
         $this->listaClassrooms = Session::has('periodo') ? $this->_classroomRepository->getListaClases(Session::get('periodo')->id) : [];
         /* $matricula = $this->matriculaId? $this->_matriculaRepository::find($this->matriculaId):null;
@@ -90,8 +98,12 @@ class MatriculaConfiguracionGeneral extends Component
         $this->validate();
         $modeloMatricula = self::buildModeloMatricula();
 
+        // Validar eliminacion automatica de pagos en el caso que cambie el monto a pagar
+        // En caso de no haber cambio no cambiar el estado de matiucla a pendiende de actualizacion
+
         try {
             $this->_matriculaRepository->actualizar($this->matriculaId, $modeloMatricula);
+            $this->_cuotasRepository->evaluarRequisitosActualizacion($this->matriculaId);
             /* $this->emitUp('cargar-id-matricula', $matriculaCreada->id); */
             /* $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'cargar-id-matricula', $matriculaCreada->id); */
             sweetAlert($this, 'matricula', EstadosEntidadEnum::UPDATED);
@@ -155,6 +167,11 @@ class MatriculaConfiguracionGeneral extends Component
         $matricula = $this->_matriculaRepository::find($matricula_id);
         if($matricula) self::vincularInformacionMatricula($matricula);
         else toastAlert($this, 'Error al cargar la informacion de la matricula');
+    }
+
+    // Listeners de matricula-configuracion-pagos
+    public function cuotaGenerada( ){
+        $this->emitUp('cuotas-pagos-updated');
     }
 
 }

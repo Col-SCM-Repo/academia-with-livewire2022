@@ -75,6 +75,11 @@
 
     @push('scripts')
         <script>
+            Livewire.on('render-matriculageneral', ()=>{
+                console.log('La pagina se renderizo');
+                console.log( @js($listaDescuentos) );
+            })
+
             $(document).ready(()=>{
                 Livewire.emit('pagina-cargada-matricula');
                 Livewire.on( "data-autocomplete-matricula", ({ carreras })=>{
