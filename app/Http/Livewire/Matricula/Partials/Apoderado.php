@@ -68,6 +68,7 @@ class Apoderado extends Component
 
     public function render()
     {
+        toastAlert($this, 'CARGANDO RENDER APODERADO','warning' );
         return view('livewire.matricula.partials.apoderado')->with('lista_apoderados', $this->_apoderadoRepository->getListaApoderados($this->idEstudiante));
     }
 

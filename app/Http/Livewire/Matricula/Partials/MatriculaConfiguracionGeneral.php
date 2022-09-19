@@ -23,14 +23,10 @@ class MatriculaConfiguracionGeneral extends Component
     private $_classroomRepository, $_matriculaRepository, $_carrerasRepository, $_descuentosRepository, $_cuotasRepository;
 
     protected $listeners = [
-        'pagina-cargada-matricula' => 'enviarDataAutocomplete',
+        /* 'pagina-cargada-matricula' => 'enviarDataAutocomplete', */
         'matricula-estudiante-id' => 'cargarIdEstudiante',
         'cargar-id-matricula' => 'cargarIdMatricula',
         'descuentos-actualizados' => 'render',
-
-        // Eventos de matricula-configuracion-pagos
-        'cuota-generada'=> 'cuotaGenerada',
-
     ];
 
     protected $rules = [
@@ -69,7 +65,7 @@ class MatriculaConfiguracionGeneral extends Component
     public function render()
     {
         $this->emit('render-matriculageneral');
-        toastAlert($this, 'Render GENERAL');
+        toastAlert($this, 'CARGANDO RENDER MATRICULAS-CONF-GENERAL','warning' );
         $this->listaDescuentos = $this->_descuentosRepository->listaDescuentos();
         $this->listaClassrooms = Session::has('periodo') ? $this->_classroomRepository->getListaClases(Session::get('periodo')->id) : [];
         /* $matricula = $this->matriculaId? $this->_matriculaRepository::find($this->matriculaId):null;
@@ -84,11 +80,10 @@ class MatriculaConfiguracionGeneral extends Component
         /* dd($modeloMatricula); */
         try {
             $matriculaCreada = $this->_matriculaRepository->registrar($modeloMatricula);
-            $this->emitUp('cargar-id-matricula', $matriculaCreada->id);
-            $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'cargar-id-matricula', $matriculaCreada->id);
             $this->matriculaId = $matriculaCreada->id;
             sweetAlert($this, 'matricula', EstadosEntidadEnum::CREATED);
-
+            $this->emitTo('matricula.partials.matricula', 'renderizar-matricula');
+            /* $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'renderizar-matricula-pagos'); */
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
         }
@@ -103,17 +98,17 @@ class MatriculaConfiguracionGeneral extends Component
 
         try {
             $this->_matriculaRepository->actualizar($this->matriculaId, $modeloMatricula);
-            $this->_cuotasRepository->evaluarRequisitosActualizacion($this->matriculaId);
+            $requiereActualizar = $this->_cuotasRepository->evaluarRequisitosActualizacion($this->matriculaId);
+            if($requiereActualizar){
+                $this->emitTo('matricula.partials.matricula', 'renderizar-matricula');
+                /* $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'renderizar-matricula-pagos'); */
+            }
             /* $this->emitUp('cargar-id-matricula', $matriculaCreada->id); */
             /* $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'cargar-id-matricula', $matriculaCreada->id); */
             sweetAlert($this, 'matricula', EstadosEntidadEnum::UPDATED);
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
         }
-    }
-
-    public function delete(){
-
     }
 
     /* Funciones Internas  */
@@ -153,11 +148,6 @@ class MatriculaConfiguracionGeneral extends Component
         $this->observaciones = $matricula->observations;
     }
 
-    public function enviarDataAutocomplete()
-    {
-        $this->emit('data-autocomplete-matricula', (object)[ "carreras" => $this->listaCarreras ]);
-    }
-
     public function cargarIdEstudiante(int $estudiante_id){
         $this->estudianteId=$estudiante_id;
     }
@@ -168,10 +158,4 @@ class MatriculaConfiguracionGeneral extends Component
         if($matricula) self::vincularInformacionMatricula($matricula);
         else toastAlert($this, 'Error al cargar la informacion de la matricula');
     }
-
-    // Listeners de matricula-configuracion-pagos
-    public function cuotaGenerada( ){
-        $this->emitUp('cuotas-pagos-updated');
-    }
-
 }

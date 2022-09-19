@@ -75,16 +75,13 @@
 
     @push('scripts')
         <script>
-            Livewire.on('render-matriculageneral', ()=>{
-                console.log('La pagina se renderizo');
-                console.log( @js($listaDescuentos) );
-            })
-
             $(document).ready(()=>{
-                Livewire.emit('pagina-cargada-matricula');
-                Livewire.on( "data-autocomplete-matricula", ({ carreras })=>{
+                /* Livewire.emit('pagina-cargada-matricula'); */
+                $( "#carrera_matricula" ).typeahead({ source: @Js($listaCarreras) });
+
+                /* Livewire.on( "data-autocomplete-matricula", ({ carreras })=>{
                     $( "#carrera_matricula" ).typeahead({ source: carreras });
-                });
+                }); */
             });
         </script>
     @endpush

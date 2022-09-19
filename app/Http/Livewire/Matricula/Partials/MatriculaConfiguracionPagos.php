@@ -18,7 +18,9 @@ class MatriculaConfiguracionPagos extends Component
 
     private $_matriculaRepository, $_cuotasRepository;
 
-    protected $listeners = [ ];
+    protected $listeners = [
+        'renderizar-matricula-pagos'=>'render'
+     ];
 
     protected $rules = [
         'matriculaId' => 'required|integer|min:1 ',
@@ -50,7 +52,7 @@ class MatriculaConfiguracionPagos extends Component
 
     public function render()
     {
-        toastAlert($this, 'Render PAGOS ');
+        toastAlert($this, 'CARGANDO RENDER MATRICULAS-CONF-PAGOS','warning' );
         $matricula_status = $this->matriculaId? $this->_matriculaRepository::find($this->matriculaId)->status : null;
         return view('livewire.matricula.partials.matricula-configuracion-pagos', compact('matricula_status'));
     }
@@ -63,9 +65,11 @@ class MatriculaConfiguracionPagos extends Component
             $msg = $this->_cuotasRepository->generarCoutasPago($modeloPagos);
             toastAlert($this, $msg, EstadosAlertasEnum::SUCCESS);
             sweetAlert($this, 'cuota', EstadosEntidadEnum::CREATED);
-            $this->emitUp('cuota-generada', $this->matriculaId);
             openModal($this, '#form-modal-cuotas-pago', false);
             $this->matriculaId=$this->matriculaId;
+
+            $this->emitTo('matricula.partials.matricula', 'renderizar-matricula');
+            /* $this->emit('pagos-matricula-actualizados', $this->matriculaId ); */
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
         }
@@ -78,8 +82,9 @@ class MatriculaConfiguracionPagos extends Component
             $msg = $this->_cuotasRepository->actualizarCoutasPago($this->matriculaId, $modeloPagos);
             toastAlert($this, $msg, EstadosAlertasEnum::SUCCESS);
             sweetAlert($this, 'cuota', EstadosEntidadEnum::UPDATED);
-            $this->emitUp('cuota-generada', $this->matriculaId);
             openModal($this, '#form-modal-cuotas-pago', false);
+            $this->emitTo('matricula.partials.matricula', 'renderizar-matricula');
+            /* $this->emit('pagos-matricula-actualizados', $this->matriculaId ); */
         } catch (Exception $ex) {
             toastAlert($this, $ex->getMessage());
         }
@@ -146,9 +151,7 @@ class MatriculaConfiguracionPagos extends Component
                 $this->detalleCuotas = $cuotasExistentes->detalle_cuotas;
             }
             else $this->reset(['costoMatricula','tipoPago','numeroCuotas','detalleCuotas']);
-        } catch ( Exception $ex) {
-            toastAlert($this, $ex->getMessage());
-        }
+        } catch ( Exception $ex) { toastAlert($this, $ex->getMessage()); }
     }
 
     public function calcularMontoCuotas( $indiceArray = null ){

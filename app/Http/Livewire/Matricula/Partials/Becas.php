@@ -44,6 +44,7 @@ class Becas extends Component
 
     public function render()
     {
+        toastAlert($this, 'CARGANDO RENDER BECAS','warning' );
         $this->emit('asignar-eventos-descuentos');
         $listaBecasDisponibles = $this->_becaRepository->listaDescuentos();
         return view('livewire.matricula.partials.becas')->with('becas', $listaBecasDisponibles);

@@ -81,6 +81,13 @@ class InstallmentRepository extends Installment
 
         $cuotasDesactivadas = self::desactivarCuotasMatricula($matricula_id);
         $cuotasCreadas = self::generarCoutasPago($moInstallment);
+
+        // Creando pagos
+        /* if(true){
+
+
+        } */
+
         return "$cuotasDesactivadas \n $cuotasCreadas";
     }
 
@@ -96,7 +103,9 @@ class InstallmentRepository extends Installment
             $matricula->status = EstadosMatriculaEnum::PENDIENTE_ACTIVACION;
             $matricula->save();
             self::desactivarCuotasMatricula($matricula_id, false);
+            return true;
         }
+        return false;
     }
 
     public function desactivarCuotasMatricula(int $matricula_id, bool $autoEliminacion=true){
@@ -154,7 +163,7 @@ class InstallmentRepository extends Installment
         $monto_pagado = 0;          // Monto total abonado;
 
         foreach ($cuotas as $cuotaIterador) {
-            $informacionCuota = self::buildInformacionCuotas($cuotaIterador, true);
+            $informacionCuota =  self::buildInformacionCuotas($cuotaIterador, true);
 
             $monto_deuda_inicial += $cuotaIterador->amount;
             $monto_pagado += $informacionCuota->monto_pagado;
@@ -165,7 +174,7 @@ class InstallmentRepository extends Installment
                 default: throw new NotFoundResourceException('Error, tipo de cuota no identificado ['. $cuotaIterador->type .']');
             }
         }
-        return (object) [
+        $informacionPagos= [
             'matricula' => $cuotas_matricula,
             'ciclo' => $cuotas_ciclo,
             'monto_deuda_inicial' => $monto_deuda_inicial,
@@ -173,6 +182,8 @@ class InstallmentRepository extends Installment
             'monto_deuda_pendiente' => $monto_deuda_inicial - $monto_pagado,
             'total_pagado' => ($monto_deuda_inicial - $monto_pagado) == 0,
         ];
+        /* dd($informacionPagos); */
+        return $informacionPagos ;
     }
 
     public function informacionPagosCuotas($matricula_id)   //Antes getCuotasCiclo

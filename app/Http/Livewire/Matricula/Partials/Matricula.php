@@ -17,6 +17,7 @@ class Matricula extends Component
     ];
 
     protected $listeners = [
+        'renderizar-matricula'=>'render',
        /*  'student-found' => 'setData',
         'change-prop-enrollment' => 'setData',
         'reset-form-matricula' => 'initialState',
@@ -46,8 +47,17 @@ class Matricula extends Component
 
     public function render()
     {
-        toastAlert($this, 'Render MATRICULA');
-        $matricula = $this->matriculaId ? $this->_matriculaRepository::find($this->matriculaId):null;
+        toastAlert($this, 'CARGANDO RENDER MATRICULAS','warning' );
+        $matricula = null;
+        if( $this->matriculaId ){
+            $matricula = $this->_matriculaRepository::find($this->matriculaId);
+
+            $this->emitTo('matricula.partials.matricula-configuracion-general', 'renderizar-matricula');
+            $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'renderizar-matricula');
+            $this->emitTo('matricula.partials.pago', 'pagos-matricula-actualizados', $matricula->id);
+
+        }
+
         return view('livewire.matricula.partials.matricula', compact('matricula'));
     }
 

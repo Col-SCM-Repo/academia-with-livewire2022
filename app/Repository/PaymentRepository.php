@@ -23,35 +23,41 @@ class PaymentRepository extends Payment
     // llamara a un metodo de pagosRepository para generar un codigo de pago para cada pago realizado en la cuota
     // Crear un metodo en payments para generar notas y colocar un parametro para descontar el amountpayment automatico de la matricula
 
-    private $_cuotasRepository;
+    private $_cuotasRepository, $_matriculaRepository ;
 
     public function __construct()
     {
         $this->_cuotasRepository = new InstallmentRepository();
+        $this->_matriculaRepository = new EnrollmentRepository();
     }
 
     public function builderModelRepository()
     {
         return (object) [
-            //'id' => null,
-            'cuota_id' => null,                 // installment_id
-            'matricula_id' => null,             //
-            'montoPagado' => null,              // amount
+            'matricula_id' => null,           //
 
-            'pago_id' => null                   // payment_id
-
-            // 'serie' => null,                 // ...evaluar
+            'cuota_id' => null,	              // installment_id
+            'montoPagado' => null,	          // amount
+            'modo_pago' => null,	          // pay_mode
+            'nombre_banco' => null,	          // bank_name
+            'numero_operacion' => null,	      // operation_number
+            // 'path_voucher' => null,	      // path_voucher
+            // 'serie' => null,               // ...evaluar
             // 'numeration' => null,            // ...evaluar
         ];
     }
 
-    public function pagarMatricula( object $modelBuilder ){     // Solo requiere de cuota_id y montoPagado
+    public function pagarMatricula( object $modelBuilder ){     // Solo requiere de cuota_id, matricula y montoPagado
         $cuota = $this->_cuotasRepository::find($modelBuilder->cuota_id);
         if (!$cuota) throw new NotFoundResourceException('No se encontro la cuota especificada');
         if($cuota->abonado() >= $cuota->amount) throw new NotFoundResourceException('La cuota ya esta pagada');
 
-        if(round($modelBuilder->montoPagado, 2) == round($cuota->amount, 2))
-            return [self::almacenarPago($cuota->id, $modelBuilder->montoPagado)];
+        if(round($modelBuilder->montoPagado, 2) == round($cuota->amount, 2)){
+            $pagos =  [self::almacenarPago($cuota->id, $modelBuilder->montoPagado)];
+            if(count($pagos)>0)
+                self::abonarInformacionMatricula($modelBuilder->matricula_id, $modelBuilder->montoPagado);
+            return $pagos;
+        }
 
         throw new Exception('Error, el pago de la matricula no se puede fraccionar');
     }
@@ -93,6 +99,7 @@ class PaymentRepository extends Payment
                     }
                 }
             }
+            if(count($pagos)>0) self::abonarInformacionMatricula($modelBuilder->matricula_id, round($modelBuilder->montoPagado,2));
             return $pagos;
         }
         else
@@ -103,7 +110,9 @@ class PaymentRepository extends Payment
         $pago = Payment::find($pago_id);
         // dd($pago, $pago_id);
         if($pago){
-            return self::almacenarPago(null, $pago->amount, false, $pago_id );
+            $pagoAnulado = self::almacenarPago(null, $pago->amount, false, $pago_id );
+            if( $pagoAnulado ) self::abonarInformacionMatricula($pago->installment->enrollment->id, -1*$pago->amount);
+            return  $pagoAnulado;
         }
         else
             throw new NotFoundResourceException('Error, no se encuentra el pago a eliminar id:'.$pago_id);
@@ -127,9 +136,12 @@ class PaymentRepository extends Payment
         return $pago;
     }
 
-
-
-
+    private function abonarInformacionMatricula( int $matricula_id, $monto ){
+        $matricula = $this->_matriculaRepository::find( $matricula_id );
+        if(!$matricula) throw new NotFoundResourceException("Error, no se encontro la matricula con id $matricula_id");
+        $matricula->amount_paid +=  round($monto,2);
+        $matricula->save();
+    }
 
 
 /*

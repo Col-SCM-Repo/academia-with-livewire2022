@@ -53,6 +53,7 @@ class Alumno extends Component
     }
 
     public function render(){
+        toastAlert($this, 'CARGANDO RENDER ALUMNO','warning' );
         return view('livewire.matricula.partials.alumno');
     }
 

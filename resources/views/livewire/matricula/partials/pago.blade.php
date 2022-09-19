@@ -5,12 +5,8 @@
                 <h5 > REGISTRO DE PAGOS </h5>
                 @if ($matricula_id)
                     @if ($cuotas)
-                        @if ( $cuotas['total_pagado'])
-                            <span class="label label-primary"> Sin deuda </span>
-                        @else
-                            <span class="label label-warning-light"> Con deuda </span>
-                        @endif
-
+                        @if ( $cuotas['total_pagado']) <span class="label label-primary"> Sin deuda </span>
+                        @else   <span class="label label-warning-light"> Con deuda </span>  @endif
                     @else
                         <span class="label label-danger"> Sin registrar </span>
                     @endif
@@ -19,9 +15,7 @@
             @if ($cuotas)
                 <div class="ibox-tools">
                     <div>
-                        <a class="btn btn-xs btn-success " style="color: #FFF">
-                            Ver historial pagos
-                        </a>
+                        <a class="btn btn-xs btn-success " style="color: #FFF"> Ver historial pagos </a>
                     </div>
                     <div>
                         <small class="help-block m-b-none text-primary text-right">
@@ -40,9 +34,7 @@
                 <div class="row">
                     <label class="col-md-2 col-sm-3" for="">
                         <p>Matricula</p>
-                        <button type="button" class="btn btn-xs btn-danger" wire:click='abrirModalPagos("matricula")'  >
-                            Pagar
-                        </button>
+                        <button type="button" class="btn btn-xs btn-danger" wire:click='abrirModalPagos("matricula")'> <i class="fa fa-money" aria-hidden="true"></i> Pagar </button>
                     </label>
                     <div class="col-md-10">
                         <table class="table table-sm table-responsive table-striped table-bordered table-hover">
@@ -57,7 +49,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-
                                 @if (count($cuotas['matricula'])>0)
                                     @foreach ($cuotas['matricula'] as $cuota)
                                         <tr>
@@ -74,18 +65,13 @@
                                             <td scope="row"> {{ $cuota->fecha_limite }} </td>
                                             <td scope="row">
                                                 <button class="btn btn-xs btn-success " {{ ($cuota->total_pagado)? '':'disabled' }}  wire:click='abrirModalHistorial("matricula", {{ $cuota->id }})'>
-                                                    <i class="fa fa-book" aria-hidden="true"></i>
-                                                    Historial
+                                                    <i class="fa fa-book" aria-hidden="true"></i> Historial
                                                 </button>
                                             </td>
                                         </tr>
                                     @endforeach
                                 @else
-                                    <tr>
-                                        <td scope="row" colspan="5">
-                                            <h5>No se encontraron cuotas</h5>
-                                        </td>
-                                    </tr>
+                                    <tr> <td scope="row" colspan="5"> <h5>No se encontraron cuotas</h5> </td> </tr>
                                 @endif
                             </tbody>
                         </table>
@@ -95,9 +81,7 @@
                 <div class="row">
                     <label class="col-md-2 col-sm-3" for="">
                         <p>Ciclo</p>
-                        <button type="button" class="btn btn-xs btn-danger" wire:click='abrirModalPagos' >
-                            Abonar
-                        </button>
+                        <button type="button" class="btn btn-xs btn-danger" wire:click='abrirModalPagos'> <i class="fa fa-money" aria-hidden="true"></i> Abonar </button>
                     </label>
                     <div class="col-md-10">
                         <table class="table table-sm table-responsive table-striped table-bordered table-hover">
@@ -171,15 +155,15 @@
                     <div class="form-group row">
                         <label class="col-sm-4 control-label text-right">Deuda de cuota</label>
                         <div class="col-sm-8">
-                            <input type="text" wire:model.defer="formularioPago.monto_pendiente_cuota" class="form-control" disabled >
-                            <x-input-error variable='formularioPago.monto_pendiente_cuota'> </x-input-error>
+                            <input type="text" wire:model.defer="monto_pendiente_cuota" class="form-control" disabled >
+                            <x-input-error variable='monto_pendiente_cuota'> </x-input-error>
                         </div>
                     </div>
-                    <div class="form-group row"  style="{{ $formularioPago['cuota_id']!=null? 'display:none':'' }}">
+                    <div class="form-group row"  style="{{ $cuota_id != null ? 'display:none':'' }}">
                         <label class="col-sm-4 control-label text-right">Monto a abonar</label>
                         <div class="col-sm-8">
-                            <input type="number"  wire:model.defer="formularioPago.monto_pagar" class="form-control" >
-                            <x-input-error variable='formularioPago.monto_pagar'> </x-input-error>
+                            <input type="number"  wire:model.defer="monto_pagar" class="form-control" >
+                            <x-input-error variable='monto_pagar'> </x-input-error>
                         </div>
                     </div>
                 </div>
@@ -192,7 +176,7 @@
     </x-modal-form>
     <!-- end: Modal pagos -->
 
-    <!-- begin: Modal pagos -->
+    <!-- begin: Modal historial -->
     <x-modal-form-lg idForm='form-modal-historial' titulo="Historial de pagos" >
         <div class="px-5" style="padding: 0 2rem  !important;">
             <div class="">
@@ -242,13 +226,14 @@
             </div>
         </div>
     </x-modal-form-lg>
-    <!-- end: Modal pagos -->
+    <!-- end: Modal historial -->
 
+    @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', ()=>{
             Livewire.hook('message.processed', (msg, {fingerprint}) => {
                 console.log(fingerprint);
-                    if(fingerprint.name == 'matricula.pago'){
+                    if(fingerprint.name == 'matricula.partials.pago'){
                         [...document.getElementsByClassName('btn-pago-anular')].forEach((el)=>{
                             el.addEventListener('click', ({target})=>{
                                 if( target.dataset.target ){
@@ -271,36 +256,6 @@
                     }
             })
         })
-/*
-        NOTA:
-            * HISTORIAL ES NECESARIO VSUALIZAR CUANDO YA HAY CUOTAS
-*/
-
-    </script>
-
-    @push('scripts')
-    <script>
-        $(()=>{
-            [...document.getElementsByClassName('btn-pago-anular')].forEach((el)=>{
-                        el.addEventListener('click', ({target})=>{
-                            if( target.dataset.target ){
-                                swal({
-                                    title: "Estas Seguro?",
-                                    text: "Se anulara el pago",
-                                    icon: "warning",
-                                    buttons: true,
-                                    buttons: ["Cancelar", "Eliminar"],
-                                    dangerMode: true,
-                                })
-                                .then((willDelete) => {
-                                    if (willDelete) {
-                                        Livewire.emit('anular-pago', target.dataset.target)
-                                    }
-                                });
-                            }
-                        })
-                    })
-        });
     </script>
     @endpush
 </div>
