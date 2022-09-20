@@ -29,7 +29,7 @@ class Installment extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class, 'installment_id', 'id')
-                ->where('type', '=', TiposPagoFacturaEnum::TICKET);
+                ->where('type', '=', TiposPagoFacturaEnum::TICKET)->orderBy('id', 'asc');
     }
 
     public function abonado()

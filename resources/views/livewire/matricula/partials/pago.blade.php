@@ -163,7 +163,7 @@
                     <div class="form-group row"  style="{{ $cuota_id != null ? 'display:none':'' }}">
                         <label class="col-sm-4 control-label text-right">Monto a abonar</label>
                         <div class="col-sm-8">
-                            <input type="number"  wire:model.defer="monto_pagar" class="form-control" {{$modo_pago!=''? '':'disabled'}}>
+                            <input type="number"  wire:model.defer="monto_pagar" step="0.1" class="form-control" {{$modo_pago!=''? '':'disabled'}}>
                             <x-input-error variable='monto_pagar'> </x-input-error>
                         </div>
                     </div>
@@ -186,15 +186,6 @@
                         </div>
                     @endif
                 </div>
-
-                <x-input-error variable='matricula_id'> </x-input-error>
-                <x-input-error variable='cuota_id'> </x-input-error>
-                <x-input-error variable='monto_pendiente_cuota'> </x-input-error>
-                <x-input-error variable='monto_pagar'> </x-input-error>
-                <x-input-error variable='modo_pago'> </x-input-error>
-                <x-input-error variable='nombre_banco'> </x-input-error>
-                <x-input-error variable='numero_operacion'> </x-input-error>
-
                 <div class="col-sm-3" >
                     <button class="btn btn-sm btn-danger" type="submit" style="padding: .75rem 3rem"> Pagar </button>
                     <br> <br>

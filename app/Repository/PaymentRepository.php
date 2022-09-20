@@ -13,16 +13,6 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class PaymentRepository extends Payment
 {
-    /*
-        COLUMNAS:
-                    id	installment_id	amount	type	concept_type
-                    user_id	payment_id	serie	numeration
-    */
-
-    /*PENDIENTE */
-    // llamara a un metodo de pagosRepository para generar un codigo de pago para cada pago realizado en la cuota
-    // Crear un metodo en payments para generar notas y colocar un parametro para descontar el amountpayment automatico de la matricula
-
     private $_cuotasRepository, $_matriculaRepository ;
 
     public function __construct()
@@ -53,7 +43,7 @@ class PaymentRepository extends Payment
         if($cuota->abonado() >= $cuota->amount) throw new NotFoundResourceException('La cuota ya esta pagada');
 
         if(round($modelBuilder->montoPagado, 2) == round($cuota->amount, 2)){
-            $pagos =  [self::almacenarPago($cuota->id, $modelBuilder->montoPagado)];
+            $pagos =  [self::almacenarPago($cuota->id, $modelBuilder->montoPagado, $modelBuilder)];
             if(count($pagos)>0)
                 self::abonarInformacionMatricula($modelBuilder->matricula_id, $modelBuilder->montoPagado);
             return $pagos;
@@ -78,22 +68,22 @@ class PaymentRepository extends Payment
                 if(!$cuotaIterador->total_pagado){
                     if( ! $cuotaIterador->pagos ){
                         if( $saldo>= $cuotaIterador->monto_cuota ){
-                            $pagos[] = self::almacenarPago($cuotaIterador->id, $cuotaIterador->monto_cuota );
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $cuotaIterador->monto_cuota, $modelBuilder );
                             $saldo -= $cuotaIterador->monto_cuota;
                         }
                         else{
-                            $pagos[] = self::almacenarPago($cuotaIterador->id, $saldo, false);
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $saldo, $modelBuilder, false);
                             $saldo = 0;
                         }
                     }
                     else{
                         $montoPendienteCuota = round($cuotaIterador->monto_cuota,2) - round($cuotaIterador->monto_pagado, 2);
                         if( $saldo>= $montoPendienteCuota ){
-                            $pagos[] = self::almacenarPago($cuotaIterador->id, $montoPendienteCuota, false);
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $montoPendienteCuota, $modelBuilder, false);
                             $saldo -= $montoPendienteCuota;
                         }
                         else{
-                            $pagos[] = self::almacenarPago($cuotaIterador->id, $saldo, false);
+                            $pagos[] = self::almacenarPago($cuotaIterador->id, $saldo, $modelBuilder, false);
                             $saldo = 0;
                         }
                     }
@@ -110,7 +100,7 @@ class PaymentRepository extends Payment
         $pago = Payment::find($pago_id);
         // dd($pago, $pago_id);
         if($pago){
-            $pagoAnulado = self::almacenarPago(null, $pago->amount, false, $pago_id );
+            $pagoAnulado = self::almacenarPago(null, $pago->amount, null, false, $pago_id );
             if( $pagoAnulado ) self::abonarInformacionMatricula($pago->installment->enrollment->id, -1*$pago->amount);
             return  $pagoAnulado;
         }
@@ -119,7 +109,7 @@ class PaymentRepository extends Payment
 
     }
 
-    private function almacenarPago( $cuota_id, $monto, bool $entero=true, $pago_id = null)
+    private function almacenarPago( $cuota_id, $monto, object $moPago=null, bool $entero=true, $pago_id = null)
     {
         $pago = new Payment();
         $pago->installment_id = $cuota_id;
@@ -127,6 +117,9 @@ class PaymentRepository extends Payment
         $pago->type = $pago_id ? TiposPagoFacturaEnum::DEVOLUCION : TiposPagoFacturaEnum::TICKET;
         $pago->concept_type = $entero? TiposConceptoPagoEnun::ENTERO : TiposConceptoPagoEnun::PARCIAL;
         $pago->user_id = Auth::user()->id;
+        $pago->pay_mode = $pago_id? null : $moPago->modo_pago ;
+        $pago->bank_name = $pago_id? null : $moPago->nombre_banco ;
+        $pago->operation_number = $pago_id? null : $moPago->numero_operacion ;
         $pago->payment_id = $pago_id;
         $pago->save();
 

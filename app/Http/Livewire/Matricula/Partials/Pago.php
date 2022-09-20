@@ -26,8 +26,8 @@ class Pago extends Component
         'monto_pendiente_cuota' => 'numeric|min:0',
         'monto_pagar' => 'required|numeric|min:1',
         'modo_pago' => 'required|string|in:cash,deposit',
-        'nombre_banco' => 'required | string | min:3',
-        'numero_operacion' => 'required | string | min:3',
+        'nombre_banco' => 'nullable|required|string|min:3',
+        'numero_operacion' => 'nullable|required|string|min:3',
     ];
 
     protected $listeners = [
@@ -70,18 +70,22 @@ class Pago extends Component
                                                         ->with('cuotas_ciclo', $cuotas_ciclo);
     }
 
+    public function updatedModoPago( $value ){
+        switch($value){
+            case ModoPagoEnum::EFECTIVO:
+                $this->nombre_banco = '--------';
+                $this->numero_operacion = '------';
+                break;
+            case ModoPagoEnum::DEPOSITO_BANCARIO:
+                $this->nombre_banco = '';
+                $this->numero_operacion = '';
+                break;
+        }
+    }
+
     /***********************************************************  CRUD *************************************************************/
     public function pagar(){
-
-        if($this->modo_pago == ModoPagoEnum::EFECTIVO){
-            $this->validateOnly('matricula_id');
-            $this->validateOnly('cuota_id');
-            $this->validateOnly('monto_pendiente_cuota');
-            $this->validateOnly('monto_pagar');
-            $this->validateOnly('modo_pago');
-        }
-        else
-            $this->validate();
+        $this->validate();
 
         $modelPago = self::buildModelPago();
 
