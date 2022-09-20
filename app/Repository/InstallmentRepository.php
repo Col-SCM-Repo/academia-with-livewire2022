@@ -72,12 +72,12 @@ class InstallmentRepository extends Installment
 
     public function actualizarCoutasPago(int $matricula_id, object $moInstallment)
     {
-        $informacionPagos = self::informacionPagosCuotas($matricula_id);
+        /* $informacionPagos = self::informacionPagosCuotas($matricula_id); */
         $matricula = $this->_matriculaRepository::find($matricula_id);
         $matricula->status = EstadosMatriculaEnum::ACTIVO;
 
-        if(!$informacionPagos || !$matricula /* || (round($informacionPagos->monto_deuda_pagado, 2) == ( round((float) $matricula->amount_paid, 2)))  */)
-            throw new Exception('Error, la matricula presenta incoherencias en las cuotas de pago');
+        if(!$matricula ) throw new Exception('Error, no se encontró la matricula');
+        if($matricula->amount_paid > 0 ) throw new Exception('Error, no se puede actualizar la matricula, debido a que se encontró pagos registrados.');
 
         $cuotasDesactivadas = self::desactivarCuotasMatricula($matricula_id);
         $cuotasCreadas = self::generarCoutasPago($moInstallment);

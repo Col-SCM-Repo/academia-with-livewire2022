@@ -98,6 +98,10 @@ class EnrollmentRepository extends Enrollment
         $matricula = Enrollment::find($matricula_id);
         if(!$matricula) throw new NotFoundResourceException('Error, no se encontrò la matricula');
 
+        if( $matricula->period_cost_final != $mEnrollment->costo_ciclo_final  ){
+            if($matricula->amount_paid>0) throw new NotFoundResourceException('No se puede actualizar el costo de la matricula, por que se encontró pagos realizados');
+        }
+
         $matricula->type = 'normal';
         $matricula->classroom_id = $mEnrollment->aula_id;
         $matricula->career_id = $this->_carrerasRepository->buscarRegistrarCarrera($mEnrollment->carrera)->id;
@@ -159,6 +163,7 @@ class EnrollmentRepository extends Enrollment
         return Enrollment::join('classrooms', 'enrollments.classroom_id', 'classrooms.id')
                                 ->join('levels', 'classrooms.level_id' ,'levels.id')
                                 ->where('enrollments.deleted_at', null)
+                                ->where('enrollments.status', '!=', EstadosMatriculaEnum::INACTIVO)
                                 ->where('classrooms.deleted_at', null)
                                 ->where('enrollments.student_id', $estudiante_id)
                                 ->where('levels.period_id', $periodo_id)

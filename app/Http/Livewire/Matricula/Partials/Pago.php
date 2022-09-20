@@ -32,12 +32,18 @@ class Pago extends Component
 
     protected $listeners = [
         'anular-pago' => 'anularPago',
-        'pagos-matricula-actualizados' => 'cargarDataPagos'
+        'pagos-matricula-actualizados' => 'cargarDataPagos',
+        'resetear-pagos' => 'resetearPagos'
     ];
 
     public function __construct(){
         $this->_cuotaRepository = new InstallmentRepository();
         $this->_pagoRepository = new PaymentRepository();
+    }
+
+    public function resetearPagos(){
+        $this->reset(['historial', 'matricula_id']);
+        $this->reset(['cuota_id', 'monto_pendiente_cuota', 'monto_pagar', 'modo_pago', 'nombre_banco', 'numero_operacion']);
     }
 
     public function mount(){

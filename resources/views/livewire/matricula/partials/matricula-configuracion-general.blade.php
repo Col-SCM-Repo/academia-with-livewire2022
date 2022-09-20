@@ -17,7 +17,7 @@
             <div class="form-group">
                 <label class="col-lg-3 control-label"> Observaciones: </label>
                 <div class="col-lg-9">
-                    <textarea rows="4" title="Observaciones de la matricula." class="form-control " wire:model="observaciones"  {{$classroom? "":"disabled"}}></textarea>
+                    <textarea rows="4" title="Observaciones de la matricula." class="form-control " wire:model.defer="observaciones"  {{$classroom? "":"disabled"}}></textarea>
                     <x-input-error variable='observaciones'> </x-input-error>
                 </div>
             </div>

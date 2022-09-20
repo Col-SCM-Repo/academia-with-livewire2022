@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Matricula\Partials;
 
 use App\Enums\{EstadosEntidadEnum, FormasPagoEnum, TiposParentescosApoderadoEnum};
 use App\Repository\{CareerRepository, ClassroomRepository, EnrollmentRepository};
+use Exception;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
@@ -17,7 +18,7 @@ class Matricula extends Component
     ];
 
     protected $listeners = [
-        'renderizar-matricula'=>'render',
+        'renderizar-matricula'=>'renderizarMatricula',
        /*  'student-found' => 'setData',
         'change-prop-enrollment' => 'setData',
         'reset-form-matricula' => 'initialState',
@@ -35,15 +36,10 @@ class Matricula extends Component
         $this->_matriculaRepository = new EnrollmentRepository();
     }
 
-    public function initialState()
-    {
-
-    }
-
-    public function mount()
+   /*  public function mount()
     {
         self::initialState();
-    }
+    } */
 
     public function render()
     {
@@ -61,8 +57,25 @@ class Matricula extends Component
         return view('livewire.matricula.partials.matricula', compact('matricula'));
     }
 
+    public function renderizarMatricula($matricula_id = null){
+        if($matricula_id)
+            $this->matriculaId =  $matricula_id;
+        self::render();
+    }
+
     public function retirarAlumno( $matricula_id ){
-        dd($matricula_id);
+        try {
+            $this->_matriculaRepository->eliminar($matricula_id);
+            sweetAlert($this, 'alumno', EstadosEntidadEnum::CREATED);
+            $this->reset(['matriculaId']);
+
+            $this->emitTo('matricula.partials.matricula-configuracion-general', 'resetear-matricula-general');
+            $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'resetear-matricula-pagos');
+            $this->emitTo('matricula.partials.pago', 'resetear-pagos');
+        } catch (Exception $ex) {
+            toastAlert($this, $ex->getMessage());
+        }
+
     }
 
     public function cambiarIdEstudiante( int $estudiante_id ){

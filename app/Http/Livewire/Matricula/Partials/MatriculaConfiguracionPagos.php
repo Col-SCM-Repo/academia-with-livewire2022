@@ -19,15 +19,16 @@ class MatriculaConfiguracionPagos extends Component
     private $_matriculaRepository, $_cuotasRepository;
 
     protected $listeners = [
-        'renderizar-matricula-pagos'=>'render'
+        'renderizar-matricula-pagos'=>'render',
+        'resetear-matricula-pagos' => 'resetearMatricula'
      ];
 
     protected $rules = [
         'matriculaId' => 'required|integer|min:1 ',
 
         'costoMatricula' => 'required|numeric|min:0 ',
-        'costoCiclo' => 'required|numeric|min:0|max:4 ',
-        'costoAbonado' => 'required|numeric|min:0|max:4 ',
+        'costoCiclo' => 'required|numeric|min:0 ',
+        'costoAbonado' => 'required|numeric|min:0 ',
         'tipoPago' => 'required|string|in:cash,credit',
         'numeroCuotas' => 'required|integer|min:0 ',
         'detalleCuotas' => 'nullable|array',
@@ -35,6 +36,11 @@ class MatriculaConfiguracionPagos extends Component
         'detalleCuotas.*.costo' => 'required|numeric|min:1',
         'detalleCuotas.*.fecha' => 'nullable|required|date',
     ];
+
+    public function resetearMatricula(){
+        $this->reset([ 'matriculaId' ]);
+        $this->reset([ 'costoMatricula', 'costoCiclo', 'costoAbonado', 'tipoPago', 'numeroCuotas', 'detalleCuotas' ]);
+    }
 
     public function mount($matricula_id){
         $this->matriculaId = $matricula_id;

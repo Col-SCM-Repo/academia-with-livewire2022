@@ -27,6 +27,7 @@ class MatriculaConfiguracionGeneral extends Component
         'matricula-estudiante-id' => 'cargarIdEstudiante',
         'cargar-id-matricula' => 'cargarIdMatricula',
         'descuentos-actualizados' => 'render',
+        'resetear-matricula-general' => 'resetearMatricula'
     ];
 
     protected $rules = [
@@ -40,6 +41,11 @@ class MatriculaConfiguracionGeneral extends Component
         'costoCiclo' => 'required | numeric | min:0',
         'observaciones' => ' nullable | string '
     ];
+
+    public function resetearMatricula(){
+        $this->reset(['matriculaId']);
+        $this->reset(['descuento',  'classroom', 'carrera', 'costoCiclo', 'costoCicloFinal', 'observaciones']);
+    }
 
     public function __construct()
     {
@@ -82,7 +88,7 @@ class MatriculaConfiguracionGeneral extends Component
             $matriculaCreada = $this->_matriculaRepository->registrar($modeloMatricula);
             $this->matriculaId = $matriculaCreada->id;
             sweetAlert($this, 'matricula', EstadosEntidadEnum::CREATED);
-            $this->emitTo('matricula.partials.matricula', 'renderizar-matricula');
+            $this->emitTo('matricula.partials.matricula', 'renderizar-matricula', $matriculaCreada->id);
             /* $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'renderizar-matricula-pagos'); */
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
@@ -118,6 +124,7 @@ class MatriculaConfiguracionGeneral extends Component
             $this->vacantesDisponibles = $this->listaClassrooms[$classroom_id]['vacantes_disponibles'];
             $this->costoCiclo = $this->listaClassrooms[$classroom_id]['costo'];
             $this->costoCicloFinal = $this->listaClassrooms[$classroom_id]['costo'];
+            $this->reset([ 'descuento']);
         }
         else $this->reset([ 'totalVacantes', 'vacantesDisponibles', 'costoCiclo', 'costoCicloFinal' ]);
     }
