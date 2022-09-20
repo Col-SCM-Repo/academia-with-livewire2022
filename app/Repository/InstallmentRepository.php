@@ -211,7 +211,36 @@ class InstallmentRepository extends Installment
         ];
     }
 
-    private function cuotasActivasTotales(int $matricula_id){
+    public function informacionMontosYDeudas( int $matricula_id ){
+        $general_deuda = 0;     $general_pagado = 0; $matricula_deuda = 0;
+        $matricula_pagado = 0;  $ciclo_deuda = 0;    $ciclo_pagado = 0;
+
+        foreach (self::cuotasActivasTotales($matricula_id) as $cuota) {
+            $acumulador_monto_pagado = 0;
+            foreach ($cuota->payments as $pago) if(!$pago->note) $acumulador_monto_pagado += $pago->amount;
+
+            if($cuota->type == TiposCuotaEnum::CICLO ){
+                $ciclo_deuda+= $cuota->amount;
+                $ciclo_pagado+= $acumulador_monto_pagado;
+            }
+            else{
+                $matricula_deuda+= $cuota->amount;
+                $matricula_pagado+= $acumulador_monto_pagado;
+            }
+            $general_deuda += $cuota->amount;
+            $general_pagado += $acumulador_monto_pagado;
+        }
+        return (object)[
+            'general_deuda' => $general_deuda,
+            'general_pagado' => $general_pagado,
+            'matricula_deuda' => $matricula_deuda,
+            'matricula_pagado' => $matricula_pagado,
+            'ciclo_deuda' => $ciclo_deuda,
+            'ciclo_pagado' => $ciclo_pagado,
+        ];
+    }
+
+    public function cuotasActivasTotales(int $matricula_id){
         return  Installment::where('enrollment_id', $matricula_id)
                             ->where('status', EstadosEnum::ACTIVO)
                             ->where('deleted_at', null)
@@ -219,7 +248,7 @@ class InstallmentRepository extends Installment
                             ->get();
     }
 
-    private function cuotasActivasMatricula(int $matricula_id){
+    public function cuotasActivasMatricula(int $matricula_id){
         $cuotasMatricula =  Installment::where('enrollment_id', $matricula_id)
                                         ->where('type',  TiposCuotaEnum::MATRICULA)
                                         ->where('status', EstadosEnum::ACTIVO)
@@ -231,7 +260,7 @@ class InstallmentRepository extends Installment
         return $numeroCuotas == 1 ? $cuotasMatricula[0] : null;
     }
 
-    private function cuotasActivasCiclo(int $matricula_id){
+    public function cuotasActivasCiclo(int $matricula_id){
         return  Installment::where('enrollment_id', $matricula_id)
                             ->where('type',  TiposCuotaEnum::CICLO)
                             ->where('status', EstadosEnum::ACTIVO)
