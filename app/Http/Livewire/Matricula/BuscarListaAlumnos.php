@@ -30,12 +30,12 @@ class BuscarListaAlumnos extends Component
 
     public function render()
     {
-        $this->listaEstudiantes = $this->_estudianteRepository->getListaAlumnos($this->busqueda, 25);
+        $this->listaEstudiantes = $this->_estudianteRepository->getListaAlumnos($this->busqueda, 15);
         return view('livewire.matricula.buscar-lista-alumnos');
     }
 
     public function seleccionarEstudiante( int $estudiante_id ){
         $this->estudianteSeleccionado = $estudiante_id;
-        $this->emitTo('matricula.informacion-alumno','cargar-data-informacion-alumno', $estudiante_id);
+        $this->emitTo('matricula.informacion-alumno-steps','estudiante-seleccionado-id', $estudiante_id);
     }
 }

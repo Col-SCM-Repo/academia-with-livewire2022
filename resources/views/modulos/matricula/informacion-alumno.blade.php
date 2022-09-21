@@ -72,7 +72,7 @@ $slot = ''
     </div>
 
     <div class=" col-md-8  " style="min-height: 100vh">
-        @livewire('matricula.informacion-alumno')
+        @livewire('matricula.informacion-alumno-steps')
     </div>
 
 </div>

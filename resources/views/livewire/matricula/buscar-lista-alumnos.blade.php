@@ -23,7 +23,7 @@
         <div class="ibox-content">
             <form>
                 <div class="form-group">
-                    <input type="text" class="form-control" wire:model='busqueda' placeholder="Buscar estudiante">
+                    <input type="text" class="form-control" wire:model='busqueda' placeholder="INGRESE DNI, APELLIDOS Y NOMBRES">
                 </div>
                 <div>
                     <table class="table table-sm table-hover table-striped table-bordered">

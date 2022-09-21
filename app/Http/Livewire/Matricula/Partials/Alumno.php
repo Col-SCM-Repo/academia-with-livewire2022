@@ -106,7 +106,7 @@ class Alumno extends Component
     }
 
     public function cargarDataAlumno( string $estudiante_dni ){
-        $this->validateOnly('dni');
+        /* $this->validateOnly('dni'); */
         self::initialState();
         $this->dni = $estudiante_dni;
         $informacionEstudiante = $this->_estudianteRepository->getInformacionEstudiante($estudiante_dni);

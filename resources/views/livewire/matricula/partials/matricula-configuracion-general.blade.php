@@ -1,5 +1,5 @@
 <div >
-    <form x-data class="row" wire:submit.prevent="{{$matriculaId? 'update' : 'create' }}">
+    <form x-data id="formulario-config-general" class="row" wire:submit.prevent="{{$matriculaId? 'update' : 'create' }}">
         <div class="col-lg-7 form-horizontal">
             <div class="form-group">
                 <label class="col-lg-3 control-label">Ciclo/Nivel/Aula: </label>
@@ -57,13 +57,14 @@
                 </div>
             </div>
         </div>
+    </form>
         <div class="col-lg-12 " style="display: flex">
             <span wire:loading wire:target="create, update"> Guardando ...</span>
             <div style="flex-grow: 1" class="text-right">
                 @if ($matriculaId)
                     @livewire('matricula.partials.matricula-configuracion-pagos', ['matricula_id' => $matriculaId])
                 @endif
-                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem" {{$classroom? "":"disabled"}}>
+                <button class="btn btn-sm btn-primary" type="submit" style="padding: .75rem 3rem" {{$classroom? "":"disabled"}} form="formulario-config-general">
                     <i class="fa fa-save"></i> {{$matriculaId? 'Actualizar' : 'Registrar' }} matricula
                 </button>
             </div>
@@ -71,7 +72,6 @@
         <div class="col-lg-12  text-right" style="padding-top: 1rem" >
             <small>NOTA: Debe generar las cuotas de pago despues de guardar los cambios de la matricula </small>
         </div>
-    </form>
 
     @push('scripts')
         <script>

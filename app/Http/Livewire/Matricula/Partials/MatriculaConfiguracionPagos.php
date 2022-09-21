@@ -20,7 +20,8 @@ class MatriculaConfiguracionPagos extends Component
 
     protected $listeners = [
         'renderizar-matricula-pagos'=>'render',
-        'resetear-matricula-pagos' => 'resetearMatricula'
+        'resetear-matricula-pagos' => 'resetearMatricula',
+        'cargar-id-matricula' => 'cargarIdMatricula',
      ];
 
     protected $rules = [
@@ -180,6 +181,10 @@ class MatriculaConfiguracionPagos extends Component
                 $cuotasAutogeneradas[] = ["costo" => $costoCuota,"fecha" => null];
             $this->detalleCuotas = $cuotasAutogeneradas;
         }
+    }
+
+    public function cargarIdMatricula(int $matricula_id){
+        $this->matriculaId = $matricula_id;
     }
 
     private function buildModeloPagos(){

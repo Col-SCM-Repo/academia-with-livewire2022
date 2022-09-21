@@ -48,8 +48,8 @@ class Matricula extends Component
         if( $this->matriculaId ){
             $matricula = $this->_matriculaRepository::find($this->matriculaId);
 
-            $this->emitTo('matricula.partials.matricula-configuracion-general', 'renderizar-matricula');
-            $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'renderizar-matricula');
+            $this->emitTo('matricula.partials.matricula-configuracion-general', 'cargar-id-matricula', $matricula->id);
+            $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'cargar-id-matricula', $matricula->id );
             $this->emitTo('matricula.partials.pago', 'pagos-matricula-actualizados', $matricula->id);
 
         }
@@ -92,7 +92,11 @@ class Matricula extends Component
         $matriculaVigente = $this->_matriculaRepository->buscarMatriculaVigente( $estudiante_id, $periodo_id);
         if($matriculaVigente){
             $this->emitTo('matricula.partials.matricula-configuracion-general', 'cargar-id-matricula', $matriculaVigente->id);
+            $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'cargar-id-matricula', $matriculaVigente->id);
             $this->matriculaId = $matriculaVigente->id;
+        }
+        else{
+            $this->emitTo('matricula.partials.pago', 'resetear-pagos');
         }
 
     }

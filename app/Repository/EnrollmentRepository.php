@@ -24,20 +24,6 @@ class EnrollmentRepository extends Enrollment
     public function builderModelRepository()
     {
         return (object) [
-            /*
-                'tipo_matricula' => null,       // type
-                'estudiante_id' => null,        // student_id
-                'aula_id' => null,              // classroom_id
-                'carrera' => null,              // nombre carrera
-                'tipo_pago' => null,            // payment_type
-                'observaciones' => null,        // observations
-
-                'costo_matricula' => null,      //
-                'costo_ciclo' => null,          // period_cost
-                'cantidad_cuotas' => null,      // fees_quantity
-                'cuotas_detalle' => null,       // fees_quantity
-            */
-
             /* 'tipo_matricula' => null,       // type */
             'descuento_id' => null,         // scholarship_id
             'estudiante_id' => null,        // student_id
@@ -69,28 +55,6 @@ class EnrollmentRepository extends Enrollment
         $matricula->code = str_pad($matricula->id, 6, "0", STR_PAD_LEFT);
         $matricula->save();
         return $matricula;
-        /*
-            $matricula->fees_quantity = ($mEnrollment->tipo_pago == strtoupper(FormasPagoEnum::CREDITO)) ? $mEnrollment->cantidad_cuotas : 0;
-            $matricula->payment_type = $mEnrollment->tipo_pago;
-            // Cuotas de pago (Installments)
-            $mIntallment = $this->_cuotasRepository->builderModelRepository();
-            $mIntallment->matricula_id = $matricula->id;
-            $mIntallment->tipo_pago = $mEnrollment->tipo_pago;
-            $mIntallment->costo_matricula = $mEnrollment->costo_matricula;
-            $mIntallment->costo_ciclo = $mEnrollment->costo_ciclo;
-            $mIntallment->cuotas = $matricula->fees_quantity;
-            $mIntallment->detalle_cuotas = $matricula->fees_quantity >0 ? $mEnrollment->cuotas_detalle : array() ;
-
-            $cuotasGeneradas = null;
-            try {
-                $cuotasGeneradas = $this->_cuotasRepository->generarCoutasPago($mIntallment);
-                if(! $cuotasGeneradas) throw new Exception('Ocurrio un error al generar las cuotas de pago');
-                return $matricula;
-            } catch (Exception $e) {
-                self::eliminar( $matricula->id );
-                throw new BadRequestException($e->getMessage());
-            }
-        */
     }
 
     public function actualizar( int $matricula_id, object $mEnrollment)
@@ -176,14 +140,8 @@ class EnrollmentRepository extends Enrollment
     }
 
     public function listaMatriculasEstudiante( int $estudianteId ){
-
         $matriculas = array();
-        foreach (Enrollment::where('student_id', $estudianteId)->get() as $matricula) {
-            if($matricula->classroom->level->period->active == EstadosEnum::ACTIVO)
-                $estadoMatricula = ($matricula->status == EstadosEnum::ACTIVO)? "ACTIVO" : "RETIRADO";
-            else
-                $estadoMatricula = ($matricula->status == EstadosEnum::ACTIVO)? "INACTIVO" : "RETIRADO";
-
+        foreach (Enrollment::where('student_id', $estudianteId)->where('deleted_at', null)->get() as $matricula)
             $matriculas[] = (object)[
                 'matricula_id' => $matricula->id,
                 'matricula_codigo' => $matricula->code,
@@ -193,11 +151,16 @@ class EnrollmentRepository extends Enrollment
                 'periodo' => $matricula->classroom->level->period->name,
                 'anio' => $matricula->classroom->level->period->year,
                 'descripcion'=> $matricula->classroom->level->period->name.'/'.$matricula->classroom->level->level_type->description.'/'.$matricula->classroom->name,
-                'estado_matricula' => $estadoMatricula,
+                'estado_matricula' => EstadosMatriculaEnum::getEstado($matricula->status),
+                'bg_estado' => EstadosMatriculaEnum::getColor($matricula->status),
                 'fecha'=>date ( 'Y-m-d h:i:s A', strtotime($matricula->created_at))
             ];
-        }
         return $matriculas;
+    }
+
+    public function cargarMatricula( int $matricula_id ){
+        // enviar id de la m,atricula a matricula y pagos
+        dd( 'Enviando id de matricula ...', $matricula_id  );
     }
 
 }

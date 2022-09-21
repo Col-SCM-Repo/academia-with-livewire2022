@@ -16,4 +16,13 @@ abstract class EstadosMatriculaEnum
             default: return 'ESTADO INDEFINIDO';
         }
     }
+
+    public static function getColor( int $estadoMatricula ){
+        switch ($estadoMatricula) {
+            case self::ACTIVO: return 'text-primary';
+            case self::INACTIVO: return 'text-danger';
+            case self::PENDIENTE_ACTIVACION: return 'text-warning';
+            default: return 'text-light';
+        }
+    }
 }
