@@ -17,6 +17,9 @@ class ConfiguracionBasica extends Component
     }
 
     protected $listeners = [];
+    /*
+            'resetear-configuracion-basica'
+    */
 
     protected $rules = [
         'formulario_examen.nombre' => 'required | string',

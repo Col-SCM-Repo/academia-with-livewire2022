@@ -24,9 +24,10 @@ class ExamRepository extends Exam
             'codigo_grupo' => null,         // group_code
             'nombre' => null,               // name
             'numero_preguntas' => null,     // number_questions
+            'puntaje_incorrectas' => null,  // score_wrong
             'tipo_evaluacion' => null,      // evaluation_type
             'fecha_examen' => null,         // exam_date
-            'usuario_id' => null,           // user_id
+            //'usuario_id' => null,           // user_id
             'ruta_archivo' => null,         // path
         ];
     }

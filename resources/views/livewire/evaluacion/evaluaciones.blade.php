@@ -3,17 +3,9 @@
         <div class="col-md-3">
             <h2>EXAMENES</h2>
             <div class="m-t m-b">
-
-                <p>
-                    Examenes para el ciclo:
-                    <strong>
-                        @if ( Session::has('periodo') )
-                            {{ Session::get('periodo')->name }}
-                        @endif
-                    </strong>
-                </p>
+                <p> Examenes para el ciclo: <strong> @if ( Session::has('periodo') ) {{ Session::get('periodo')->name }} @endif</strong> </p>
             </div>
-            <button type="button" class="btn btn-sm btn-primary" wire:click='openModalExamenes'>
+            <button type="button" class="btn btn-sm btn-primary" wire:click='openModalNuevoExamen'>
                 <i class="fa fa-plus" aria-hidden="true"></i> Nuevo examen
             </button>
         </div>
@@ -36,12 +28,22 @@
                                     <th class="text-center">ID</th>
                                     <th class="text-center">Nombre</th>
                                     <th class="text-center">Fecha</th>
-                                    <th class="text-center">Estado</th>
                                     <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-
+                                @foreach ($listaExamenes as $examen)
+                                    <tr>
+                                        <td>{{ $examen->id }}</td>
+                                        <td>{{ $examen->name }}</td>
+                                        <td>{{ $examen->exam_date }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
+                                            <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-trash"   aria-hidden="true"></i> Eliminar </button>
+                                            <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-check"   aria-hidden="true"></i> Respuestas </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
