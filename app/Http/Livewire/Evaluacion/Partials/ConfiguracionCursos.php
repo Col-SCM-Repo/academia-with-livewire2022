@@ -73,6 +73,7 @@ class ConfiguracionCursos extends Component
         return [
             'curso_id' => $curso->id,
             'curso_nombre' => $curso->name,
+            'curso_nombre_corto' => $curso->shortname,
             'curso_check' => $active,
         ];
     }
