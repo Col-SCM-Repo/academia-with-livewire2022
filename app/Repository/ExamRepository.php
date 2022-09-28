@@ -17,7 +17,7 @@ class ExamRepository extends Exam
     public function builderModelRepository()
     {
         return (object) [
-            'id' => null,                   // id
+            /* 'id' => null, */             // id
             'periodo_id' => null,           // period_id
             'nivel_id' => null,             // level_id
             'grupo_id' => null,             // group_id
@@ -34,8 +34,8 @@ class ExamRepository extends Exam
 
     public function registrar ( object $modelExam ) {
         // Validaciones
-        if( ! in_array($modelExam->tipo_evaluacion, [TipoEvaluacionEnum::getArrayTypesEvaluation()]) )
-            throw new Exception('No se encontró el tipo de examen');
+        /* if( ! in_array($modelExam->tipo_evaluacion, [TipoEvaluacionEnum::getArrayTypesEvaluation()]) )
+            throw new Exception('No se encontró el tipo de examen'); */
 
         $examen = new Exam();
         $examen->period_id = $modelExam->periodo_id;
@@ -44,10 +44,12 @@ class ExamRepository extends Exam
         $examen->group_code = $modelExam->codigo_grupo;
         $examen->name = $modelExam->nombre;
         $examen->number_questions = $modelExam->numero_preguntas;
+        $examen->score_wrong = $modelExam->puntaje_incorrectas;
         $examen->evaluation_type = $modelExam->tipo_evaluacion;
         $examen->exam_date = $modelExam->fecha_examen;
         $examen->user_id = Auth::user()->id;
         $examen->save();
+        return $examen;
     }
 
     public function actualizar ( int $examen_id, object $modelExam ) {
@@ -61,22 +63,22 @@ class ExamRepository extends Exam
         $examen->group_code = $modelExam->codigo_grupo? $modelExam->codigo_grupo :$examen->group_code;
         $examen->name = $modelExam->nombre? $modelExam->nombre :$examen->name;
         $examen->number_questions = $modelExam->numero_preguntas? $modelExam->numero_preguntas :$examen->number_questions;
+        $examen->score_wrong = $modelExam->puntaje_incorrectas? $modelExam->puntaje_incorrectas :$examen->score_wrong;
         $examen->evaluation_type = $modelExam->tipo_evaluacion? $modelExam->tipo_evaluacion :$examen->evaluation_type;
         $examen->exam_date = $modelExam->fecha_examen? $modelExam->fecha_examen :$examen->exam_date;
-        $examen->user_id = $modelExam->usuario_id? $modelExam->usuario_id :$examen->user_id;
+        //$examen->user_id = $modelExam->usuario_id? $modelExam->usuario_id :$examen->user_id;
         $examen->path = $modelExam->ruta_archivo? $modelExam->ruta_archivo :$examen->path;
         $examen->save();
-
         return $examen;
     }
 
-    public function agregarRutaExamen ( int $examen_id, string $ruta_examen ) {
+    /* public function agregarRutaExamen ( int $examen_id, string $ruta_examen ) {
         $examen =  Exam::find($examen_id);
 
         if(!$examen) throw new NotFoundResourceException('No se encontro el examen a actualizas');
         $examen->path = $ruta_examen;
         return $examen->save();
-    }
+    } */
 
     public function eliminar ( int $examen_id ) {
         $examen =  Exam::find($examen_id);
@@ -87,20 +89,28 @@ class ExamRepository extends Exam
     }
 
 
-    public function eliminarRegistros ( int $examen_id ) {
+    // Por evaluar
+    public function eliminarPreguntasCursosExamen ( int $examen_id ) {
         $examen = Exam::find($examen_id);
         if(!$examen) throw new NotFoundResourceException('Error, no se encontró el examen ');
 
+        $cursosEliminados = 0;
+        $preguntasEliminadas = 0;
+
         $examen_cursos = $examen->course_scores;
         if(count($examen_cursos)>0)
-            foreach($examen_cursos as $curso)
+            foreach($examen_cursos as $curso) {
                 $curso->delete();
+                $cursosEliminados++;
+            }
 
         $preguntas = $examen->questions;
-        if(count($preguntas)>0)
-            foreach ($preguntas as $pregunta)
-                $pregunta->delete();
-        return true;
+            if(count($preguntas)>0)
+                foreach ($preguntas as $pregunta){
+                    $pregunta->delete();
+                    $preguntasEliminadas++;
+                }
+        return "Se elimino $cursosEliminados cursos y $preguntasEliminadas preguntas.";
     }
 
 }

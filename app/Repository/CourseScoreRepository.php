@@ -4,62 +4,84 @@ namespace App\Repository;
 
 use Exception;
 use App\Models\CourseScore;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class CourseScoreRepository extends CourseScore
 {
     private $_examenRepository;
-    public function __construct()
-    {
+    public function __construct() {
         $this->_examenRepository = new ExamRepository();
     }
 
     public function builderModelRepository()
     {
         return (object) [
-            'id' => null,
-            'examen_id' => null,            // exam_id
-            'curso_id' => null,             // course_id
-            'puntaje_correctas' => null,    // score_correct
-            'puntaje_incorrectas' => null,  // score_wrong
-            'numero_preguntas' => null,     // number_questions
-            'orden' => null,                // order
+           /*  'id' => null, */
+            'examen_id' => null,    // exam_id
+            'cursos' => array(),    // array CursoExam
         ];
     }
 
-    public function registrar ( array $arrayDatosCurso ) {
-        if(count($arrayDatosCurso)==0) throw new Exception('Error, no se encontrò cursos para el examen');
+    public function buildCursoExam( int $cursoId, int $orden, int $numeroPreguntas, int $puntajeCorrectas, int $puntajeIncorrectas  ){
+        return (object) [
+            'curso_id' => $cursoId,                         // course_id
+            'orden' => $orden,                              // order
+            'numero_preguntas' => $numeroPreguntas,         // number_questions
+            'puntaje_correctas' => $puntajeCorrectas,       // score_correct
+            'puntaje_incorrectas' => $puntajeIncorrectas,   // score_wrong
+        ];
+    }
 
-        $examen = $this->_examenRepository::find($arrayDatosCurso[0]->examen_id);
-        if(!$examen) throw new NotFoundResourceException('Error, no se encontró el examen ');
-        if(count($examen->course_scores)>0 ) throw new Exception('El detalle de examen ya se encuentra registrada, por favor actualice para modificar');
+    public function registrar ( object $modelDatosCurso ) {
+        $examen = $this->_examenRepository::find($modelDatosCurso->examen_id);
+
+        if(count($modelDatosCurso->cursos)==0 || !$examen  )
+            throw new BadRequestException('Error, parametros incorrectos para la configuracion de cursos.');
+        if(count($examen->course_scores)>0 )
+            throw new Exception('El detalle de examen ya se encuentra registrada, por favor actualice para modificar');
 
         $cursosExamen= array();
-        foreach ($arrayDatosCurso as $index=>$modelCursoDetalle)
+        foreach ($modelDatosCurso->cursos  as $curso)
             $cursosExamen[] = [
-                'exam_id' =>$modelCursoDetalle->examen_id,
-                'course_id' =>$modelCursoDetalle->curso_id,
-                'score_correct' =>$modelCursoDetalle->puntaje_correctas,
-                'score_wrong' =>$modelCursoDetalle->puntaje_incorrectas,
-                'number_questions' =>$modelCursoDetalle->numero_preguntas,
-                'order' =>$index+1,
+                'exam_id' => $modelDatosCurso->examen_id,
+                'course_id' => $curso->curso_id,
+                'order' => $curso->orden,
+                'number_questions' => $curso->numero_preguntas,
+                'score_correct' => $curso->puntaje_correctas,
+                'score_wrong' => $curso->puntaje_incorrectas,
             ];
         return CourseScore::insert($cursosExamen);
     }
 
-    public function actualizar ( int $datosCurso_id, object $modelDatosCurso ) {
-        $datosCurso = self::find($datosCurso_id);
-        if(!$datosCurso) throw new NotFoundResourceException('Error, no se encontró el curso a actualizar');
+    public function actualizar ( object $modelDatosCurso ) {
+        $examen = $this->_examenRepository::find($modelDatosCurso->examen_id);
+        if( !$examen )  throw new BadRequestException('Error, no se encontró examen.');
 
-        $datosCurso->score_correct = $modelDatosCurso->puntaje_correctas ? $modelDatosCurso->puntaje_correctas : $datosCurso->score_correct;
-        $datosCurso->score_wrong = $modelDatosCurso->puntaje_incorrectas ? $modelDatosCurso->puntaje_incorrectas : $datosCurso->score_wrong;
-        $datosCurso->number_questions = $modelDatosCurso->numero_preguntas ? $modelDatosCurso->numero_preguntas : $datosCurso->number_questions;
-        $datosCurso->save();
+        if(count($examen->course_scores)>0)
+            foreach( $examen->course_scores as $cursoPuntajes ) $cursoPuntajes->delete();
 
-        return $datosCurso;
+        self::registrar($modelDatosCurso);
+
+        if(count($examen->questions)>0){
+            $cursos = $examen->course_scores;
+            $orden =0;
+            $limite=1 + $cursos[$orden]->number_questions ;
+
+            foreach ($examen->questions as $pregunta) {
+                if( $pregunta->question_number >= $limite ) {
+                    $orden++;
+                    $limite+=$cursos[$orden]->number_questions ;
+                }
+                $pregunta->course_id = $cursos[$orden]->course_id ;
+                $pregunta->score = $cursos[$orden]->course_id;
+                /* $pregunta->correct_answer = $cursos[$orden]->score_correct; */
+                $pregunta->save();
+            }
+        }
+        return true;
     }
 
-    public function eliminarRegistros( int $examen_id ){
+    /* public function eliminarRegistrosDetalle( int $examen_id ){
         $examen = $this->_examenRepository::find($examen_id);
         if(!$examen) throw new NotFoundResourceException('Error, no se encontró el examen');
 
@@ -68,7 +90,7 @@ class CourseScoreRepository extends CourseScore
             foreach($examen_cursos as $curso)
                 $curso->delete();
         return true;
-    }
+    } */
 
     /* public function eliminar ( int $datosCurso_id ) {
         $datosCurso = self::find($datosCurso_id);

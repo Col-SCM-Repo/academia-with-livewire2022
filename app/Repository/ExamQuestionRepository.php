@@ -15,17 +15,6 @@ class ExamQuestionRepository extends ExamQuestion
         $this->_examenRepository = new ExamRepository();
     }
 
-    public function builderModelRepository()
-    {
-        return (object) [
-            // 'id' => null,
-            'examen_id' => null,            // exam_id
-            'curso_id' => null,             // course_id
-            'numero_pregunta' => null,      // question_number
-            'puntaje' => null,              // score
-            'pregunta_correctas' => null,   // correct_answer
-        ];
-    }
 
     public function generarRegistros( int $examen_id ){
         $examen = $this->_examenRepository::find($examen_id);
@@ -52,12 +41,11 @@ class ExamQuestionRepository extends ExamQuestion
         return ExamQuestion::insert($preguntas);
     }
 
-    public function actualizarPregunta( int $pregunta_id, object $modelPregunta ){
+    public function actualizarPregunta( int $pregunta_id, string $respuesta ){
         $pregunta = self::find($pregunta_id);
-        if(!$pregunta) throw new NotFoundResourceException('Error, no se encontró a la pregunta');
+        if( ! $pregunta ) throw new NotFoundResourceException('Error, no se encontró a la pregunta');
 
-        $pregunta->score = $modelPregunta->puntaje;
-        $pregunta->correct_answer = $modelPregunta->pregunta_correctas;
+        $pregunta->correct_answer = $respuesta;
         $pregunta->save();
         return $pregunta;
     }
@@ -68,8 +56,8 @@ class ExamQuestionRepository extends ExamQuestion
 
         $preguntas = $examen->questions;
         if(count($preguntas)>0)
-            foreach ($preguntas as $pregunta)
-                $pregunta->delete();
-        return true;
+            foreach ($preguntas as $pregunta) $pregunta->delete();
+
+        return count($preguntas).' preguntas eliminadas';
     }
 }

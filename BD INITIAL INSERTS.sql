@@ -2859,4 +2859,36 @@ INSERT INTO `users` (`id`, `entity_id`, `username`, `password`, `type`, `status`
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ÁLGEBRA',1 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ANATOMÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('APTITUD MATEMÁTICA',1 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ARITMÉTICA',1 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ARTE Y CULTURA',1 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('BIOLOGÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('CIENCIAS NATURALES',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('LENGUAJE',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('COMUNICACIÓN',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ECOLOGÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ECONOMÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('ESTADÍSTICA Y PROBABILIDADES',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('FILOSOFÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('FÍSICA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('GEOGRAFÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('GEOMETRÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('HISTORIA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('LITERATURA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('PSICOLOGÍA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('QUÍMICA',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('QUÍMICA II',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('RAZONAMIENTO LÓGICO',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('RAZONAMIENTO MATEMÁTICO',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('RAZONAMIENTO VERBAL',2 );
+INSERT INTO courses( `name`,`academic_area_id`) VALUES ('TRIGONOMETRÍA',2 );
+
+
+
+
+
+
+
 

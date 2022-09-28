@@ -36,10 +36,10 @@ $slot = ''
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-lg-7">
-                    @livewire('mantenimiento.ciclos-aulas.aulas')
+                    {{-- @livewire('mantenimiento.ciclos-aulas.aulas') --}}
                 </div>
                 <div class="col-lg-5">
-                    @livewire('mantenimiento.ciclos-aulas.niveles')
+                   {{--  @livewire('mantenimiento.ciclos-aulas.niveles') --}}
                 </div>
             </div>
         </div>

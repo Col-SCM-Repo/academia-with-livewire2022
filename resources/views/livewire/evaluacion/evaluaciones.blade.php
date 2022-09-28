@@ -37,9 +37,9 @@
                                         <td>{{ $examen->id }}</td>
                                         <td>{{ $examen->name }}</td>
                                         <td>{{ $examen->exam_date }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
-                                            <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-trash"   aria-hidden="true"></i> Eliminar </button>
+                                        <td  class="text-center">
+                                            <button type="button" class="btn btn-xs btn-success" wire:click="editarExamenOpenModal({{$examen->id}})"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
+                                            <button type="button" class="btn btn-xs btn-danger" wire:click="eliminarExamen({{$examen->id}}) "> <i class="fa fa-trash"   aria-hidden="true"></i> Eliminar </button>
                                             <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-check"   aria-hidden="true"></i> Respuestas </button>
                                         </td>
                                     </tr>
