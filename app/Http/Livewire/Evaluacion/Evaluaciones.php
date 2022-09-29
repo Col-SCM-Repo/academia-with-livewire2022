@@ -52,7 +52,7 @@ class Evaluaciones extends Component
         $this->emitTo('evaluacion.partials.configuracion-respuestas', 'resetear-configuracion-respuestas');
     }
 
-    public function renderizarComponentes( $examen_id = null ){
+    public function renderizarComponentes( int $examen_id ){
         $this->emitTo('evaluacion.partials.configuracion-basica', 'renderizar', $examen_id);
         $this->emitTo('evaluacion.partials.configuracion-cursos', 'renderizar', $examen_id);
         $this->emitTo('evaluacion.partials.configuracion-respuestas', 'renderizar', $examen_id);
