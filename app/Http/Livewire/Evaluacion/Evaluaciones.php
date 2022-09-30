@@ -45,6 +45,7 @@ class Evaluaciones extends Component
     }
 
     public function openModalNuevoExamen(){
+        $this->reset(['examen_id']);
         openModal($this, "#form-modal-examenes");
         // Inicializar formularios
         $this->emitTo('evaluacion.partials.configuracion-basica', 'resetear-configuracion-basica');

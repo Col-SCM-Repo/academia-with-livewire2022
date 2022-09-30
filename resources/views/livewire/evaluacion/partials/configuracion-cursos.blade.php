@@ -1,4 +1,10 @@
 <div  wire:ignore.self>
+
+    <style>
+        .bg-danger-casillero {
+            background: #edbdbd;
+        }
+    </style>
     <form class="row" wire:submit.prevent=" {{ $numeroCursosAlmacenados>0? 'update' : 'create' }} " >
 
         <div class="col-sm-6 form-horizontal " style="border-right: 3px solid #e3e3e3;  " >
@@ -33,16 +39,18 @@
                                     <td style="padding-top: 2px; padding-bottom: 2px;" title="Orden">{{$cursoDetalle['orden']}}</td>
                                     <td style="padding-top: 2px; padding-bottom: 2px;">{{$cursoDetalle['nombre_curso']}} <strong><small>({{$num_preguntas}}-{{$num_preguntas + (int) $cursoDetalle['numero_preguntas'] }})</small></strong> </td>
                                     <td style="padding-top: 2px; padding-bottom: 2px;" class="text-center">
-                                        <input style=" width: 4rem;" type="number" step="0.1" placeholder="Val. Correctas" title="Valor para las preguntas correctas" wire:model.defer = '{{ "cursosDetalle.$index.puntaje_correcto" }}'>
+                                        <input style=" width: 4rem;" type="number" step="0.1"  wire:model = '{{ "cursosDetalle.$index.puntaje_correcto" }}'
+                                        @error("cursosDetalle.$index.puntaje_correcto") class="bg-danger-casillero " title="Debe ser un numero mayor a 0" @enderror>
                                     </td>
-                                    <td style="padding-top: 2px; padding-bottom: 2px;" class="text-center">
-                                        <input style=" width: 4.5rem;" type="number" placeholder="Num. preguntas" title="Numero de preguntas" wire:model = '{{ "cursosDetalle.$index.numero_preguntas" }}'>
+                                    <td style="padding-top: 2px; padding-bottom: 2px;" class="text-center" >
+                                        <input style=" width: 4.5rem;"  type="number"  wire:model = '{{ "cursosDetalle.$index.numero_preguntas" }}'
+                                        @error("cursosDetalle.$index.numero_preguntas") class="bg-danger-casillero " title="Debe ser un numero entero mayor a 0"  @enderror >
                                     </td>
                                     <td style="padding-top: 2px; padding-bottom: 2px;">
                                         <button class="btn btn-xs btn-success" type="button" wire:click="onBtnUp({{$index}})" {{ $index == 0? 'disabled':'' }} >
                                             <i class="fa fa-arrow-up" aria-hidden="true"></i>
                                         </button>
-                                        <button class="btn btn-xs btn-success" type="button" wire:click="onBtnDown({{$index}})" {{ $index==count($cursosDetalle)-1? 'disabled':'' }} >
+                                        <button class="btn btn-xs btn-success" type="button" wire:click="onBtnDown({{$index}})" {{ $cursoDetalle['orden']==count($cursosDetalle)? 'disabled':'' }} >
                                             <i class="fa fa-arrow-down" aria-hidden="true"></i>
                                         </button>
                                     </td>
@@ -65,7 +73,7 @@
             @php  $activarBtns = count($cursosDetalle)>0;  @endphp
 
             <div style="flex-grow: 1; justify-content: center">
-                <span style="display: inline-block; margin-top: 1rem"> {{$num_preguntas}} preguntas configuradas/ {{ 0 }} pendientes ( puntaje total: 500 )</span>
+                <span style="display: inline-block; margin-top: 1rem"> {{$numeroPreguntasConfiguradas}} preguntas configuradas/ de {{$numPreguntasEstablecidas}} ( puntaje total: {{$puntajeTotal}} )</span>
             </div>
             <div class="text-right">
                 <button class="btn btn-sm btn-success" type="button" title="Generar preguntas de examen en blanco" {{ ($activarBtns && $numeroCursosAlmacenados>0  )? '':'disabled' }}>

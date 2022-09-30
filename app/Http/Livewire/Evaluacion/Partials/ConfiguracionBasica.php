@@ -95,19 +95,18 @@ class ConfiguracionBasica extends Component
     } */
     public function renderizar( $examen_id ){
         self::initialState();
-        if( $examen_id )  {
-            $examen = $this->_examenRepository::find($examen_id);
-            if(!$examen) return;
-            $this->examen_id = $examen->id;
-            $this->nombre = $examen->name;
-            $this->tipo_examen = $examen->evaluation_type;
-            $this->grupo_id = $examen->group_id;
-            $this->codigo_de_grupo = $examen->group_code;
-            $this->nivel_id = $examen->level_id;
-            $this->numero_preguntas = $examen->number_questions;
-            $this->fecha_examen = $examen->exam_date;
-            $this->valor_preguntas_incorrectas = $examen->score_wrong;
-        }
+
+        $examen = $this->_examenRepository::find($examen_id);
+        if(!$examen) return;
+        $this->examen_id = $examen->id;
+        $this->nombre = $examen->name;
+        $this->tipo_examen = $examen->evaluation_type;
+        $this->grupo_id = $examen->group_id;
+        $this->codigo_de_grupo = $examen->group_code;
+        $this->nivel_id = $examen->level_id;
+        $this->numero_preguntas = $examen->number_questions;
+        $this->fecha_examen = $examen->exam_date;
+        $this->valor_preguntas_incorrectas = $examen->score_wrong;
     }
 
     // Funciones internas (privadas)

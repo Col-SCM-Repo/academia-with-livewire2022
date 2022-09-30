@@ -15,10 +15,12 @@ class ConfiguracionRespuestas extends Component
 
     protected $listeners = [
         'renderizar' => 'renderizar',
+        'resetear-configuracion-respuestas' => 'initialState'
     ];
-    /*
-            'resetear-configuracion-respuestas'
-    */
+
+    public function initialState(){
+        $this->reset(['examen_id']);
+    }
 
     public function render()
     {

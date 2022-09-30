@@ -22,13 +22,13 @@ class CourseScoreRepository extends CourseScore
         ];
     }
 
-    public function buildCursoExam( int $cursoId, int $orden, int $numeroPreguntas, int $puntajeCorrectas, int $puntajeIncorrectas  ){
+    public function buildCursoExam( int $cursoId, int $orden, int $numeroPreguntas, int $puntajeCorrectas ){
         return (object) [
             'curso_id' => $cursoId,                         // course_id
             'orden' => $orden,                              // order
             'numero_preguntas' => $numeroPreguntas,         // number_questions
             'puntaje_correctas' => $puntajeCorrectas,       // score_correct
-            'puntaje_incorrectas' => $puntajeIncorrectas,   // score_wrong
+            /* 'puntaje_incorrectas' => $puntajeIncorrectas,  */  // score_wrong
         ];
     }
 
@@ -48,9 +48,10 @@ class CourseScoreRepository extends CourseScore
                 'order' => $curso->orden,
                 'number_questions' => $curso->numero_preguntas,
                 'score_correct' => $curso->puntaje_correctas,
-                'score_wrong' => $curso->puntaje_incorrectas,
+                /* 'score_wrong' => $curso->puntaje_incorrectas, */
             ];
-        return CourseScore::insert($cursosExamen);
+        CourseScore::insert($cursosExamen);
+        return CourseScore::where('exam_id', $examen->id)->get() ;  // pendiente .. cambiar
     }
 
     public function actualizar ( object $modelDatosCurso ) {
