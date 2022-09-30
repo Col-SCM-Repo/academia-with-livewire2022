@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Evaluacion\Partials;
 use App\Enums\EstadosEntidadEnum;
 use App\Repository\CourseRepository;
 use App\Repository\CourseScoreRepository;
+use App\Repository\ExamQuestionRepository;
 use App\Repository\ExamRepository;
 use Exception;
 use Livewire\Component;
@@ -21,7 +22,7 @@ class ConfiguracionCursos extends Component
     public  $numeroCursosAlmacenados, $numPreguntasEstablecidas,    // Almacenados en BD
             $numeroPreguntasConfiguradas, $puntajeTotal;            // Temporales
 
-    private $_cursosRepository, $_cursosPuntajesRepository, $_examenRepository;
+    private $_cursosRepository, $_cursosPuntajesRepository, $_examenPreguntasRepository, $_examenRepository;
 
     public  $rules = [
         'examen_id'                         => 'required|integer|min:0',
@@ -31,7 +32,9 @@ class ConfiguracionCursos extends Component
         'cursosDetalle.*.nombre_curso'      => 'required|string',
         'cursosDetalle.*.numero_preguntas'  => 'required|integer|min:1',
         'cursosDetalle.*.puntaje_correcto'  => 'required|numeric|min:1',
-        /* 'cursosDetalle.*.puntaje_incorrecto'=> 'required|integer|min:0', */
+        /* 'cursosDetalle.*.puntaje_incorrecto'=> 'required|integer|min:0',
+            wire:change="setSomeProperty($event.target.value)"
+        */
     ];
 
     protected $listeners = [
@@ -48,18 +51,18 @@ class ConfiguracionCursos extends Component
         $this->numPreguntasEstablecidas = 0;
         $this->numeroPreguntasConfiguradas = 0;
         $this->puntajeTotal = 0;
-
-        self::cargarChecks();
     }
 
     public function __construct(){
         $this->_cursosRepository = new CourseRepository();
         $this->_cursosPuntajesRepository = new CourseScoreRepository();
         $this->_examenRepository = new ExamRepository();
+        $this->_examenPreguntasRepository = new ExamQuestionRepository();
     }
 
     public function mount(){
         self::initialState();
+        self::cargarChecks();
     }
 
     public function render(){
@@ -84,8 +87,8 @@ class ConfiguracionCursos extends Component
         $this->validate();
         $moPuntuacionCurso = self::buildModelPuntajeCurso();
         try {
-             /* $numeroCursosCreados =  */$this->_cursosPuntajesRepository->registrar($moPuntuacionCurso);
-             sweetAlert($this, 'curso', EstadosEntidadEnum::CREATED);
+             $this->_cursosPuntajesRepository->actualizar($moPuntuacionCurso);
+             sweetAlert($this, 'curso', EstadosEntidadEnum::UPDATED);
              /* $this->numeroCursosAlmacenados = $numeroCursosCreados ; */
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
@@ -132,6 +135,16 @@ class ConfiguracionCursos extends Component
         }
     }
 
+    public function generarNotasExamen( int $examen_id ){
+        try {
+            $this->_examenPreguntasRepository->generarRegistros( $examen_id );
+            sweetAlert($this, 'curso', EstadosEntidadEnum::UPDATED);
+            $this->emitTo('evaluacion.partials.configuracion-respuestas', 'renderizar', $examen_id);
+        } catch (Exception $err) {
+            toastAlert($this, $err->getMessage());
+        }
+    }
+
     public function updatedCursosDetalle($value){
         try {
             if($value== null || $value=='' ) throw new Exception();
@@ -158,7 +171,8 @@ class ConfiguracionCursos extends Component
             $this->numeroCursosAlmacenados = count($cursosAlmacenados) ;
             $this->numeroPreguntasConfiguradas = count($examen->questions);
         }
-
+        else self::cargarChecks();
+        self::actualizarInformacionExamen();
     }
 
     public function onBtnUp(int $index_array){
@@ -182,21 +196,35 @@ class ConfiguracionCursos extends Component
     }
 
     // Funciones internas
-    private function cargarChecks ( $cursosSeleccionados = null ){
-        $checks =  [];
-        $cursosDisponibles = $this->_cursosRepository::all();
+    private function cargarChecks ( $cursosRegistradosDB = null ){
+        $cursosChecks = array();
+        $cursosDetalle = array();
 
-        if( ! $cursosSeleccionados ){
-            foreach($cursosDisponibles as $index=>$curso)
-                $checks [$index]= self::buildCursoCheck($curso);
-            $this->cursosDetalle = array();
-        }
-        else{
-            // cargar checks almacenados de la db
-            // cargar datos del detalleCurso
+        foreach( $this->_cursosRepository::all() as $index=>$curso)
+            $cursosChecks [$index]= self::buildCursoCheck($curso);
 
+        if( $cursosRegistradosDB ){
+            $cursosRegistradosDBStr = [];
+            foreach ($cursosRegistradosDB as $cursoDB)
+                $cursosRegistradosDBStr [] = $cursoDB->course->name;
+
+            $cursosTemp = array();
+            foreach ($cursosChecks as $cursoCheck){
+                if( in_array($cursoCheck['curso_nombre'], $cursosRegistradosDBStr))
+                    $cursoCheck['curso_check'] = true;
+                    $cursosTemp[] = $cursoCheck;
+            }
+
+            foreach ($cursosRegistradosDB as $index=>$cursoRegistradoDB)
+                $cursosDetalle [] = self::buildCursoDetalle($cursoRegistradoDB->course_id,
+                                                            $cursoRegistradoDB->course->shortname ,
+                                                            $index+1,
+                                                            $cursoRegistradoDB->number_questions,
+                                                            $cursoRegistradoDB->score_correct);
+            $cursosChecks = $cursosTemp;
         }
-        $this->cursosSeleccionados = $checks;
+        $this->cursosDetalle = $cursosDetalle;
+        $this->cursosSeleccionados = $cursosChecks;
     }
 
     private function buildCursoCheck( object $curso, bool $active=false ){
@@ -208,13 +236,13 @@ class ConfiguracionCursos extends Component
         ];
     }
 
-    private function buildCursoDetalle( int $curso_id, string $nombre_curso, int $orden  ){
+    private function buildCursoDetalle( int $curso_id, string $nombre_curso, int $orden, int $numero_preguntas=1, $puntaje_correcto=0  ){
         return [
             'orden' => $orden,
             'curso_id' => $curso_id ,
             'nombre_curso' => $nombre_curso ,
-            'numero_preguntas' => 1 ,
-            'puntaje_correcto' => 0 ,
+            'numero_preguntas' => $numero_preguntas ,
+            'puntaje_correcto' => $puntaje_correcto ,
         ];
     }
 

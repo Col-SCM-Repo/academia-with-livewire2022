@@ -20,24 +20,27 @@ class ExamQuestionRepository extends ExamQuestion
         $examen = $this->_examenRepository::find($examen_id);
         if(!$examen) throw new NotFoundResourceException('Error, no se encontró el examen');
 
-        if(!count($examen->questions)>0) self::eliminarRegistros($examen_id);
+        if(count($examen->questions)>0) self::eliminarRegistros($examen_id);
 
         $cursos = $examen->course_scores;
         if(count($cursos)==0) throw new Exception('No se encontro informacion de los cursos');
 
         $preguntas = array();
         $numeroPregunta = 0;
-        foreach($cursos as $curso)
-            for ($i=0; $i < $curso->number_questions ; $i++) {
+
+        foreach ( $cursos as $curso_scores ) {
+            for ($i=0; $i < $curso_scores->number_questions ; $i++) {
                 $numeroPregunta++;
                 $preguntas[] = [
-                    'exam_id' => $examen->id,
-                    'course_id' => $curso->id,
+                    'exam_id' => $examen_id,
+                    'course_id' => $curso_scores->course_id,
                     'question_number' => $numeroPregunta,
-                    'score' => null,
+                    'score' => $curso_scores->score_correct,
                     'correct_answer' => null,
                 ];
             }
+        }
+
         return ExamQuestion::insert($preguntas);
     }
 
