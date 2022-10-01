@@ -40,7 +40,7 @@
                                         <td  class="text-center">
                                             <button type="button" class="btn btn-xs btn-success" wire:click="editarExamenOpenModal({{$examen->id}})"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
                                             <button type="button" class="btn btn-xs btn-danger" wire:click="eliminarExamen({{$examen->id}}) "> <i class="fa fa-trash"   aria-hidden="true"></i> Eliminar </button>
-                                            <button type="button" class="btn btn-xs btn-info"> <i class="fa fa-check"   aria-hidden="true"></i> Respuestas </button>
+                                            <a type="button" class="btn btn-xs btn-info" target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examen->id]) }}"> <i class="fa fa-check"   aria-hidden="true"></i> Respuestas </a>
                                         </td>
                                     </tr>
                                 @endforeach

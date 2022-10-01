@@ -159,7 +159,7 @@ class ConfiguracionCursos extends Component
         self::initialState();
         $this->examen_id = $examen_id;
 
-        $cursosAlmacenados = $this->_cursosPuntajesRepository::where('exam_id', $examen_id)->get();
+        $cursosAlmacenados = $this->_cursosPuntajesRepository::where('exam_id', $examen_id)->orderBy('order', 'asc')->get();
 
         $examen = $this->_examenRepository::find($examen_id);
         $this->numPreguntasEstablecidas = $examen->number_questions;

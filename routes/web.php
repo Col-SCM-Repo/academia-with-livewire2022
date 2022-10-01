@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\HomeController;
+use App\Http\Livewire\Evaluacion\Partials\ConfiguracionRespuestas;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,8 @@ Route::middleware(['auth'])->prefix('evaluaciones')->group(function () {
     Route::get('/configuracion-examenes', [HomeController::class, 'configuracion'])->name('evaluaciones.configuracion');
     Route::get('/carga-revision', [HomeController::class, 'revision'])->name('evaluaciones.revision');
     Route::get('/resultados-reporte', [HomeController::class, 'reporte'])->name('evaluaciones.reporte');
+
+    Route::get('/configuracion-examenes/respuestas-configuracion/{examen_id?}', ConfiguracionRespuestas::class )->name('evaluaciones.configuracion.respuestas');
 });
 
 
