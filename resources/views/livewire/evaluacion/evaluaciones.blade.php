@@ -27,6 +27,7 @@
                                 <tr>
                                     <th class="text-center">ID</th>
                                     <th class="text-center">Nombre</th>
+                                    <th class="text-center">Estado</th>
                                     <th class="text-center">Fecha</th>
                                     <th class="text-center">Acciones</th>
                                 </tr>
@@ -36,11 +37,16 @@
                                     <tr>
                                         <td>{{ $examen->id }}</td>
                                         <td>{{ $examen->name }}</td>
+                                        <td> SIN RESPUESTAS </td>
                                         <td>{{ $examen->exam_date }}</td>
                                         <td  class="text-center">
-                                            <button type="button" class="btn btn-xs btn-success" wire:click="editarExamenOpenModal({{$examen->id}})"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
+                                            <button type="button" class="btn btn-xs btn-warning" wire:click="editarExamenOpenModal({{$examen->id}})"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
                                             <button type="button" class="btn btn-xs btn-danger" wire:click="eliminarExamen({{$examen->id}}) "> <i class="fa fa-trash"   aria-hidden="true"></i> Eliminar </button>
-                                            <a type="button" class="btn btn-xs btn-info" target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examen->id]) }}"> <i class="fa fa-check"   aria-hidden="true"></i> Respuestas </a>
+                                            <a type="button" class="btn btn-xs btn-info" target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examen->id]) }}" {{ count($examen->questions)>0 ? '':'disabled' }}>
+                                                <i class="fa fa-check"   aria-hidden="true"></i> Respuestas
+                                            </a>
+                                            <a type="button" class="btn btn-xs btn-success" title="Ver respuestas" disabled > <i class="fa fa-eye" aria-hidden="true"></i> Repuestas  </a>
+
                                         </td>
                                     </tr>
                                 @endforeach

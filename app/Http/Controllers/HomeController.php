@@ -23,7 +23,7 @@ class HomeController extends Controller
 
     public function revision()          //evaluaciones/carga-revision
     {
-        return "evaluaciones - revision";
+        return view('modulos.evaluaciones.carga-revision');
     }
 
     public function reporte()           //evaluaciones/resultados-reporte
