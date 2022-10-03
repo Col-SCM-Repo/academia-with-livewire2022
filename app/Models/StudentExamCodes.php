@@ -11,9 +11,13 @@ class StudentExamCodes extends Model
     protected $primariKey = "id";
 
     protected $fillable = [
-        'student_id',
-        'student_code',     // Ultimos 4 digitos de la cartilla del examen.
-        'code_exam', 	    // Primeros 2 digitos de la cartilla del examen.
+        'enrollment_id',
+        'type_code_id',
+        'enrollment_code',      // Ultimos 4 digitos de la cartilla del examen.
+        'code_exam', 	        // Primeros 2 digitos de la cartilla del examen.
+        'observation',
+        'surname',
+        'name',
         'observation',
     ];
 
@@ -23,8 +27,13 @@ class StudentExamCodes extends Model
     ];
 
 
-    public function student(){
-        return $this->belongsTo(Student::class, 'student_id', 'id');
+    public function enrollment(){
+        return $this->belongsTo(Enrollment::class, 'enrollment_id', 'id');
     }
+
+    public function type_code(){
+        return $this->belongsTo(type_code::class, 'type_code_id', 'id');
+    }
+
 
 }

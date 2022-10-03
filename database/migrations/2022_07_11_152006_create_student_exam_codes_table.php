@@ -10,10 +10,13 @@ class CreateStudentExamCodesTable extends Migration
     {
         Schema::create('student_exam_codes', function (Blueprint $table) {
             $table->bigInteger('id', true)->unsigned();
-			$table->bigInteger('student_id')->unsigned()->index('FK_examsCode_student');
-			$table->string('student_code')->nullable();
+			$table->bigInteger('enrollment_id')->nullable()->unsigned()->index('FK_examsCode_enrollment');
+            $table->bigInteger('type_code_id')->nullable()->unsigned()->index('FK_examsCode_typeCodes');
 			$table->string('code_exam')->nullable();
-			$table->text('observation')->nullable();
+			$table->string('enrollment_code')->unique();
+			$table->string('surname', 100);
+			$table->string('name', 100);
+            $table->text('observation')->nullable();
             $table->timestamps();
         });
     }

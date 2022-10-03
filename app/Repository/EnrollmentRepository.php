@@ -163,4 +163,17 @@ class EnrollmentRepository extends Enrollment
         dd( 'Enviando id de matricula ...', $matricula_id  );
     }
 
+    public function matriculasActivasCiclo( int $ciclo_id ){
+        return Enrollment:: join('classrooms', 'enrollments.classroom_id', 'classrooms.id')
+                            ->join('levels', 'classrooms.level_id', 'levels.id' )
+                            ->where('enrollments.deleted_at', null)
+                            ->where('enrollments.status',  '!=', EstadosMatriculaEnum::INACTIVO)
+                            ->where('levels.period_id', $ciclo_id)
+                            ->orderBy('classrooms.name', 'asc')
+                            ->select(
+                                'enrollments.*',
+                                'levels.type_id',
+                            )->get();
+    }
+
 }

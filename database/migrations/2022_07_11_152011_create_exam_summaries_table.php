@@ -11,14 +11,23 @@ class CreateExamSummariesTable extends Migration
     {
         Schema::create('exam_summaries', function (Blueprint $table) {
             $table->bigInteger('id', true)->unsigned();
-			$table->string('code_exam')->nullable();
-			$table->string('student_code')->nullable();
-			$table->bigInteger('exam_id')->unsigned()->nullable()->index('FK_examSummaries_exam');
-			$table->bigInteger('student_id')->unsigned()->nullable()->index('FK_examSummaries_student');
+
+			$table->bigInteger('exam_id')->unsigned()->index('FK_examSummaries_exam');
+			$table->bigInteger('enrollment_id')->unsigned()->nullable()->index('FK_examSummaries_enrollment');
+			$table->string('code_exam')->nullable();        // primeros dos digitos del examen
+			$table->string('code_enrollment')->nullable();  // Ultimos 4 digitos del codigo de alumno
+
 			$table->enum('student_type', array('free', 'student'))->default('student');
+
+            $table->smallInteger('correct_answer')->unsigned()->default(0);
+            $table->smallInteger('wrong_answer')->unsigned()->default(0);
+            $table->smallInteger('blank_answer')->unsigned()->default(0);
             $table->double('score_correct')->unsigned()->default(0);
             $table->double('score_wrong')->unsigned()->default(0);
             $table->double('final_score')->unsigned()->default(0);
+
+			$table->string('surname', 100);
+			$table->string('name', 100);
 
             $table->text('observation')->nullable();
             $table->bigInteger('user_id')->unsigned()->nullable();

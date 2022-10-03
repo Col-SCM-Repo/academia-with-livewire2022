@@ -33,16 +33,8 @@ $slot = ''
 @endsection
 
 @section('content')
-<div class="row">
-    <div class="col-lg-12">
-        <div class="ibox">
-            <div class="ibox-content row ">
 
-
-            </div>
-        </div>
-    </div>
-</div>
+@livewire('evaluacion.revision')
 
 
 @endsection

@@ -10,7 +10,7 @@ class AddForeignKeysToExamSummariesTable extends Migration
 	{
 		Schema::table('exam_summaries', function (Blueprint $table) {
 			$table->foreign('exam_id', 'FK_examSummaries_exam')->references('id')->on('exams')->onUpdate('RESTRICT')->onDelete('RESTRICT');
-			$table->foreign('student_id', 'FK_examSummaries_student')->references('id')->on('students')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+			$table->foreign('enrollment_id', 'FK_examSummaries_enrollment')->references('id')->on('students')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 	}
 
@@ -18,7 +18,7 @@ class AddForeignKeysToExamSummariesTable extends Migration
 	{
 		Schema::table('exam_summaries', function (Blueprint $table) {
 			$table->dropForeign('FK_examSummaries_exam');
-			$table->dropForeign('FK_examSummaries_student');
+			$table->dropForeign('FK_examSummaries_enrollment');
 		});
 	}
 }
