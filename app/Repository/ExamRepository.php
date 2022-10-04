@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Enums\TipoEvaluacionEnum;
 use App\Models\Exam;
 use Exception;
+use Hamcrest\Type\IsString;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
@@ -116,9 +117,28 @@ class ExamRepository extends Exam
     public function listaExamenesPorRango( $fecha_inicio, $fecha_fin ){
         $listaExamenes = array();
         foreach (self::whereBetween('exam_date', [$fecha_inicio, $fecha_fin])->get() as $index => $examen) {
-            $listaExamenes [$index] = $examen;
+            $examen->number_questions = count($examen->questions) ;
+            $examen->number_exam_summaries = count($examen->exam_summaries) ;
+
+            $estado = null;
+            if( $examen->number_questions > 0 ){
+                if( $examen->number_exam_summaries>0 )  $estado = 'REVISADO';
+                else {
+                    if( $examen->path && is_string($examen->path) && strlen($examen->path)>0  ) $estado = 'PENDIENTE DE REVISAR';
+                    else $estado = 'PENDIENTE DE CARGAR';
+                }
+            }
+            else $estado = 'PREGUNTAS NO REGISTRADAS';
+
+            $examen->status = $estado;
+
+            $examen->disabled_cartilla = $estado != 'PREGUNTAS NO REGISTRADAS' ;
+            $examen->disabled_corregir = $estado == 'PENDIENTE DE REVISAR' ;
+            $examen->disabled_resultados = $estado == 'REVISADO';
+
+            $examen->evaluation_type = TipoEvaluacionEnum::getName($examen->evaluation_type);
+            $listaExamenes [$index] = $examen->toArray();
         }
-        dd($listaExamenes);
         return $listaExamenes;
     }
 

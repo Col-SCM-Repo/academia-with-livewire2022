@@ -21,4 +21,17 @@ abstract class TipoEvaluacionEnum
             self::OTRO,
         ];
     }
+
+    public static function getName( string $value ){
+        switch ($value) {
+            case self::SIMULACRO : return 'SIMULACRO';
+            case self::MENSUAL : return 'MENSUAL';
+            case self::SEMANAL : return 'SEMANAL';
+            case self::DIARIO : return 'DIARIO';
+            case self::RAPIDO : return 'RAPIDO';
+            case self::OTRO : return 'OTRO';
+
+            default: return 'INDEFINIDO';
+        }
+    }
 }

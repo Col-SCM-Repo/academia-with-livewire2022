@@ -49,4 +49,8 @@ class Exam extends Model
     public function questions(){
         return $this->hasMany( ExamQuestion::class, 'exam_id', 'id' );
     }
+
+    public function exam_summaries(){
+        return $this->hasMany( ExamSummary::class, 'exam_id', 'id' );
+    }
 }

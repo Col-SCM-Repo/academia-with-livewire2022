@@ -5,13 +5,24 @@ namespace App\Http\Livewire\Evaluacion;
 use App\Repository\ExamRepository;
 use Exception;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class RevisionExamen extends Component
 {
+    use WithFileUploads;
+
     public $fechaInicio, $fechaFin;
+    public $archivoCartilla;
+
     public $listaExamenesDisponibles;
 
     private $_examenesRepository;
+
+
+    protected $rules = [
+        'archivoCartilla' => 'required|file|max:1024',
+    ];
+
 
     public function __construct()
     {
