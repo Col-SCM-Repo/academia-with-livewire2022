@@ -65,7 +65,6 @@ class ConfiguracionBasica extends Component
         $this->validate();
         try {
             $moExamen = self::buildModelExamen();
-
             $examen = $this->_examenRepository->registrar( $moExamen );
             $this->examen_id = $examen->id;
             $this->emitUp('renderizar-componentes', $this->examen_id);

@@ -34,7 +34,31 @@ $slot = ''
 
 @section('content')
 
-@livewire('evaluacion.revision')
-
+<div class="ibox">
+    <div class="ibox-content" style="padding: 0">
+        <div class="tabs-nueva-matricula " style="min-height: 85vh">
+            <ul class="nav nav-tabs">
+                <li class=" active"><a data-toggle="tab" href="#tab-1"> CODIGOS EXAMEN</a></li>
+                <li class=" "><a data-toggle="tab" href="#tab-2">REVISIÓN DE EXAMEN</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="tab-1" class="tab-pane active">
+                    <div class="panel-body ">
+                        <!-- Begin: codigos examen -->
+                            @livewire('evaluacion.revision-codigos')
+                        <!-- End: codigos examen -->
+                    </div>
+                </div>
+                <div id="tab-2" class="tab-pane">
+                    <div class="panel-body ">
+                        <!-- Begin: revision examenes -->
+                            @livewire('evaluacion.revision-examen')
+                        <!-- End: revision examenes -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection

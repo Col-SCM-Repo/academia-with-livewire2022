@@ -3,11 +3,15 @@
         <div class="col-md-10 " style="border-right: 3px solid #d3d3d3; ">
             <div style="display: flex; ">
                 <h5 class="text-uppercase" style="flex-grow: 1">Nivel seleccionado: &nbsp; {{ $nivelSeleccionado? $nivelSeleccionado : ' - '  }} </h5>
-                <div>
-                    @if ( $nivelSeleccionado == 'LIBRES' )
-                        <button class="btn btn-xs btn-success" wire:click="onClickAddAluLibre" > <i class="fa fa-plus" aria-hidden="true"></i> Alumno libre </button>
-                    @endif
+                <div class="form-group "  style="flex-grow: 1">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <input type="text" style="width: 90%; border:1px solid #74747482; border-radius: .125rem;" wire:model="busqueda" placeholder="Buscar por aula, apellidos o nombre">
                 </div>
+                @if ( $nivelSeleccionado == 'LIBRE' )
+                    <div style="padding-left: 3rem;">
+                        <button class="btn btn-xs btn-success" wire:click="onClickAddAluLibre" title="Nuevo alumno libre" > <i class="fa fa-plus" aria-hidden="true"></i> Alumno  </button>
+                    </div>
+                @endif
             </div>
             <table class="table table-hover table-inverse table-responsive">
                 <thead class="thead-inverse">
@@ -45,19 +49,49 @@
                         @endif
 
                         @if ( $listaCodigosEstudiantes && count($listaCodigosEstudiantes)>0 )
-                            @foreach ($listaCodigosEstudiantes as $codigoEstudiante)
+                            @foreach ($listaCodigosEstudiantes as $index => $codigoEstudiante)
                                 <tr >
-                                    <td style="padding-top: 0; padding-bottom: 0;"  scope="row"> {{ $codigoEstudiante->enrollment_code }} </td>
-                                    <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante->level }} </td>
-                                    <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante->classroom }} </td>
-                                    <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante->surname }} </td>
-                                    <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante->name }} </td>
 
-                                    @if ( $nivelSeleccionado == 'LIBRES' )
-                                        <td style="padding: 0; width: 8rem;" class="text-center" >
-                                            <button class="btn btn-xs btn-info" > <i class="fa fa-pencil" aria-hidden="true"></i> </button>
-                                            <button class="btn btn-xs btn-warning" > <i class="fa fa-folder" aria-hidden="true"></i> </button>
+                                    @if ( $nivelSeleccionado == 'LIBRE' )
+                                        <td style="padding: 0;"  scope="row">
+                                            <input  type="text" class="form-control" style="padding: 2px"
+                                            @error("listaCodigosEstudiantes.$index.enrollment_code") style="background: #ffe0e3;" title="{{$message}}" @enderror
+                                            {{ $estudianteCodeId == $codigoEstudiante['id']? '': 'disabled' }} wire:model.defer='{{ "listaCodigosEstudiantes.$index.enrollment_code" }}'>
                                         </td>
+                                        <td style="padding: 0;" >
+                                            <input  type="text" class="form-control" style="padding: 2px"
+                                            @error("listaCodigosEstudiantes.$index.level") style="background: #ffe0e3;" title="{{$message}}" @enderror
+                                            disabled wire:model.defer='{{ "listaCodigosEstudiantes.$index.level" }}'>
+                                        </td>
+                                        <td style="padding: 0;" >
+                                            <input  type="text" class="form-control" style="padding: 2px"
+                                            @error("listaCodigosEstudiantes.$index.classroom") style="background: #ffe0e3;" title="{{$message}}" @enderror
+                                            disabled wire:model.defer='{{ "listaCodigosEstudiantes.$index.classroom" }}'>
+                                        </td>
+                                        <td style="padding: 0;" >
+                                            <input  type="text" class="form-control" style="padding: 2px"
+                                            @error("listaCodigosEstudiantes.$index.surname") style="background: #ffe0e3;" title="{{$message}}" @enderror
+                                            {{ $estudianteCodeId == $codigoEstudiante['id']? '': 'disabled' }} wire:model.defer='{{ "listaCodigosEstudiantes.$index.surname" }}'>
+                                        </td>
+                                        <td style="padding: 0;" >
+                                            <input  type="text" class="form-control" style="padding: 2px"
+                                            @error("listaCodigosEstudiantes.$index.name") style="background: #ffe0e3;" title="{{$message}}" @enderror
+                                            {{ $estudianteCodeId == $codigoEstudiante['id']? '': 'disabled' }} wire:model.defer='{{ "listaCodigosEstudiantes.$index.name" }}'>
+                                        </td>
+
+                                        <td style="padding: 0; width: 8rem;" class="text-center" >
+                                            @if ( $estudianteCodeId == $codigoEstudiante['id']  )
+                                                <button class="btn btn-xs btn-success" wire:click="onBtnGuardarEdicion({{ $index }})"> <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>
+                                            @else
+                                                <button class="btn btn-xs btn-info" wire:click="onBtnModoEdicion({{ $codigoEstudiante['id'] }})" > <i class="fa fa-pencil" aria-hidden="true"></i> </button>
+                                            @endif
+                                        </td>
+                                    @else
+                                        <td style="padding-top: 0; padding-bottom: 0;"  scope="row"> {{ $codigoEstudiante['enrollment_code'] }} </td>
+                                        <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante['level'] }} </td>
+                                        <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante['classroom'] }} </td>
+                                        <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante['surname'] }} </td>
+                                        <td style="padding-top: 0; padding-bottom: 0;" > {{ $codigoEstudiante['name'] }} </td>
                                     @endif
                                 </tr>
                             @endforeach
@@ -83,11 +117,11 @@
             <div style="padding: 1rem .125rem;">
                 <h5 class="text-uppercase" >Niveles</h5>
                 @foreach ($listaNiveles as $nivel)
-                    <button class="btn btn-xs btn-success btn-block" wire:click="onClickNivel('{{$nivel->description }}', {{$nivel->id }})" >
+                    <button class="btn btn-xs btn-success btn-block" wire:click="onClickNivel('{{$nivel->description }}')" >
                         <i class="fa fa-users" aria-hidden="true"></i> {{ $nivel->description }}
                     </button>
                 @endforeach
-                <button class="btn btn-xs btn-success btn-block" wire:click="onClickNivel('LIBRES')" >
+                <button class="btn btn-xs btn-success btn-block" wire:click="onClickNivel('LIBRE')" >
                     <i class="fa fa-user-secret" aria-hidden="true"></i> ALUMNOS LIBRES
                 </button>
             </div>

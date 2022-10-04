@@ -163,7 +163,7 @@ class EnrollmentRepository extends Enrollment
         dd( 'Enviando id de matricula ...', $matricula_id  );
     }
 
-    public function matriculasActivasCiclo( int $ciclo_id ){
+    public function matriculasActivasCiclo( int $ciclo_id){
         return Enrollment:: join('classrooms', 'enrollments.classroom_id', 'classrooms.id')
                             ->join('levels', 'classrooms.level_id', 'levels.id' )
                             ->where('enrollments.deleted_at', null)

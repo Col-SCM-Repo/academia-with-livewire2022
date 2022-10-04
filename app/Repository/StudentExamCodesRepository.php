@@ -30,11 +30,10 @@ class StudentExamCodesRepository extends StudentExamCodes
         foreach ($matriculas as $matricula) {
             $apellidos = $matricula->student->entity->father_lastname.' '.$matricula->student->entity->mother_lastname;
             $nombres = $matricula->student->entity->name;
-            $type_code_id = $matricula->type_id;
-            $codesGenerados [] = self::createEstudianteCodigoExamen($apellidos, $nombres,$matricula->code, $type_code_id, $matricula );
+            $codesGenerados [] = self::createEstudianteCodigoExamen($apellidos, $nombres,$matricula->code, $matricula );
         }
 
-        return $codesGenerados;
+        return count($codesGenerados);
     }
 
     public function resetearCodigosExamen(){
@@ -45,32 +44,56 @@ class StudentExamCodesRepository extends StudentExamCodes
         return count($codigosRegistrados);
     }
 
-    public function estudiantesRegistrados ( $type_code_id ){
+    public function estudiantesRegistrados ( $level_name, $busqueda = '' ){
         $estudiantesRegistrados = array();
-        foreach ( self::where('type_code_id', $type_code_id, 'asc' )->get() as $index => $estudianteCode) {
-            if($estudianteCode->enrollment){
-                $estudianteCode->level = $estudianteCode->type_code->description;
-                $estudianteCode->classroom = $estudianteCode->enrollment->classroom->name;
-            }
-            $estudiantesRegistrados [$index] = $estudianteCode;
-        }
+        $estudiantes = self::where('level', $level_name)
+                            ->where( function($query) use ($busqueda){
+                                $query  ->orWhere('classroom', 'like', "%$busqueda%")
+                                        ->orWhere('surname', 'like', "%$busqueda%")
+                                        ->orWhere('name', 'like', "%$busqueda%");
+                            })
+                            ->orderBy('classroom')
+                            ->orderBy('surname')
+                            ->orderBy('name')
+                            ->get();
+
+        foreach ( $estudiantes as $index => $estudianteCode)
+            $estudiantesRegistrados [$index] = $estudianteCode->toArray();
         return $estudiantesRegistrados;
     }
 
-    public function createEstudianteCodigoExamen( string $apellidos, string $nombres, string $codigo_estudiante, int $type_code_id=null , $matricula=null){
+    public function createEstudianteCodigoExamen( string $apellidos, string $nombres, string $codigo_estudiante, $matricula=null){
         $estudianteCodigoExamen = new StudentExamCodes();
-        $estudianteCodigoExamen->type_code_id = $type_code_id;
-        $estudianteCodigoExamen->code_exam = null;
-        $estudianteCodigoExamen->surname = $apellidos;
-        $estudianteCodigoExamen->name = $nombres;
-        $estudianteCodigoExamen->observation = null;
 
         $longitudCodigo = strlen($codigo_estudiante);
-        $estudianteCodigoExamen->enrollment_id = $matricula? $matricula->id : null;
         $estudianteCodigoExamen->enrollment_code = substr($codigo_estudiante, $longitudCodigo-4,4);
+        /* $estudianteCodigoExamen->exam_code = null; */
+        $estudianteCodigoExamen->observation = null;
+        $estudianteCodigoExamen->surname = $apellidos;
+        $estudianteCodigoExamen->name = $nombres;
 
+        if($matricula){
+            $estudianteCodigoExamen->enrollment_id = $matricula->id;
+            $estudianteCodigoExamen->level = $matricula->classroom->level->level_type->description;
+            $estudianteCodigoExamen->classroom = $matricula->classroom->name;
+        }else{
+            $estudianteCodigoExamen->level = 'LIBRE';
+            $estudianteCodigoExamen->classroom = 'LIBRE';
+        }
         $estudianteCodigoExamen->save();
         return $estudianteCodigoExamen;
+    }
+
+    public function actualizarEstudianteCodeExm ( $id, string $nombre, string $apellidos, string $codigo ){
+        $estudianteCode = self::find($id);
+        if(!$estudianteCode) throw new NotFoundResourceException('Error, no se encuentra el codigo del estudiante. ');
+
+        $estudianteCode->exam_code = $codigo ;
+        $estudianteCode->surname = $apellidos ;
+        $estudianteCode->name = $nombre ;
+        $estudianteCode->save();
+
+        return $estudianteCode;
     }
 
 }

@@ -113,4 +113,13 @@ class ExamRepository extends Exam
         return "Se elimino $cursosEliminados cursos y $preguntasEliminadas preguntas.";
     }
 
+    public function listaExamenesPorRango( $fecha_inicio, $fecha_fin ){
+        $listaExamenes = array();
+        foreach (self::whereBetween('exam_date', [$fecha_inicio, $fecha_fin])->get() as $index => $examen) {
+            $listaExamenes [$index] = $examen;
+        }
+        dd($listaExamenes);
+        return $listaExamenes;
+    }
+
 }
