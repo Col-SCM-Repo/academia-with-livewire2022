@@ -27,7 +27,7 @@
         <hr>
         <div >
             @if ($listaExamenesDisponibles)
-                <table class="table table-hover  table-stripped table-inverse table-responsive">
+                <table class="table   table-stripped table-inverse table-responsive">
                     <thead class="thead-inverse">
                         <tr>
                             <th>CODIGO</th>
@@ -40,9 +40,7 @@
                         </thead>
                         <tbody>
                             @if ( count($listaExamenesDisponibles) > 0 )
-                                @foreach ($listaExamenesDisponibles as $examn)
-                                @php
-                                @endphp
+                                @foreach ($listaExamenesDisponibles as $index=>$examn)
                                     <tr>
                                         <td scope="row"> {{ $examn['id'] }}  </td>
                                         <td> {{ $examn['name'] }} </td>
@@ -50,10 +48,24 @@
                                         <td> {{ $examn['status']  }} </td>
                                         <td> {{ $examn['exam_date'] }} </td>
                                         <td>
-                                            <input type="file" wire:model="archivoCartilla">
-                                            <button class="btn btn-xs btn-success" {{ $examn['disabled_cartilla'] ? '' : 'disabled' }} >    <i class="fa fa-upload" aria-hidden="true"></i> Cargar cartila. respuestas </button>
-                                            <button class="btn btn-xs btn-danger"  {{ $examn['disabled_corregir'] ? '' : 'disabled' }}  > <i class="fa fa-magic" aria-hidden="true"></i> Corregir examen </button>
+                                            <label for="{{'input-file-exam'.$examn['id']}}" class="btn btn-xs btn-success" {{ $examn['disabled_cartilla'] ? '' : 'disabled' }}> <i class="fa fa-upload" aria-hidden="true"></i> Subir cartilla </label>
+                                            <button class="btn btn-xs btn-danger"  {{ $examn['disabled_corregir'] ? '' : 'disabled' }} wire:click="onBtnCorregirExam({{$index}})" > <i class="fa fa-magic" aria-hidden="true"></i> Corregir examen </button>
                                             <button class="btn btn-xs btn-primary" {{ $examn['disabled_resultados'] ? '' : 'disabled' }}> <i class="fa fa-file" aria-hidden="true"></i> Ver resultados</button>
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="6">
+                                            <div  x-data="{ isUploading: false, progress: 0 }" x-on:livewire-upload-start="isUploading = true; progress= 0"
+                                            x-on:livewire-upload-finish="isUploading = false" x-on:livewire-upload-error="isUploading = false" x-on:livewire-upload-progress="progress = $event.detail.progress" >
+                                                <input type="file" style="visibility: false; display: none;  "  id="{{'input-file-exam'.$examn['id']}}" wire:model='{{ "listaExamenesDisponibles.$index.archivo" }}' class="btn btn-xs btn-sucees" placeholder="Cargar cartila. respuestas " {{ $examn['disabled_cartilla'] ? '' : 'disabled' }}>
+                                                <div x-show="isUploading" class="text-center">
+                                                    <div class="progress progress-striped active" >
+                                                        <div :style="{ 'width': progress+'%' }" aria-valuemax="100" aria-valuemin="0" aria-valuenow="75" role="progressbar" class="progress-bar progress-bar-danger">
+                                                            <span class="sr-only">Subiendo archivo</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -64,6 +76,7 @@
                             @endif
                         </tbody>
                 </table>
+
             @else
                 <div class="text-center" style="padding: 3rem; background: #c8c8c847;">
                     Aun no se especifica el rango de busqueda para los examenes.
@@ -72,4 +85,18 @@
         </div>
 
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('ready', ()=>{
+                Livewire.on('livewire-upload-progress', (e)=>{
+                    console.log(e);
+                    console.log('livewire-upload-progresssssssss');
+                });
+
+            });
+
+        </script>
+    @endpush
+
 </div>

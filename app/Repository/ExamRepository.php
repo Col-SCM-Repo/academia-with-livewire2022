@@ -73,13 +73,13 @@ class ExamRepository extends Exam
         return $examen;
     }
 
-    /* public function agregarRutaExamen ( int $examen_id, string $ruta_examen ) {
+    public function agregarRutaExamen ( int $examen_id, string $ruta_examen ) {
         $examen =  Exam::find($examen_id);
 
         if(!$examen) throw new NotFoundResourceException('No se encontro el examen a actualizas');
         $examen->path = $ruta_examen;
         return $examen->save();
-    } */
+    }
 
     public function eliminar ( int $examen_id ) {
         $examen =  Exam::find($examen_id);
@@ -137,6 +137,9 @@ class ExamRepository extends Exam
             $examen->disabled_resultados = $estado == 'REVISADO';
 
             $examen->evaluation_type = TipoEvaluacionEnum::getName($examen->evaluation_type);
+
+            $examen->archivo = null;
+
             $listaExamenes [$index] = $examen->toArray();
         }
         return $listaExamenes;
