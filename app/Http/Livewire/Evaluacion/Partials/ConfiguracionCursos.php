@@ -236,7 +236,7 @@ class ConfiguracionCursos extends Component
         ];
     }
 
-    private function buildCursoDetalle( int $curso_id, string $nombre_curso, int $orden, int $numero_preguntas=1, $puntaje_correcto=0  ){
+    private function buildCursoDetalle( int $curso_id, string $nombre_curso, int $orden, int $numero_preguntas=1, $puntaje_correcto=1 ){
         return [
             'orden' => $orden,
             'curso_id' => $curso_id ,

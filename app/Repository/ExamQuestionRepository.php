@@ -74,7 +74,9 @@ class ExamQuestionRepository extends ExamQuestion
         $buildExamInfo  = fn(int  $id, int $num, $ptn, $rpta='' ) => [ "id"=>$id, "numero" => $num, "puntaje" => $ptn, "respuesta" => $rpta ];
         $buildCursoInfo = fn($id,$nombre,$shortName,$preguntas) => [ "id" => $id, "nombre" => $nombre, "nombre_corto" => $shortName, "numero" => count($preguntas), "preguntas" => $preguntas];
 
-        foreach (self::where('exam_id', $examen_id)->orderBy('question_number')->get() as $index => $pregunta)
+        $ultimo_curso_id = null ;
+        foreach (self::where('exam_id', $examen_id)->orderBy('question_number')->get() as $index => $pregunta){
+            $ultimo_curso_id = $pregunta->course_id;
             if($cursoActual != $pregunta->course_id){   // revisar por que esta almacenando el couseid en score
                 if( $cursoActual>=0 ) $cursos [$index] = $buildCursoInfo($pregunta->course_id, $nombreCurso, $nombreCursoCorto, $preguntas );
                 $preguntas = array();
@@ -84,8 +86,10 @@ class ExamQuestionRepository extends ExamQuestion
                 $nombreCursoCorto = $pregunta->course->shortname;
             }
             else $preguntas[] = $buildExamInfo($pregunta->id, $pregunta->question_number, $pregunta->score, $pregunta->correct_answer);
+        }
 
-        $cursos [] = $buildCursoInfo($pregunta->course_id, $nombreCurso, $nombreCursoCorto, $preguntas) ;
+        if($ultimo_curso_id) $cursos [] = $buildCursoInfo($ultimo_curso_id, $nombreCurso, $nombreCursoCorto, $preguntas);
+
         return $cursos;
     }
 
