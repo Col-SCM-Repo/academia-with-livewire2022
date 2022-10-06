@@ -43,7 +43,7 @@
                                 @foreach ($listaExamenesDisponibles as $index=>$examn)
                                     <tr>
                                         <td scope="row"> {{ $examn['id'] }}  </td>
-                                        <td> {{ $examn['name'] }} </td>
+                                        <td> <a target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examn['id'] ]) }}"> {{ $examn['name'] }}</a>   </td>
                                         <td> {{ $examn['evaluation_type'] }} </td>
                                         <td> {{ $examn['status']  }} </td>
                                         <td> {{ $examn['exam_date'] }} </td>

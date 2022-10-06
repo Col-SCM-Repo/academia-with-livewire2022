@@ -44,6 +44,7 @@ class Pago extends Component
     public function resetearPagos(){
         $this->reset(['historial', 'matricula_id']);
         $this->reset(['cuota_id', 'monto_pendiente_cuota', 'monto_pagar', 'modo_pago', 'nombre_banco', 'numero_operacion']);
+        $this->reset([ 'general_deuda', 'general_pagado', 'matricula_deuda', 'matricula_pagado', 'ciclo_deuda', 'ciclo_pagado' ]);
     }
 
     public function mount(){

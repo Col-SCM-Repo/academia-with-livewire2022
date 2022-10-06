@@ -42,9 +42,12 @@ class MatriculaConfiguracionGeneral extends Component
         'observaciones' => ' nullable | string '
     ];
 
-    public function resetearMatricula(){
+    public function resetearMatricula( bool $completo = false ){
         $this->reset(['matriculaId']);
         $this->reset(['descuento',  'classroom', 'carrera', 'costoCiclo', 'costoCicloFinal', 'observaciones']);
+        if($completo){
+            $this->reset(['estudianteId']);
+        }
     }
 
     public function __construct()

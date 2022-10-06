@@ -9,10 +9,14 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 class ExamQuestionRepository extends ExamQuestion
 {
     private $_examenRepository;
+    private $_estudianteCodigosExamnRepository, $_examenResumenRepository, $_cursoResumenRepository ;
 
     public function __construct()
     {
         $this->_examenRepository = new ExamRepository();
+        $this->_examenResumenRepository = new ExamSummaryRepository();
+        $this->_estudianteCodigosExamnRepository = new StudentExamCodesRepository();
+        $this->_cursoResumenRepository = new CourseSummaryRepository();
     }
 
 
@@ -71,27 +75,122 @@ class ExamQuestionRepository extends ExamQuestion
         $nombreCurso        = null;
         $nombreCursoCorto   = null;
 
-        $buildExamInfo  = fn(int  $id, int $num, $ptn, $rpta='' ) => [ "id"=>$id, "numero" => $num, "puntaje" => $ptn, "respuesta" => $rpta ];
-        $buildCursoInfo = fn($id,$nombre,$shortName,$preguntas) => [ "id" => $id, "nombre" => $nombre, "nombre_corto" => $shortName, "numero" => count($preguntas), "preguntas" => $preguntas];
+        $buildPregunta  = fn(int  $id, int $num, $rpta='' ) => [ "id"=>$id, "numero" => $num, "respuesta" => $rpta ];
+        $buildCurso = fn($id,$nombre,$shortName,$ptn, $preguntas) => ["id" => $id,
+                                                                "nombre" =>$nombre,
+                                                                "nombre_corto" => $shortName,
+                                                                "numero" => count($preguntas),
+                                                                "puntaje" => $ptn,
+                                                                "preguntas" => $preguntas
+                                                            ];
 
         $ultimo_curso_id = null ;
+        $ultimo_puntaje = 0;
         foreach (self::where('exam_id', $examen_id)->orderBy('question_number')->get() as $index => $pregunta){
-            $ultimo_curso_id = $pregunta->course_id;
             if($cursoActual != $pregunta->course_id){   // revisar por que esta almacenando el couseid en score
-                if( $cursoActual>=0 ) $cursos [$index] = $buildCursoInfo($pregunta->course_id, $nombreCurso, $nombreCursoCorto, $preguntas );
+                if( $cursoActual>=0 ) $cursos [$index] = $buildCurso($ultimo_curso_id, $nombreCurso, $nombreCursoCorto, $ultimo_puntaje, $preguntas );
                 $preguntas = array();
-                $preguntas[] = $buildExamInfo($pregunta->id, $pregunta->question_number, $pregunta->score, $pregunta->correct_answer);
+                $preguntas[] = $buildPregunta($pregunta->id, $pregunta->question_number, $pregunta->correct_answer);
                 $cursoActual = $pregunta->course_id;
                 $nombreCurso = $pregunta->course->name;
                 $nombreCursoCorto = $pregunta->course->shortname;
             }
-            else $preguntas[] = $buildExamInfo($pregunta->id, $pregunta->question_number, $pregunta->score, $pregunta->correct_answer);
+            else $preguntas[] = $buildPregunta($pregunta->id, $pregunta->question_number, $pregunta->correct_answer);
+            $ultimo_curso_id = $pregunta->course_id;
+            $ultimo_puntaje = $pregunta->score;
         }
-
-        if($ultimo_curso_id) $cursos [] = $buildCursoInfo($ultimo_curso_id, $nombreCurso, $nombreCursoCorto, $preguntas);
-
+        if($ultimo_curso_id) $cursos [] = $buildCurso($ultimo_curso_id, $nombreCurso, $nombreCursoCorto,$ultimo_puntaje,  $preguntas);
         return $cursos;
     }
 
+    public function corregirExamen( int $examen_id, array $respuestas_data ){
+        $solucionarioPreguntas = self::getPreguntasExamen($examen_id);
+        $examen = $this->_examenRepository::find($examen_id);
+        if(!count($respuestas_data)>0) throw new Exception('No se encontro hojas de respuesta');
+        if(!$examen) throw new Exception('Examen no encontrado');
+
+        $numeroExamnCorregido = 0;
+        $numeroExamnError = 0;
+
+        foreach ( $respuestas_data as $respuestaData) {
+            $numeroPreguntasCorrectas = 0;
+            $numeroPreguntasIncorrectas = 0;
+            $numeroPreguntasBlanco = 0;
+            $puntajeCorrectas = 0;
+            $puntajeIncorrectas = 0;
+
+            try {
+
+                // crear examn summary  y pasar al corregirPreguntasPorCurso
+
+                $cursosResumen = array();
+                foreach ($solucionarioPreguntas as $cursoSolucionario){
+                    $cursoResumen = self::corregirPreguntasPorCurso( $respuestaData['respuestas'], $cursoSolucionario, $examen->score_wrong );
+                    $cursosResumen [] =$cursoResumen;
+                    $numeroPreguntasCorrectas += $cursoResumen->correct_answers ;
+                    $numeroPreguntasIncorrectas += $cursoResumen->wrong_answers ;
+                    $numeroPreguntasBlanco += $cursoResumen->blank_answers ;
+                    $puntajeCorrectas += $cursoResumen->correct_score ;
+                    $puntajeIncorrectas += $cursoResumen->wrong_score ;
+                }
+
+                // actuaklizar examn summary
+
+                $numeroExamnCorregido ++;
+            } catch (Exception $err) {
+                $numeroExamnError++;
+
+                continue;
+            }
+
+        }
+
+
+    }
+
+    private function eliminarCursosResumen( $examen_resumen_id ){
+        // pendiente ....
+    }
+
+
+    private function corregirPreguntasPorCurso( $respuestasAlumno, $solucionario, $valor_incorrectas ){
+        $numeroPreguntasCorrectas = 0;
+        $numeroPreguntasIncorrectas = 0;
+        $numeroPreguntasBlanco = 0;
+        $respuestasAlumnoStr = '';
+
+        foreach ($solucionario['preguntas'] as $pregunta) {
+            $respuestaAlumno = $respuestasAlumno[ ((int)$pregunta['numero'])-1 ];
+            $respuestasAlumnoStr .= $respuestaAlumno ;
+            if($respuestaAlumno != '' && $respuestaAlumno != ' ' && $respuestaAlumno != null )
+                if( $pregunta['respuesta'] == $respuestaAlumno ) $numeroPreguntasCorrectas ++;
+                else $numeroPreguntasIncorrectas ++;
+            else $numeroPreguntasBlanco++;
+        }
+        $moResumenCurso = $this->_cursoResumenRepository->builderModelRepository() ;
+        $moResumenCurso->curso_id = $solucionario['id'];
+        $moResumenCurso->numero_correctas = $numeroPreguntasCorrectas;
+        $moResumenCurso->numero_incorrectas = $numeroPreguntasIncorrectas;
+        $moResumenCurso->numero_blanco = $numeroPreguntasBlanco;
+        $moResumenCurso->respuestas_estudiante = $respuestasAlumnoStr;
+        $moResumenCurso->puntaje_correctos = $numeroPreguntasCorrectas * $solucionario['puntaje'];
+        $moResumenCurso->puntaje_incorrectos = $valor_incorrectas * $numeroPreguntasIncorrectas;
+        /* $moResumenCurso->puntaje_total = $numeroPreguntasCorrectas * $solucionario['puntaje'] - $valor_incorrectas * $numeroPreguntasIncorrectas; */
+
+        return $this->_cursoResumenRepository->registrar($moResumenCurso);
+    }
+
+    /* public function preguntasExamen( int $examen_id ){
+        $respuestasExamen = [];
+        foreach ( self::where('exam_id', $examen_id)->orderBy('question_number', 'asc')->get()  as $index => $pregunta){
+            if( $index +1  != $pregunta->question_number  )  throw new Exception('Error, faltan preguntas configuradas, numero '.($index+1));
+            if( $pregunta->correct_answer != null)  throw new Exception('Error, aun hay preguntas sin configurar (en blanco), numero '.($index+1));
+
+            $respuestasExamen[] = (object)[ 'numero'=>$pregunta->question_number,
+                                            'respuesta'=>$pregunta->correct_answer,
+                                            'valor'=>$pregunta->score ];
+        }
+        return $respuestasExamen;
+    } */
 
 }

@@ -7,7 +7,8 @@ use Livewire\Component;
 class NuevaMatriculaSteps extends Component
 {
     protected $listeners = [
-        'alumno-id-encontrado' => 'estudianteEncontrado'
+        'alumno-id-encontrado' => 'estudianteEncontrado',
+        'reset-matricula-steps' => 'resetStepMatricula'
     ];
 
     public function render()
@@ -20,6 +21,14 @@ class NuevaMatriculaSteps extends Component
         $this->emitTo('matricula.partials.apoderado', 'cargar-id-estudiante', $estudiante_id);
         $this->emitTo('matricula.partials.matricula', 'cargar-id-estudiante', $estudiante_id);
         /* $this->emitTo('matricula.partials.pagos', 'cargar-id-estudiante', $estudiante_id); */
+    }
+
+    public function resetStepMatricula(){
+        $this->emitTo('matricula.partials.alumno', 'reset-alumno');
+        $this->emitTo('matricula.partials.apoderado', 'reset-form-apoderado');
+        $this->emitTo('matricula.partials.matricula', 'resetear-matricula', true);
+        $this->emitTo('matricula.partials.pago', 'resetear-pagos');
+
     }
 
 

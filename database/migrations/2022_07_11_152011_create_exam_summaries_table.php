@@ -22,9 +22,9 @@ class CreateExamSummariesTable extends Migration
             $table->smallInteger('correct_answer')->unsigned()->default(0);
             $table->smallInteger('wrong_answer')->unsigned()->default(0);
             $table->smallInteger('blank_answer')->unsigned()->default(0);
-            $table->double('score_correct')->unsigned()->default(0);
-            $table->double('score_wrong')->unsigned()->default(0);
-            $table->double('final_score')->unsigned()->default(0);
+            $table->double('score_correct')->default(0);
+            $table->double('score_wrong')->default(0);
+            $table->double('final_score')->default(0);
 
 			$table->string('surname', 100);
 			$table->string('name', 100);

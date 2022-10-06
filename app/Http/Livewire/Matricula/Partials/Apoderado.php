@@ -20,7 +20,7 @@ class Apoderado extends Component
     private $_distritosRepository, $_ocupacionRepository, $_apoderadoRepository;
 
     protected $listeners = [
-        'reset-form-apoderado' => 'initialState',
+        'reset-form-apoderado' => 'resetearApoderado',
         'pagina-cargada-apoderado' => 'enviarDataAutocomplete',
         'change-props-apoderado' => 'setData',
         'cargar-id-estudiante' => 'cambiarIdEstudiante',
@@ -111,6 +111,11 @@ class Apoderado extends Component
         } catch (Exception $err) {
             toastAlert( $this, $err->getMessage());
         }
+    }
+
+    public function resetearApoderado(){
+        $this->reset([  'idEstudiante', 'relative_id', 'dni', 'fecha_nacimiento', 'telefono', 'distrito', 'direccion', 'parentesco',
+                        'nombres', 'apellido_paterno', 'apellido_materno', 'ocupacion', 'sexo', 'estado_marital']);
     }
 
     /***********************************************************  Funciones listeners *************************************************************/

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Evaluacion;
 
 use App\Enums\EstadosAlertasEnum;
+use App\Repository\ExamQuestionRepository;
 use App\Repository\ExamRepository;
 use Exception;
 use Illuminate\Support\Facades\Session;
@@ -19,7 +20,7 @@ class RevisionExamen extends Component
 
     public $listaExamenesDisponibles;
 
-    private $_examenesRepository;
+    private $_examenesRepository, $_examenPreguntasRepository;
 
 
     protected $rules = [
@@ -31,6 +32,7 @@ class RevisionExamen extends Component
     public function __construct()
     {
         $this->_examenesRepository = new ExamRepository();
+        $this->_examenPreguntasRepository = new ExamQuestionRepository();
     }
 
     public function render()
@@ -53,14 +55,30 @@ class RevisionExamen extends Component
 
         $examen = $this->listaExamenesDisponibles[$index];
         if($examen['path'] && Storage::exists( $examen['path'] ) ){
-            $str = '';
+            $inicioCaptura = 48;
+
+            $longitudCodigoGrupo = 2;
+            $longitudCodigoAlumno = 4;
+            $numeroPreguntas = count($examen['questions']);
+
+            if( !$numeroPreguntas>0 ) throw new Exception('No se encontro preguntas para el examen');
+
+            $cartillasRespuestas = array();
             $fp = fopen(storage_path('app/'.$examen['path']), "r");
             while (!feof($fp)){
-                $linea = fgets($fp);
-                $str .= "\n $linea";
+                $cadenaCartilla = substr( fgets($fp) , $inicioCaptura);
+
+                $codigoGrupo  = substr($cadenaCartilla, 0, $longitudCodigoGrupo);
+                $codigoAlumno = substr($cadenaCartilla, $longitudCodigoGrupo, $longitudCodigoAlumno);
+                $respuestas   = str_split(substr($cadenaCartilla, $longitudCodigoGrupo + $longitudCodigoAlumno ));
+
+                /* if( !$codigoGrupo==$examen['group_code'])
+                throw new Exception( "Error, incongruencia de codigos de examen COD:$codigoGrupo , linea: ".(count($cartillasRespuestas)+1)  ); */
+
+                $cartillasRespuestas [] = [ 'cod_grupo'=>$codigoGrupo, 'cod_alumno'=>$codigoAlumno, 'respuestas'=>$respuestas ];
             }
             fclose($fp);
-            dd($str);
+            $statusCorreccion = $this->_examenPreguntasRepository->corregirExamen($examen['id'], $cartillasRespuestas);
         }
         else throw new Exception('Error, no se encontro la cartilla de respuestas');
 
@@ -73,9 +91,10 @@ class RevisionExamen extends Component
             $nombre = explode('.', $name);
             if( count($nombre)==3 && $nombre[0]== 'listaExamenesDisponibles' && $nombre[2]  == 'archivo' ){
                 $archivo = $this->listaExamenesDisponibles[ $nombre[1] ]['archivo'];
-                if($archivo &&  ($archivo->extension() == 'txt') ){
+                $extension = pathinfo($archivo->getClientOriginalName(), PATHINFO_EXTENSION);
+                if($archivo &&  ($extension == 'dat' || $extension == 'txt') ){
                     $ruta = 'examenes/'.Session::get('periodo')->year;
-                    $nombreArchivo = urlencode (date('Y-m-d-H:i:s').'-'.$this->listaExamenesDisponibles[ $nombre[1] ]['name']).'.txt';
+                    $nombreArchivo = urlencode (date('Y-m-d-H:i:s').'-'.$this->listaExamenesDisponibles[ $nombre[1] ]['name']).'.dat';
                     $archivo->storeAs($ruta, $nombreArchivo);
                     toastAlert($this, 'Archivo registrado correctamente', EstadosAlertasEnum::SUCCESS);
                     $this->_examenesRepository->agregarRutaExamen($this->listaExamenesDisponibles[ $nombre[1] ]['id'],$ruta.'/'.$nombreArchivo);

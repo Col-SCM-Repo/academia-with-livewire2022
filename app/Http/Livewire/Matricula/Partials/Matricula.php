@@ -19,6 +19,7 @@ class Matricula extends Component
 
     protected $listeners = [
         'renderizar-matricula'=>'renderizarMatricula',
+        'resetear-matricula' => 'resetearMatricula',
        /*  'student-found' => 'setData',
         'change-prop-enrollment' => 'setData',
         'reset-form-matricula' => 'initialState',
@@ -103,6 +104,15 @@ class Matricula extends Component
 
     public function cambiarIdMatricula( int $matricula_id ){
         $this->matriculaId = $matricula_id;
+    }
+
+    public function resetearMatricula( bool $completo = false ){
+        $this->reset(['matriculaId']);
+        $this->emitTo('matricula.partials.matricula-configuracion-general', 'resetear-matricula-general', $completo);
+        $this->emitTo('matricula.partials.matricula-configuracion-pagos', 'resetear-matricula-pagos');
+        if($completo){
+            $this->reset(['estudianteId']);
+        }
     }
 }
 

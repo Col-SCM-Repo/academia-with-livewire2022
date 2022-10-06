@@ -37,7 +37,7 @@
     </ol>
 </div>
 <div class="col-md-7 text-right" style="padding-top: 1rem">
-    <button class="btn btn-sm btn-success din" type="button" id="btnResetComponents">
+    <button class="btn btn-sm btn-success din" type="button" id="btnResetComponents" >
         Limpiar formulario
     </button>
 </div>
@@ -58,12 +58,12 @@
 
 @push('scripts')
     <script>
-        /* $(document).ready(()=>{
+        $(document).ready(()=>{
+            console.log('asdvajsvdj');
             $('#btnResetComponents').on('click', ()=>{
-                alert("reseteando componentes");
-                Livewire.emit('reset-forms', true);
+                Livewire.emitTo('matricula.nueva-matricula-steps', 'reset-matricula-steps');
             })
-        }) */
+        })
     </script>
 @endpush
 

@@ -11,7 +11,7 @@ class CreateCourseSummariesTable extends Migration
     {
         Schema::create('course_summaries', function (Blueprint $table) {
             $table->bigInteger('id', true)->unsigned();
-			$table->bigInteger('exam_summary_id')->unsigned()->index('FK_courseSummary_examSummary');
+			$table->bigInteger('exam_summary_id')->unsigned()->nullable()->index('FK_courseSummary_examSummary');
 			$table->bigInteger('course_id')->unsigned()->index('FK_courseSummary_course');
 
             $table->integer('correct_answers')->unsigned()->default(0);
@@ -19,7 +19,9 @@ class CreateCourseSummariesTable extends Migration
             $table->integer('blank_answers')->unsigned()->default(0);
 
             $table->text('student_responses')->nullable();
-            $table->double('course_score')->unsigned()->default(0);     // puntaje de curso
+            $table->double('correct_score')->default(0);    // puntaje de curso
+            $table->double('wrong_score')->default(0);      // puntaje de curso
+            $table->double('course_score')->default(0);     // puntaje de curso
             $table->timestamps();
         });
     }
