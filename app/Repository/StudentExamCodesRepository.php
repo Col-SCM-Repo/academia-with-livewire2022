@@ -96,4 +96,8 @@ class StudentExamCodesRepository extends StudentExamCodes
         return $estudianteCode;
     }
 
+    public function buscarEstudianteExamnPorCodigo( string $codigo_estudiante ){
+        return StudentExamCodes::where( 'enrollment_code', $codigo_estudiante )->first();
+    }
+
 }

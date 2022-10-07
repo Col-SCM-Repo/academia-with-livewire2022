@@ -39,4 +39,7 @@ class ExamSummary extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function course_summary(){
+        return $this->hasMany( CourseSummary::class, 'exam_summary_id', 'id');
+    }
 }

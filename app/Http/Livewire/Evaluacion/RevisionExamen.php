@@ -66,19 +66,21 @@ class RevisionExamen extends Component
             $cartillasRespuestas = array();
             $fp = fopen(storage_path('app/'.$examen['path']), "r");
             while (!feof($fp)){
-                $cadenaCartilla = substr( fgets($fp) , $inicioCaptura);
-
+                $linea = fgets($fp);
+                if( strlen($linea) < $inicioCaptura+$longitudCodigoGrupo+$longitudCodigoAlumno+10 ) continue; // La linea almenos debe tener 64 caracteres cod_exm, cod_estudian, y 10 preguntas
+                $cadenaCartilla = substr( $linea , $inicioCaptura);
                 $codigoGrupo  = substr($cadenaCartilla, 0, $longitudCodigoGrupo);
                 $codigoAlumno = substr($cadenaCartilla, $longitudCodigoGrupo, $longitudCodigoAlumno);
                 $respuestas   = str_split(substr($cadenaCartilla, $longitudCodigoGrupo + $longitudCodigoAlumno ));
 
-                /* if( !$codigoGrupo==$examen['group_code'])
-                throw new Exception( "Error, incongruencia de codigos de examen COD:$codigoGrupo , linea: ".(count($cartillasRespuestas)+1)  ); */
+                if( !$codigoGrupo==$examen['group_code'])
+                throw new Exception( "Error, incongruencia de codigos de examen COD:$codigoGrupo , linea: ".(count($cartillasRespuestas)+1)  );
 
                 $cartillasRespuestas [] = [ 'cod_grupo'=>$codigoGrupo, 'cod_alumno'=>$codigoAlumno, 'respuestas'=>$respuestas ];
             }
             fclose($fp);
             $statusCorreccion = $this->_examenPreguntasRepository->corregirExamen($examen['id'], $cartillasRespuestas);
+            dd($statusCorreccion);
         }
         else throw new Exception('Error, no se encontro la cartilla de respuestas');
 

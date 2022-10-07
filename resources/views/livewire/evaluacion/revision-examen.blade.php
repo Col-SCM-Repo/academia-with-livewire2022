@@ -30,7 +30,7 @@
                 <table class="table   table-stripped table-inverse table-responsive">
                     <thead class="thead-inverse">
                         <tr>
-                            <th>CODIGO</th>
+                            <th>COD EXAMEN</th>
                             <th>NOMBRE</th>
                             <th>TIPO</th>
                             <th>ESTADO</th>
@@ -42,8 +42,8 @@
                             @if ( count($listaExamenesDisponibles) > 0 )
                                 @foreach ($listaExamenesDisponibles as $index=>$examn)
                                     <tr>
-                                        <td scope="row"> {{ $examn['id'] }}  </td>
-                                        <td> <a target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examn['id'] ]) }}"> {{ $examn['name'] }}</a>   </td>
+                                        <td scope="row"> {{ $examn['group_code'] }}  </td>
+                                        <td> <a title="Ver respuestas" target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examn['id'] ]) }}"> {{ $examn['name'] }}</a>   </td>
                                         <td> {{ $examn['evaluation_type'] }} </td>
                                         <td> {{ $examn['status']  }} </td>
                                         <td> {{ $examn['exam_date'] }} </td>

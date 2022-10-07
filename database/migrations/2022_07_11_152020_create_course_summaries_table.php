@@ -21,7 +21,7 @@ class CreateCourseSummariesTable extends Migration
             $table->text('student_responses')->nullable();
             $table->double('correct_score')->default(0);    // puntaje de curso
             $table->double('wrong_score')->default(0);      // puntaje de curso
-            $table->double('course_score')->default(0);     // puntaje de curso
+            /* $table->double('course_score')->default(0);   */   // puntaje de curso
             $table->timestamps();
         });
     }

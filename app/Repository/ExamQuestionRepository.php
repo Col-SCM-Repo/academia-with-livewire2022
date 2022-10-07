@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Enums\TiposEstudianteEnum;
 use App\Models\ExamQuestion;
 use Exception;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -108,52 +109,56 @@ class ExamQuestionRepository extends ExamQuestion
         $examen = $this->_examenRepository::find($examen_id);
         if(!count($respuestas_data)>0) throw new Exception('No se encontro hojas de respuesta');
         if(!$examen) throw new Exception('Examen no encontrado');
-
         $numeroExamnCorregido = 0;
         $numeroExamnError = 0;
+        $erroresMsg = array();
+        foreach ( $respuestas_data as $i=>$respuestaData) {
+            $numeroCorrectas = 0;
+            $numeroIncorrectas = 0;
+            $numeroBlanco = 0;
+            $ptnCorrectas = 0;
+            $ptnIncorrectas = 0;
 
-        foreach ( $respuestas_data as $respuestaData) {
-            $numeroPreguntasCorrectas = 0;
-            $numeroPreguntasIncorrectas = 0;
-            $numeroPreguntasBlanco = 0;
-            $puntajeCorrectas = 0;
-            $puntajeIncorrectas = 0;
-
+            $examen_resumen_id = null;
             try {
+                $estudianteExamenCodigo = $this->_estudianteCodigosExamnRepository->buscarEstudianteExamnPorCodigo( $respuestaData['cod_alumno'] );
+                if( ! $estudianteExamenCodigo ) throw new Exception('Error, no se encontro el estudiante con codigo '.$respuestaData['cod_alumno']);
 
-                // crear examn summary  y pasar al corregirPreguntasPorCurso
-
-                $cursosResumen = array();
+                $moExamenResumen = $this->_examenResumenRepository->builderModelRepository();
+                $moExamenResumen->examen_id = $examen_id;
+                $moExamenResumen->matricula_id = $estudianteExamenCodigo->enrollment_id ;
+                $moExamenResumen->codigo_examen = $respuestaData['cod_grupo'] ;
+                $moExamenResumen->codigo_estudiante = $estudianteExamenCodigo->enrollment_code ;
+                $moExamenResumen->tipo_estudiante = $estudianteExamenCodigo->enrollment_id? TiposEstudianteEnum::ESTUDIANTE : TiposEstudianteEnum::LIBRE;
+                $moExamenResumen->apellidos = $estudianteExamenCodigo->surname;
+                $moExamenResumen->nombre = $estudianteExamenCodigo->name;
+                $examen_resumen_id = $this->_examenResumenRepository->registrar($moExamenResumen)->id;
                 foreach ($solucionarioPreguntas as $cursoSolucionario){
-                    $cursoResumen = self::corregirPreguntasPorCurso( $respuestaData['respuestas'], $cursoSolucionario, $examen->score_wrong );
-                    $cursosResumen [] =$cursoResumen;
-                    $numeroPreguntasCorrectas += $cursoResumen->correct_answers ;
-                    $numeroPreguntasIncorrectas += $cursoResumen->wrong_answers ;
-                    $numeroPreguntasBlanco += $cursoResumen->blank_answers ;
-                    $puntajeCorrectas += $cursoResumen->correct_score ;
-                    $puntajeIncorrectas += $cursoResumen->wrong_score ;
+                    $cursoResumen = self::corregirPreguntasPorCurso( $respuestaData['respuestas'], $cursoSolucionario, $examen->score_wrong, $examen_resumen_id );
+                    $numeroCorrectas += $cursoResumen->correct_answers ;
+                    $numeroIncorrectas += $cursoResumen->wrong_answers ;
+                    $numeroBlanco += $cursoResumen->blank_answers ;
+                    $ptnCorrectas += $cursoResumen->correct_score;
+                    $ptnIncorrectas += $cursoResumen->wrong_score;
                 }
-
-                // actuaklizar examn summary
-
+                $this->_examenResumenRepository->actualizarPuntajeResumen($examen_resumen_id,$numeroCorrectas,$numeroIncorrectas,$numeroBlanco,$ptnCorrectas,$ptnIncorrectas);
                 $numeroExamnCorregido ++;
             } catch (Exception $err) {
+                if($examen_resumen_id) $this->_examenResumenRepository->eliminarExamenResumen($examen_resumen_id);
+                $erroresMsg []= 'Cartilla['.($i+1).']: '. ($err->getMessage());
                 $numeroExamnError++;
-
                 continue;
             }
-
         }
-
-
+        return (object) [ 'examenesCorregidos'=>$numeroExamnCorregido, 'examenesConErrores'=>$numeroExamnError, 'logs'=>$erroresMsg ];
     }
 
-    private function eliminarCursosResumen( $examen_resumen_id ){
+    /* private function eliminarCursosResumen( $examen_resumen_id ){
         // pendiente ....
     }
+ */
 
-
-    private function corregirPreguntasPorCurso( $respuestasAlumno, $solucionario, $valor_incorrectas ){
+    private function corregirPreguntasPorCurso( $respuestasAlumno, $solucionario, $valor_incorrectas, $examen_resumen_id ){
         $numeroPreguntasCorrectas = 0;
         $numeroPreguntasIncorrectas = 0;
         $numeroPreguntasBlanco = 0;
@@ -168,6 +173,7 @@ class ExamQuestionRepository extends ExamQuestion
             else $numeroPreguntasBlanco++;
         }
         $moResumenCurso = $this->_cursoResumenRepository->builderModelRepository() ;
+        $moResumenCurso->resumen_examen_id = $examen_resumen_id ;
         $moResumenCurso->curso_id = $solucionario['id'];
         $moResumenCurso->numero_correctas = $numeroPreguntasCorrectas;
         $moResumenCurso->numero_incorrectas = $numeroPreguntasIncorrectas;
@@ -175,7 +181,6 @@ class ExamQuestionRepository extends ExamQuestion
         $moResumenCurso->respuestas_estudiante = $respuestasAlumnoStr;
         $moResumenCurso->puntaje_correctos = $numeroPreguntasCorrectas * $solucionario['puntaje'];
         $moResumenCurso->puntaje_incorrectos = $valor_incorrectas * $numeroPreguntasIncorrectas;
-        /* $moResumenCurso->puntaje_total = $numeroPreguntasCorrectas * $solucionario['puntaje'] - $valor_incorrectas * $numeroPreguntasIncorrectas; */
 
         return $this->_cursoResumenRepository->registrar($moResumenCurso);
     }
