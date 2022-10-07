@@ -133,7 +133,7 @@ class ExamRepository extends Exam
             $examen->status = $estado;
 
             $examen->disabled_cartilla = $estado != 'PREGUNTAS NO REGISTRADAS' ;
-            $examen->disabled_corregir = $estado == 'PENDIENTE DE REVISAR' ;
+            $examen->disabled_corregir = $estado == 'PENDIENTE DE REVISAR' || $estado=='REVISADO' ;
             $examen->disabled_resultados = $estado == 'REVISADO';
 
             $examen->evaluation_type = TipoEvaluacionEnum::getName($examen->evaluation_type);

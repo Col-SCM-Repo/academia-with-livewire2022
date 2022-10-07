@@ -53,36 +53,46 @@ class RevisionExamen extends Component
 
     public function onBtnCorregirExam( int $index ){
 
-        $examen = $this->listaExamenesDisponibles[$index];
-        if($examen['path'] && Storage::exists( $examen['path'] ) ){
-            $inicioCaptura = 48;
+        try {
+            $examen = $this->listaExamenesDisponibles[$index];
+            if($examen['path'] && Storage::exists( $examen['path'] ) ){
+                $inicioCaptura = 48;
 
-            $longitudCodigoGrupo = 2;
-            $longitudCodigoAlumno = 4;
-            $numeroPreguntas = count($examen['questions']);
+                $longitudCodigoGrupo = 2;
+                $longitudCodigoAlumno = 4;
+                $numeroPreguntas = count($examen['questions']);
 
-            if( !$numeroPreguntas>0 ) throw new Exception('No se encontro preguntas para el examen');
+                if( !$numeroPreguntas>0 ) throw new Exception('No se encontro preguntas para el examen');
 
-            $cartillasRespuestas = array();
-            $fp = fopen(storage_path('app/'.$examen['path']), "r");
-            while (!feof($fp)){
-                $linea = fgets($fp);
-                if( strlen($linea) < $inicioCaptura+$longitudCodigoGrupo+$longitudCodigoAlumno+10 ) continue; // La linea almenos debe tener 64 caracteres cod_exm, cod_estudian, y 10 preguntas
-                $cadenaCartilla = substr( $linea , $inicioCaptura);
-                $codigoGrupo  = substr($cadenaCartilla, 0, $longitudCodigoGrupo);
-                $codigoAlumno = substr($cadenaCartilla, $longitudCodigoGrupo, $longitudCodigoAlumno);
-                $respuestas   = str_split(substr($cadenaCartilla, $longitudCodigoGrupo + $longitudCodigoAlumno ));
+                $cartillasRespuestas = array();
+                $fp = fopen(storage_path('app/'.$examen['path']), "r");
+                while (!feof($fp)){
+                    $linea = fgets($fp);
+                    if( strlen($linea) < $inicioCaptura+$longitudCodigoGrupo+$longitudCodigoAlumno+10 ) continue; // La linea almenos debe tener 64 caracteres cod_exm, cod_estudian, y 10 preguntas
+                    $cadenaCartilla = substr( $linea , $inicioCaptura);
+                    $codigoGrupo  = substr($cadenaCartilla, 0, $longitudCodigoGrupo);
+                    $codigoAlumno = substr($cadenaCartilla, $longitudCodigoGrupo, $longitudCodigoAlumno);
+                    $respuestas   = str_split(substr($cadenaCartilla, $longitudCodigoGrupo + $longitudCodigoAlumno ));
 
-                if( !$codigoGrupo==$examen['group_code'])
-                throw new Exception( "Error, incongruencia de codigos de examen COD:$codigoGrupo , linea: ".(count($cartillasRespuestas)+1)  );
+                    if( !$codigoGrupo==$examen['group_code'])
+                    throw new Exception( "Error, incongruencia de codigos de examen COD:$codigoGrupo , linea: ".(count($cartillasRespuestas)+1)  );
 
-                $cartillasRespuestas [] = [ 'cod_grupo'=>$codigoGrupo, 'cod_alumno'=>$codigoAlumno, 'respuestas'=>$respuestas ];
+                    $cartillasRespuestas [] = [ 'cod_grupo'=>$codigoGrupo, 'cod_alumno'=>$codigoAlumno, 'respuestas'=>$respuestas ];
+                }
+                fclose($fp);
+                $statusCorreccion = $this->_examenPreguntasRepository->corregirExamen($examen['id'], $cartillasRespuestas);
+
+                $evaluacionesCreadas = $statusCorreccion->examenesCorregidos;
+
+                if($evaluacionesCreadas>0)  toastAlert($this, "$evaluacionesCreadas examen(es) corregidos", EstadosAlertasEnum::SUCCESS );
+                if($statusCorreccion->examenesConErrores >0)
+                    foreach ($statusCorreccion->logs  as $error)
+                        toastAlert($this, $error, EstadosAlertasEnum::ERROR );
             }
-            fclose($fp);
-            $statusCorreccion = $this->_examenPreguntasRepository->corregirExamen($examen['id'], $cartillasRespuestas);
-            dd($statusCorreccion);
+            else throw new Exception('Error, no se encontro la cartilla de respuestas');
+        } catch (Exception $err ) {
+            toastAlert($this, $err->getMessage());
         }
-        else throw new Exception('Error, no se encontro la cartilla de respuestas');
 
     }
 

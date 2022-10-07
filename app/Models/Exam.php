@@ -51,6 +51,6 @@ class Exam extends Model
     }
 
     public function exam_summaries(){
-        return $this->hasMany( ExamSummary::class, 'exam_id', 'id' );
+        return $this->hasMany( ExamSummary::class, 'exam_id', 'id' )->orderBy('final_score', 'desc');
     }
 }

@@ -50,7 +50,7 @@
                                         <td>
                                             <label for="{{'input-file-exam'.$examn['id']}}" class="btn btn-xs btn-success" {{ $examn['disabled_cartilla'] ? '' : 'disabled' }}> <i class="fa fa-upload" aria-hidden="true"></i> Subir cartilla </label>
                                             <button class="btn btn-xs btn-danger"  {{ $examn['disabled_corregir'] ? '' : 'disabled' }} wire:click="onBtnCorregirExam({{$index}})" > <i class="fa fa-magic" aria-hidden="true"></i> Corregir examen </button>
-                                            <button class="btn btn-xs btn-primary" {{ $examn['disabled_resultados'] ? '' : 'disabled' }}> <i class="fa fa-file" aria-hidden="true"></i> Ver resultados</button>
+                                            <a class="btn btn-xs btn-primary" {{ $examn['disabled_resultados'] ? '' : 'disabled' }} href="{{ route('reportes.notas.resultados-general', ['examen_id'=>$examn['id']]) }}" target="_blank" > <i class="fa fa-file" aria-hidden="true"></i> Ver resultados</a>
                                         </td>
                                     </tr>
                                     <tr >
