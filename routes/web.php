@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PdfController;
+use App\Http\Livewire\Aula\Informacion;
 use App\Http\Livewire\Evaluacion\Partials\ConfiguracionRespuestas;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -63,6 +64,15 @@ Route::middleware(['auth'])->prefix('reportes')->group(function () {
     Route::get('/', [HomeController::class, 'reportes'])->name('reportes');
 
     Route::get('/notas/resultados-general-examen/{examen_id}', [PdfController::class, 'reporteNotasGeneralesPorExamen'])->name('reportes.notas.resultados-general');
+});
+
+Route::middleware(['auth'])->prefix('aulas')->group(function () {
+    Route::get('/', [HomeController::class, 'aulasIndexView'])->name('aulas.index');
+    Route::get('informacion/{aula_id}', [HomeController::class, 'aulasInformacionView'] )->name('aulas.informacion');
+
+/*     Route::get('prueba', Informacion::class ); */
+
+
 });
 
 

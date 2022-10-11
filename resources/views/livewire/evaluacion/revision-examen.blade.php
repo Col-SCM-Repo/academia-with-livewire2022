@@ -40,6 +40,9 @@
                         </thead>
                         <tbody>
                             @if ( count($listaExamenesDisponibles) > 0 )
+                            @php
+                                $erroresId = array_keys($logs);
+                            @endphp
                                 @foreach ($listaExamenesDisponibles as $index=>$examn)
                                     <tr>
                                         <td scope="row"> {{ $examn['group_code'] }}  </td>
@@ -65,6 +68,13 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                @if ( in_array($examn['id'], $erroresId  ) )
+                                                    <div style="width: 100%; max-height: 9rem; overflow: scroll; padding: .125rem 3rem; background: #db6a6a32" class="text-danger">
+                                                        @foreach ($logs[ $examn['id'] ] as $i=> $mensaje)
+                                                        <span style=" {{$i==0 ? ' font-weight:900; ':'' }}" > {{ $mensaje }} <br> </span>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

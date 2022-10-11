@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EstadosEnum;
+use Illuminate\Contracts\Session\Session as SessionSession;
+use Illuminate\Support\Facades\Session;
+
 class HomeController extends Controller
 {
     public function __construct()
@@ -47,6 +51,19 @@ class HomeController extends Controller
         return view('modulos.matricula.informacion-alumno');
     }
 
+    /********************** Modulo de aulas **********************/
+    public function aulasIndexView()
+    {
+        $periodo = null;
+        if(Session::has( 'periodo' ))
+            $periodo = Session::get('periodo');
+        return view('modulos.aulas.index', compact('periodo'));
+    }
+
+    public function aulasInformacionView (int $aula_id)
+    {
+        return view('modulos.aulas.informacion')->with('aula_id', $aula_id);
+    }
 
 
 

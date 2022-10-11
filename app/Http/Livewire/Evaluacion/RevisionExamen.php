@@ -16,7 +16,7 @@ class RevisionExamen extends Component
     use WithFileUploads;
 
     public $fechaInicio, $fechaFin;
-    public $archivoCartilla;
+    public $archivoCartilla, $logs;
 
     public $listaExamenesDisponibles;
 
@@ -26,6 +26,9 @@ class RevisionExamen extends Component
     protected $rules = [
         'listaExamenesDisponibles' => 'array|required',
         'listaExamenesDisponibles.*.archivo' => 'required|file|max:1024',
+
+        'logs' => 'array|nullable',
+        'logs.*.mensajes' => 'array',
     ];
 
 
@@ -46,8 +49,9 @@ class RevisionExamen extends Component
             $this->listaExamenesDisponibles = $this->_examenesRepository->listaExamenesPorRango($this->fechaInicio, $this->fechaFin);
         } catch (Exception $err ) {
             toastAlert($this, $err->getMessage() );
-            $this->reset(['listaExamenesDisponibles']);
+            $this->reset(['listaExamenesDisponibles', 'logs']);
         }
+        $this->logs = array();
 
     }
 
@@ -57,7 +61,6 @@ class RevisionExamen extends Component
             $examen = $this->listaExamenesDisponibles[$index];
             if($examen['path'] && Storage::exists( $examen['path'] ) ){
                 $inicioCaptura = 48;
-
                 $longitudCodigoGrupo = 2;
                 $longitudCodigoAlumno = 4;
                 $numeroPreguntas = count($examen['questions']);
@@ -83,16 +86,30 @@ class RevisionExamen extends Component
                 $statusCorreccion = $this->_examenPreguntasRepository->corregirExamen($examen['id'], $cartillasRespuestas);
 
                 $evaluacionesCreadas = $statusCorreccion->examenesCorregidos;
+                $evaluacionesConErrores = $statusCorreccion->examenesConErrores;
 
-                if($evaluacionesCreadas>0)  toastAlert($this, "$evaluacionesCreadas examen(es) corregidos", EstadosAlertasEnum::SUCCESS );
-                if($statusCorreccion->examenesConErrores >0)
+                if($evaluacionesCreadas>0) {
+                     toastAlert($this, "$evaluacionesCreadas examen(es) corregidos", EstadosAlertasEnum::SUCCESS );
+                     $this->listaExamenesDisponibles[ $index ]['status'] = 'REVISADO';
+                     $this->listaExamenesDisponibles[ $index ]['disabled_cartilla'] = true;
+                     $this->listaExamenesDisponibles[ $index ]['disabled_corregir'] = true ;
+                     $this->listaExamenesDisponibles[ $index ]['disabled_resultados'] = true;
+                    }
+                if($evaluacionesConErrores >0){
+                    $mensajes = array();
+                    $primerMensaje = " $evaluacionesCreadas examenes corregidos correctamente, $evaluacionesConErrores con errores. ";
+                    toastAlert($this, $primerMensaje, EstadosAlertasEnum::WARNING);
+                    $mensajes[] = $primerMensaje;
                     foreach ($statusCorreccion->logs  as $error)
-                        toastAlert($this, $error, EstadosAlertasEnum::ERROR );
+                        $mensajes[] = " * $error .";
+                    $this->logs[ $examen['id'] ] =  $mensajes;
+                    }
             }
             else throw new Exception('Error, no se encontro la cartilla de respuestas');
         } catch (Exception $err ) {
             toastAlert($this, $err->getMessage());
         }
+
 
     }
 
@@ -110,7 +127,13 @@ class RevisionExamen extends Component
                     $archivo->storeAs($ruta, $nombreArchivo);
                     toastAlert($this, 'Archivo registrado correctamente', EstadosAlertasEnum::SUCCESS);
                     $this->_examenesRepository->agregarRutaExamen($this->listaExamenesDisponibles[ $nombre[1] ]['id'],$ruta.'/'.$nombreArchivo);
-                    $this->listaExamenesDisponibles = $this->_examenesRepository->listaExamenesPorRango($this->fechaInicio, $this->fechaFin);
+
+                    $this->listaExamenesDisponibles[ $nombre[1] ]['status'] = 'PENDIENTE DE REVISAR';
+                    $this->listaExamenesDisponibles[ $nombre[1] ]['disabled_cartilla'] = true;
+                    $this->listaExamenesDisponibles[ $nombre[1] ]['disabled_corregir'] = true ;
+                    $this->listaExamenesDisponibles[ $nombre[1] ]['disabled_resultados'] = false;
+                    $this->listaExamenesDisponibles[ $nombre[1] ]['path'] = $ruta.'/'.$nombreArchivo;
+                   /*  $this->listaExamenesDisponibles = $this->_examenesRepository->listaExamenesPorRango($this->fechaInicio, $this->fechaFin); */
                 }
                 else throw new Exception('Error, el archivo cargado no es valido');
             }

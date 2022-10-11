@@ -55,7 +55,17 @@
                 <ul class="nav nav-second-level">
                     <li><a href="{{ route('evaluaciones.configuracion') }}">Configuracion de examenes</a></li>
                     <li><a href="{{ route('evaluaciones.revision') }}">Carga y revision de examenes</a></li>
-                    <li><a href="{{ route('evaluaciones.reporte') }}">Reporte de resultados</a></li>
+                    {{-- <li><a href="{{ route('evaluaciones.reporte') }}">Reporte de resultados</a></li> --}}
+                </ul>
+            </li>
+            <li>
+                <a href="index.html">
+                    <i class="fa fa-th-large"></i> <span class="nav-label">Aulas</span> <span
+                        class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li><a href="{{ route('aulas.index') }}">Informacion de aulas</a></li>
+                    {{-- <li><a href="{{ route('evaluaciones.reporte') }}">Reporte de resultados</a></li> --}}
                 </ul>
             </li>
             <li>

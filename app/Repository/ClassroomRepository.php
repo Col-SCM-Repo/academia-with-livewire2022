@@ -110,4 +110,39 @@ class ClassroomRepository extends Classroom
         }
         return false;
     }
+
+    public function listaEstudiantes(  $clase_id,  $busqueda = null ){
+        $busqueda = $busqueda? $busqueda:'';
+       return Classroom::join('enrollments', 'classrooms.id', 'enrollments.classroom_id')
+                            ->join('students', 'students.id', 'enrollments.student_id' )
+                            ->join('entities', 'students.entity_id', 'entities.id')
+                            ->where('classrooms.id', $clase_id)
+                            ->where('enrollments.deleted_at', null)
+                            ->where('classrooms.deleted_at', null)
+                            ->where('students.deleted_at', null)
+                            ->where('entities.deleted_at', null)
+                            ->where( fn( $query )=>$query->where('entities.name', 'like', "%$busqueda%")
+                                                        ->orWhere('entities.father_lastname', 'like', "%$busqueda%")
+                                                        ->orWhere('entities.mother_lastname', 'like', "%$busqueda%")
+                                                        ->orWhere('entities.document_number', 'like', "%$busqueda%") )
+                            ->orderBy('entities.father_lastname', 'asc')
+                            ->orderBy('entities.mother_lastname', 'asc')
+                            ->orderBy('entities.name', 'asc')
+                            ->select(
+                                'classrooms.id as classroom_id',
+                                'enrollments.id as enrollment_id',
+                                'students.id as student_id',
+                                'entities.id as entity_id',
+                                'enrollments.code',
+                                'classrooms.name',
+                                'entities.father_lastname',
+                                'entities.mother_lastname',
+                                'entities.name',
+                                'entities.address',
+                                'entities.document_type',
+                                'entities.document_number',
+                            )
+                            ->get()->toArray();
+    }
+
 }
