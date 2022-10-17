@@ -4,16 +4,19 @@ namespace App\Repository;
 
 use App\Models\Classroom;
 use App\Models\Level;
+use Exception;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class ClassroomRepository extends Classroom
 {
-    private $_nivelRepository, $_periodoRepository;
+    private $_nivelRepository, $_periodoRepository, $_matriculaRepository, $_examenRepository;
 
     public function __construct()
     {
         $this->_nivelRepository = new LevelRepository();
         $this->_periodoRepository = new PeriodoRepository();
+        $this->_matriculaRepository = new EnrollmentRepository();
+        $this->_examenRepository = new ExamRepository();
     }
 
     public function builderModelRepository()
@@ -145,4 +148,42 @@ class ClassroomRepository extends Classroom
                             ->get()->toArray();
     }
 
+    public function buildModelExamenReport( $clase_id, array $examenes_IDs, array $estudiantes_IDs = null ){
+        if( !count($estudiantes_IDs)>0 ) throw new Exception('NO SE ENCONTRO EXAMENES');
+        /* dd( ['clase_id'=> $clase_id, 'examenes_IDs'=> $examenes_IDs,  'estudiantes_IDs'=> $estudiantes_IDs ]); */
+
+        $matriculados = null;
+        if($estudiantes_IDs && count($estudiantes_IDs)>0) $matriculados = $this->_matriculaRepository::whereIn( 'id', $estudiantes_IDs )->get();
+        else $matriculados = $this->_matriculaRepository::where( 'classroom_id', $clase_id )->get();
+
+        $estudiantes = array();
+
+
+        foreach ($matriculados as $matricula) {
+            $estudiante = $matricula->student;
+            $apoderados = $estudiante->relative;
+
+            $estudianteTemp = (object) [
+                'nombreEstudiante' => $estudiante->entity->father_lastname.' '.$estudiante->entity->mother_lastname.', '.$estudiante->entity->name,
+                'nombreApoderado' => (count($apoderados)>0)? $estudiante->entity->father_lastname.' '.$estudiante->entity->mother_lastname.', '.$estudiante->entity->name : 'APODERADO',
+                'examenes' => array()
+            ];
+
+            foreach ($examenes_IDs as $examenId) {
+                $examen = $this->_examenRepository::find($examenId);
+                if($examen){
+                    $estudianteTemp->examenes[] = (object)[
+                        'nombre' => $examen->name,
+                        'fecha' => date( 'd/m/Y', strtotime($examen->datetime)),
+                        'numeroPreguntas' => $examen->number_questions,
+                        'valorSimulacro' => $examen->maximun_score,
+                        'respuestasExamen' => $examen->exam_summaries->first()
+                    ];
+                }
+            }
+           /*  dd($estudianteTemp); */
+            $estudiantes [] = $estudianteTemp;
+        }
+        dd($estudiantes);
+    }
 }

@@ -31,8 +31,8 @@ class ExamSummary extends Model
         return $this->belongsTo(Exam::class, 'exam_id', 'id');
     }
 
-    public function student(){
-        return $this->belongsTo(Student::class, 'student_id', 'id');
+    public function enrollment(){
+        return $this->belongsTo(Enrollment::class, 'enrollment_id', 'id');
     }
 
     public function user(){

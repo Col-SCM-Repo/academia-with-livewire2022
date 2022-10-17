@@ -18,7 +18,9 @@ class CourseScoreRepository extends CourseScore
         return (object) [
            /*  'id' => null, */
             'examen_id' => null,    // exam_id
-            'cursos' => array(),    // array CursoExam
+            'cursos' => array(),    // array CursoExam,
+            'maximo_puntaje' => null,
+            'numero_preguntas' => null,
         ];
     }
 
@@ -51,7 +53,11 @@ class CourseScoreRepository extends CourseScore
                 /* 'score_wrong' => $curso->puntaje_incorrectas, */
             ];
         CourseScore::insert($cursosExamen);
-        return CourseScore::where('exam_id', $examen->id)->get() ;  // pendiente .. cambiar
+        $examen->maximun_score = $modelDatosCurso->maximo_puntaje;
+        $examen->number_questions = $modelDatosCurso->numero_preguntas;
+        $examen->save();
+
+        return count($cursosExamen);  // pendiente .. cambiar
     }
 
     public function actualizar ( object $modelDatosCurso ) {
@@ -61,25 +67,10 @@ class CourseScoreRepository extends CourseScore
         if(count($examen->course_scores)>0)
             foreach( $examen->course_scores as $cursoPuntajes ) $cursoPuntajes->delete();
 
-        self::registrar($modelDatosCurso);
+        if(count($examen->questions)>0)
+            foreach ($examen->questions as $pregunta) $pregunta->delete();
 
-        if(count($examen->questions)>0){
-            $cursos = $examen->course_scores;
-            $orden =0;
-            $limite=1 + $cursos[$orden]->number_questions ;
-
-            foreach ($examen->questions as $pregunta) {
-                if( $pregunta->question_number >= $limite ) {
-                    $orden++;
-                    $limite+=$cursos[$orden]->number_questions ;
-                }
-                $pregunta->course_id = $cursos[$orden]->course_id ;
-                $pregunta->score = $cursos[$orden]->course_id;
-                /* $pregunta->correct_answer = $cursos[$orden]->score_correct; */
-                $pregunta->save();
-            }
-        }
-        return true;
+        return self::registrar($modelDatosCurso);;
     }
 
     /* public function eliminarRegistrosDetalle( int $examen_id ){

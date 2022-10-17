@@ -21,6 +21,7 @@ class CourseSummaryRepository extends CourseSummary
             'respuestas_estudiante' => null,    // student_responses
             'puntaje_correctos'=> null,         // correct_score
             'puntaje_incorrectos'=> null,       // wrong_score
+            'puntaje_por_pregunta' => null ,    // score_question
             /* 'puntaje_total'=> null,             // course_score */
         ];
     }
@@ -35,6 +36,7 @@ class CourseSummaryRepository extends CourseSummary
         $cursoResumen->student_responses = $modeloCourseSummary->respuestas_estudiante;
         $cursoResumen->correct_score = $modeloCourseSummary->puntaje_correctos;
         $cursoResumen->wrong_score = $modeloCourseSummary->puntaje_incorrectos;
+        $cursoResumen->score_question = $modeloCourseSummary->puntaje_por_pregunta;
         /* $cursoResumen->course_score = $modeloCourseSummary->puntaje_total; */
         $cursoResumen->save();
         return $cursoResumen;

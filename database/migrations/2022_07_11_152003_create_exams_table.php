@@ -15,7 +15,7 @@ class CreateExamsTable extends Migration
             $table->bigInteger('group_id')->unsigned()->index('FK_exams_group');
             $table->string('group_code')->nullable();             // 2 primeros digitos
             $table->string('name');
-            $table->integer('number_questions')->unsigned();
+            $table->integer('number_questions')->unsigned()->nullable();
             $table->double('score_wrong')->unsigned()->default(1);
             $table->double('maximun_score')->unsigned()->nullable();
 			$table->enum('evaluation_type', array( 'simulacrum','monthly','weekly','daily', 'quick', 'other'));

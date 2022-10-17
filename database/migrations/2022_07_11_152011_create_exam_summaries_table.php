@@ -26,6 +26,8 @@ class CreateExamSummariesTable extends Migration
             $table->double('score_wrong')->default(0);
             $table->double('final_score')->default(0);
 
+            $table->double('score_question')->default(0);
+
 			$table->string('surname', 100);
 			$table->string('name', 100);
 

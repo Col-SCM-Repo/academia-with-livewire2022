@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\EstadosEnum;
+use App\Enums\EstadosMatriculaEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,7 +34,7 @@ class Classroom extends Model
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class, 'classroom_id', 'id')
-            ->where('status', EstadosEnum::ACTIVO);
+            ->where('status', '!=', EstadosMatriculaEnum::INACTIVO);
     }
 
     // public function full_description(){

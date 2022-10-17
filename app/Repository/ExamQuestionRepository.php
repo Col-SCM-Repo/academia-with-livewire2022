@@ -181,6 +181,8 @@ class ExamQuestionRepository extends ExamQuestion
         $moResumenCurso->respuestas_estudiante = $respuestasAlumnoStr;
         $moResumenCurso->puntaje_correctos = $numeroPreguntasCorrectas * $solucionario['puntaje'];
         $moResumenCurso->puntaje_incorrectos = $valor_incorrectas * $numeroPreguntasIncorrectas;
+        $moResumenCurso->puntaje_por_pregunta = $solucionario['puntaje'];
+
 
         return $this->_cursoResumenRepository->registrar($moResumenCurso);
     }

@@ -66,18 +66,14 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-lg-3 control-label">Preguntas:</label>
-                <div class="col-lg-9">
-                    <input type="text" wire:model.defer="numero_preguntas" class="form-control" title="Numero de preguntas">
-                    <x-input-error variable='numero_preguntas'> </x-input-error>
-                </div>
-            </div>
-            <div class="form-group">
                 <label class="col-lg-3 control-label">Puntaje incorrectas:</label>
                 <div class="col-lg-9">
                     <input type="number" wire:model.defer="valor_preguntas_incorrectas" step="0.1" class="form-control" title="Valor para las preguntas incorrectas">
                     <x-input-error variable='valor_preguntas_incorrectas'> </x-input-error>
                 </div>
+            </div>
+            <div class="form-group">
+
             </div>
 
 

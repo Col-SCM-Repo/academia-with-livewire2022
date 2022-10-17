@@ -13,7 +13,7 @@ class LevelRepository extends Level
     public function builderModelRepository()
     {
         return (object) [
-            'id' => null,           // 
+            'id' => null,           //
             'tipo_nivel' => null,   // type_id
             'periodo_id' => null,   // period_id
             'fInicio' => null, // start_date

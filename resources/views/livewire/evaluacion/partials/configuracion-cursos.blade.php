@@ -5,7 +5,7 @@
                 background: #edbdbd;
             }
         </style>
-        <form class="row" wire:submit.prevent=" {{ $numeroCursosAlmacenados>0? 'update' : 'create' }} " >
+        <form class="row" wire:submit.prevent=" {{ $numeroPreguntasEnBD>0? 'update' : 'create' }} " >
 
             <div class="col-sm-6 form-horizontal " style="border-right: 3px solid #e3e3e3;  " >
                 <h4 class="text-center text-uppercase"><strong>Cursos disponibles</strong></h4>
@@ -70,18 +70,16 @@
                 </table>
             </div>
             <div class="col-sm-12 mt-3" style="display: flex">
-                @php  $activarBtns = count($cursosDetalle)>0;  @endphp
-
                 <div style="flex-grow: 1; justify-content: center">
-                    <span style="display: inline-block; margin-top: 1rem"> {{$numeroPreguntasConfiguradas}} preguntas configuradas/ de {{$numPreguntasEstablecidas}} ( puntaje total: {{$puntajeTotal}} )</span>
+                    <span style="display: inline-block; margin-top: 1rem"> {{$numeroTotalPreguntas}} preguntas / {{$puntajeTotal}} puntos. </span>
                 </div>
                 <div class="text-right">
-                    <button class="btn btn-sm btn-success" type="button" title="Generar preguntas de examen en blanco" {{ ($activarBtns && $numeroCursosAlmacenados>0  )? '':'disabled' }} wire:click="generarNotasExamen({{ $examen_id}})" >
+                    <button class="btn btn-sm btn-success" type="button" title="Generar preguntas de examen en blanco" {{ ($numeroPreguntasEnBD>0 && !$pendienteGuardar)? '':'disabled' }} wire:click="generarNotasExamen({{ $examen_id}})" >
                         <i class="fa fa-save    "></i> Generar preguntas examen
                     </button>
 
-                    <button class="btn btn-sm btn-primary" type="submit" {{ $activarBtns? '':'disabled' }}>
-                        <i class="fa fa-save    "></i> {{ $numeroCursosAlmacenados>0 ? 'Actualizar':'Guardar' }} cursos de examen
+                    <button class="btn btn-sm btn-primary" type="submit" >
+                        <i class="fa fa-save    "></i> {{ $numeroPreguntasEnBD>0 ? 'Actualizar':'Guardar' }} cursos de examen
                     </button>
                 </div>
             </div>

@@ -19,8 +19,7 @@ class ConfiguracionCursos extends Component
     public  $examen_id;
     public  $cursosSeleccionados, $cursosDetalle;
 
-    public  $numeroCursosAlmacenados, $numPreguntasEstablecidas,    // Almacenados en BD
-            $numeroPreguntasConfiguradas, $puntajeTotal;            // Temporales
+    public  $numeroTotalPreguntas, $numeroPreguntasEnBD, $puntajeTotal, $pendienteGuardar;
 
     private $_cursosRepository, $_cursosPuntajesRepository, $_examenPreguntasRepository, $_examenRepository;
 
@@ -45,12 +44,12 @@ class ConfiguracionCursos extends Component
     public function initialState(){
         $this->reset(['examen_id']);
         $this->reset(['cursosSeleccionados', 'cursosDetalle']);
-        $this->reset(['numeroCursosAlmacenados', 'numPreguntasEstablecidas', 'numeroPreguntasConfiguradas', 'puntajeTotal' ]);
+        $this->reset(['numeroTotalPreguntas', 'numeroPreguntasEnBD', 'puntajeTotal', 'pendienteGuardar' ]);
 
-        $this->numeroCursosAlmacenados = 0 ;
-        $this->numPreguntasEstablecidas = 0;
-        $this->numeroPreguntasConfiguradas = 0;
+        $this->numeroTotalPreguntas = 0 ;
+        $this->numeroPreguntasEnBD = 0;
         $this->puntajeTotal = 0;
+        $this->pendienteGuardar = true;
     }
 
     public function __construct(){
@@ -75,9 +74,10 @@ class ConfiguracionCursos extends Component
         $this->validate();
         $moPuntuacionCurso = self::buildModelPuntajeCurso();
         try {
-             $numeroCursosCreados = $this->_cursosPuntajesRepository->actualizar($moPuntuacionCurso);
-             sweetAlert($this, 'curso', EstadosEntidadEnum::CREATED);
-             $this->numeroCursosAlmacenados = $numeroCursosCreados ;
+            $this->numeroPreguntasEnBD = $this->_cursosPuntajesRepository->registrar($moPuntuacionCurso);
+            sweetAlert($this, 'curso', EstadosEntidadEnum::CREATED);
+            $this->emitTo('evaluacion.partials.configuracion-respuestas', 'renderizar', $this->examen_id);
+            $this->pendienteGuardar = false;
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
         }
@@ -87,13 +87,13 @@ class ConfiguracionCursos extends Component
         $this->validate();
         $moPuntuacionCurso = self::buildModelPuntajeCurso();
         try {
-             $this->_cursosPuntajesRepository->actualizar($moPuntuacionCurso);
+            $this->numeroPreguntasEnBD = $this->_cursosPuntajesRepository->actualizar($moPuntuacionCurso);
              sweetAlert($this, 'curso', EstadosEntidadEnum::UPDATED);
-             /* $this->numeroCursosAlmacenados = $numeroCursosCreados ; */
+             $this->emitTo('evaluacion.partials.configuracion-respuestas', 'renderizar', $this->examen_id);
+             $this->pendienteGuardar = false;
         } catch (Exception $err) {
             toastAlert($this, $err->getMessage());
         }
-
     }
 
     // Listeners
@@ -127,6 +127,7 @@ class ConfiguracionCursos extends Component
             }
             $this->cursosDetalle =  $nuevoArray;
         }
+        $this->pendienteGuardar = true;
         try {
             self::actualizarInformacionExamen();
         } catch (Exception $err) {
@@ -146,12 +147,12 @@ class ConfiguracionCursos extends Component
     }
 
     public function updatedCursosDetalle($value){
+        $this->pendienteGuardar = true;
         try {
             if($value== null || $value=='' ) throw new Exception();
             self::actualizarInformacionExamen();
         } catch (Exception $err) {
-            $this->puntajeTotal = '-';
-            toastAlert($this, 'Error, no pueden ir campos en blanco o con 0');
+            toastAlert($this, 'Error, no pueden ir campos en blanco o 0s');
         }
     }
 
@@ -162,16 +163,14 @@ class ConfiguracionCursos extends Component
         $cursosAlmacenados = $this->_cursosPuntajesRepository::where('exam_id', $examen_id)->orderBy('order', 'asc')->get();
 
         $examen = $this->_examenRepository::find($examen_id);
-        $this->numPreguntasEstablecidas = $examen->number_questions;
-        $this->puntajeTotal = $examen->maximun_score? $examen->maximun_score : '-';
 
-        if(count($cursosAlmacenados)>0){
-            self::cargarChecks($cursosAlmacenados);   // Cargar checks guardados
+        $this->numeroTotalPreguntas = $examen->number_questions;
+        $this->puntajeTotal = $examen->maximun_score;
+        $this->numeroPreguntasEnBD = $examen->number_questions? $examen->number_questions : 0;
 
-            $this->numeroCursosAlmacenados = count($cursosAlmacenados) ;
-            $this->numeroPreguntasConfiguradas = count($examen->questions);
-        }
-        else self::cargarChecks();
+        if(count($cursosAlmacenados)>0) self::cargarChecks($cursosAlmacenados); // Cargar checks guardados
+        else self::cargarChecks();                                              // Cargar checks guardados
+
         self::actualizarInformacionExamen();
     }
 
@@ -183,6 +182,8 @@ class ConfiguracionCursos extends Component
             if ($a['orden'] == $b['orden']) return 0;
             return ($a['orden'] < $b['orden']) ? -1 : 1;
         });
+        $this->pendienteGuardar = true;
+
     }
 
     public function onBtnDown(int $index_array){
@@ -193,10 +194,14 @@ class ConfiguracionCursos extends Component
             if ($a['orden'] == $b['orden']) return 0;
             return ($a['orden'] < $b['orden']) ? -1 : 1;
         });
+
+        $this->pendienteGuardar = true;
     }
 
     // Funciones internas
     private function cargarChecks ( $cursosRegistradosDB = null ){
+        $this->pendienteGuardar = true;
+
         $cursosChecks = array();
         $cursosDetalle = array();
 
@@ -222,6 +227,7 @@ class ConfiguracionCursos extends Component
                                                             $cursoRegistradoDB->number_questions,
                                                             $cursoRegistradoDB->score_correct);
             $cursosChecks = $cursosTemp;
+            $this->pendienteGuardar = false;
         }
         $this->cursosDetalle = $cursosDetalle;
         $this->cursosSeleccionados = $cursosChecks;
@@ -251,6 +257,9 @@ class ConfiguracionCursos extends Component
         $modelCourseScore = $this->_cursosPuntajesRepository->builderModelRepository();
 
         $modelCourseScore->examen_id = $this->examen_id;
+        $modelCourseScore->numero_preguntas = ($this->numeroTotalPreguntas && $this->numeroTotalPreguntas != '-' )? $this->numeroTotalPreguntas : null ;
+        $modelCourseScore->maximo_puntaje = ($this->puntajeTotal && $this->puntajeTotal != '-' )? $this->puntajeTotal : null ;
+
         $modelCourseScore->cursos = array_map( fn($curso) => $this->_cursosPuntajesRepository->buildCursoExam(  $curso['curso_id'],
                                                                                                                 $curso['orden'],
                                                                                                                 $curso['numero_preguntas'],
@@ -264,16 +273,24 @@ class ConfiguracionCursos extends Component
     }
 
     private function actualizarInformacionExamen(){
-        $numeroPreguntasConfiguradas = 0;
+        toastAlert($this, 'ACTUAÑIZANDO', 'error');
+        $numeroTotalPreguntas = 0;
         $puntajeTotal = 0;
 
+        $faltanPuntajes = false;
+        $faltanPreguntas = false;
+
         foreach ($this->cursosDetalle as $cursoDetalle) {
-            if($cursoDetalle['numero_preguntas'] =='' || $cursoDetalle['puntaje_correcto'] =='') throw new Exception();
-            $numeroPreguntasConfiguradas += $cursoDetalle['numero_preguntas'];
-            $puntajeTotal += $cursoDetalle['numero_preguntas'] * (float)$cursoDetalle['puntaje_correcto'];
+            if( !$faltanPuntajes && $cursoDetalle['numero_preguntas']!=null ) $numeroTotalPreguntas += $cursoDetalle['numero_preguntas'];
+            else $faltanPuntajes = true;
+
+            if( !$faltanPreguntas && $cursoDetalle['puntaje_correcto']!=null ) $puntajeTotal += $cursoDetalle['numero_preguntas'] * (float)$cursoDetalle['puntaje_correcto'];
+            else $faltanPreguntas = true;
+
+            if( $faltanPuntajes && $faltanPreguntas ) break;
         }
-        $this->numeroPreguntasConfiguradas = $numeroPreguntasConfiguradas;
-        $this->puntajeTotal = $puntajeTotal;
+        $this->puntajeTotal = $faltanPuntajes? '-' : $puntajeTotal;
+        $this->numeroTotalPreguntas = $faltanPreguntas? '-' : $numeroTotalPreguntas;
     }
 
 

@@ -32,6 +32,10 @@ class CourseSummary extends Model
         return $this->belongsTo(Course::class, 'course_id', 'id');
     }
 
+    /*
+        NOTA:   * AGREGAR NUMERO DE PREGUNTAS
+                * AGREGAR PUNTAJE DE PREGUNTAS
+    */
 
 
 }

@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\ExamSummaryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PdfController;
 use App\Http\Livewire\Aula\Informacion;
 use App\Http\Livewire\Evaluacion\Partials\ConfiguracionRespuestas;
+use App\Models\ExamSummary;
+use App\Repository\ClassroomRepository;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +73,16 @@ Route::middleware(['auth'])->prefix('aulas')->group(function () {
     Route::get('/', [HomeController::class, 'aulasIndexView'])->name('aulas.index');
     Route::get('informacion/{aula_id}', [HomeController::class, 'aulasInformacionView'] )->name('aulas.informacion');
 
+    Route::get('/resultados/examen-detallado-individual/{json_examen_resumen_ids}', [ExamSummaryController::class, 'generarDetalleExamenes'] )->name('reporte.evaluacion.detallado');
+    Route::get('/resultados/examen-detallado-cartas/{classroom_id}', [ExamSummaryController::class, 'generarCartasExamen'] )->name('reporte.evaluacion.cartas');
+    Route::get('/resultados/lista-alumnos/{classroom_id}', [PdfController::class, 'generarListaAlumnos'] )->name('reporte.lista.alumnos');
+
+    Route::get('/resultados/examen-detallado-individual', function(){
+        return ( new ClassroomRepository )->buildModelExamenReport(null, [1,2], [141,142, 100]);
+    });
+
+
+    Route::get('/resultados/examen-detallado-masivo/{examen_id}/{aula_id}', [ExamSummaryController::class, 'generarDetalleExamenesAula'] )->name('reporte-aula.evaluacion.detallado');
 /*     Route::get('prueba', Informacion::class ); */
 
 

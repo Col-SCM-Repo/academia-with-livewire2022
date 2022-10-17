@@ -34,10 +34,13 @@
                             </thead>
                             <tbody>
                                 @foreach ($listaExamenes as $examen)
+                                    @php
+                                        $numeroRespuestas = count( $examen->exam_summaries );
+                                    @endphp
                                     <tr>
                                         <td>{{ $examen->id }}</td>
                                         <td>{{ $examen->name }}</td>
-                                        <td> SIN RESPUESTAS </td>
+                                        <td>{{ !$numeroRespuestas > 0 ? 'SIN RESPUESTAS' : "$numeroRespuestas REVISIONES"  }}</td>
                                         <td>{{ $examen->exam_date }}</td>
                                         <td  class="text-center">
                                             <button type="button" class="btn btn-xs btn-warning" wire:click="editarExamenOpenModal({{$examen->id}})"> <i class="fa fa-pencil"  aria-hidden="true"></i> Editar </button>
@@ -45,7 +48,8 @@
                                             <a type="button" class="btn btn-xs btn-info" target="_blank" href="{{ route('evaluaciones.configuracion.respuestas', ['examen_id'=>$examen->id]) }}" {{ count($examen->questions)>0 ? '':'disabled' }}>
                                                 <i class="fa fa-check"   aria-hidden="true"></i> Respuestas
                                             </a>
-                                            <a type="button" class="btn btn-xs btn-success" title="Ver respuestas" disabled > <i class="fa fa-eye" aria-hidden="true"></i> Repuestas  </a>
+                                            <a type="button" class="btn btn-xs btn-success" title="Ver respuestas" target="_blank" href="{{ route('reportes.notas.resultados-general', ['examen_id'=>$examen->id]) }}" {{ !$numeroRespuestas > 0? 'disabled': ''  }}
+                                             > <i class="fa fa-eye" aria-hidden="true"></i> Repuestas  </a>
 
                                         </td>
                                     </tr>

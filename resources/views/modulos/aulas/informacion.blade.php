@@ -11,5 +11,10 @@ $slot = ''
         <script src=" {{ asset('inspinia_admin/js/plugins/dataTables/datatables.min.js') }} "></script>
     @endpush
  --}}
+    @section('content')
+    <div>
 
- @livewire('aula.informacion-general', ['aula_id' => $aula_id] )
+        @livewire('aula.informacion-general', ['aula_id' => $aula_id] )
+    </div>
+
+    @endsection

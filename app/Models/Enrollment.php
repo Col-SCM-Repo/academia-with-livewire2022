@@ -62,6 +62,14 @@ class Enrollment extends Model
         return $this->belongsTo(Scholarship::class, 'scholarship_id', 'id' );
     }
 
+    public function examSummaries(){
+        return $this->hasMany(ExamSummary::class, 'enrollment_id', 'id')->orderBy('exam_summaries.id', 'desc');
+    }
+/*
+    public function examSummariesById( int $examen_id ){
+        return $this->hasMany(ExamSummary::class, 'enrollment_id', 'id')->orderBy('exam_summaries.id', 'desc');
+    } */
+
     public function statusStudent(){
         return EstadosMatriculaEnum::getEstado($this->status);
     }
