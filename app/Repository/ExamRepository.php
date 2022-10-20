@@ -147,7 +147,7 @@ class ExamRepository extends Exam
 
 
     public function listaExamenesPorPeriodo( int $periodo_id ){
-        return self::where('period_id', $periodo_id )->orderBy('id', 'desc')->select('name', 'id')->get()->toArray();
+        return self::where('period_id', $periodo_id )->orderBy('id', 'desc')->select('name', 'id', 'exam_date')->get()->toArray();
     }
 
 }

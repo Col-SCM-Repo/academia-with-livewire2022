@@ -40,16 +40,16 @@ class PdfController extends Controller
         return PDF::loadView('reports.pdf.reporte-notas-general', compact('examen'))->stream("RESULTADOS GENERALES DEL EXAMEN  - ". ($examen->name) .'.pdf');
     }
 
-    public function reporteNotasDetalladoPorAlumnos( $examenesResumen, $nombreExamen){
+    public function reporteNotasDetalladoPorAlumnos( $matriculas, $nombreExamen){
         /* dd($examenesResumenIds); */
-        return PDF::loadView('reports.pdf.reporte-notas-detallado', compact(['examenesResumen', 'nombreExamen']))
+        return PDF::loadView('reports.pdf.evaluaciones.reporte-notas-detallado', compact(['matriculas', 'nombreExamen']))
                     ->setPaper('A4', 'portrait')
                     ->stream("$nombreExamen.pdf");
     }
 
     public function generarCartasPorAula($matriculas, $nombre_documento){
         /* dd($matriculas, $nombre_documento); */
-        return PDF::loadView('reports.pdf.reporte-notas-cartas', compact(['matriculas', 'nombre_documento']))
+        return PDF::loadView('reports.pdf.evaluaciones.reporte-notas-cartas', compact(['matriculas', 'nombre_documento']))
                     ->setPaper('A4', 'portrait')
                     ->stream("$nombre_documento.pdf");
     }

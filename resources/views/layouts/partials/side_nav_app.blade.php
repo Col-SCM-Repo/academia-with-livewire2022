@@ -75,7 +75,7 @@
                 </a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('mantenimiento.ciclos-y-aulas') }}">Ciclos y aulas</a></li>
-                    <li><a href="">Usuarios</a></li>
+                    <li><a href=" {{ route('mantenimiento.usuarios') }} ">Usuarios</a></li>
                     <li><a href="">Base de datos</a></li>
                 </ul>
             </li>
