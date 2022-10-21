@@ -60,9 +60,21 @@
         }
 
         .d-inline {
-            display: inline !important
+            display: inline !important;
         }
 
+        .fs-1-125rem {
+            font-size: 1.125rem !important;
+        }
+        .fs-1rem{
+            font-size: 1rem !important;
+        }
+        .fs-0-75rem{
+            font-size: 0.75rem !important;
+        }
+        .fs-0-5rem{
+            font-size: 0.5rem !important;
+        }
 
         /* fin : Agregar a estilos globales */
 
