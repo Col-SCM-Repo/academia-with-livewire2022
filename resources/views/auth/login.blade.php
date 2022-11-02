@@ -23,7 +23,7 @@
                     </h1>
                 </div>
                 <h3>Bienvenido al sistema Academia </h3>
-                <p> Sistema para la gestiòn academica del nivel Preuniversitario</p> <br>
+                <p> Sistema para la gestión académica del nivel Preuniversitario</p> <br>
                 <p>Ingreso al sistema.</p>
                 <form class="m-t" role="form" method="POST" action="{{ route('login') }}">
                     {{ csrf_field() }}
@@ -48,7 +48,7 @@
                     <button type="submit" class="ladda-button submit btn btn-primary block full-width m-b"  data-style="zoom-in">
                         Iniciar Sesión
                     </button>
-                    <p class="text-muted text-center"><small>Si olvido su contraseña, contactar con el administrador.</small></p>
+                    <p class="text-muted text-center"><small>Si olvidó su contraseña, contactar con el administrador.</small></p>
                 </form>
                 <p class="m-t"> <small> © ACADEMIA CABRERA  &copy; {{date('Y')}}</small> </p>
             </div>
